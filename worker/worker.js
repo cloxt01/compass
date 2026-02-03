@@ -25,7 +25,6 @@ const worker = new Worker(
 
         const result = await handler(data);
         console.log(result);
-        
         await updateStatus(id, result.status, {
           ...result.data
         });

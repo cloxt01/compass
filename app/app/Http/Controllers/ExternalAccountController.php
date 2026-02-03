@@ -67,4 +67,40 @@ class ExternalAccountController extends Controller {
             return response()->json(['success' => false, 'message' => 'Failed to disconnect account', 'errors' => $e->getMessage()], 500);
         } 
     }
+
+    public function add_token(Request $request)
+    {
+        try {
+            $user_id = $request->input('user_id');
+            $token = $request->input('token');
+
+            if (!$user_id || !isset($token['access_token'], $token['refresh_token'], $token['expires_in'])) {
+                throw new \Exception("Invalid JSON format for token.");
+            }
+
+            $user = User::find($user_id);
+            if (!$user) throw new \Exception("User not found");
+
+            $user->jobstreetAccount()->updateOrCreate(
+                ['user_id' => $user->id], // filter
+                [
+                    'access_token' => $token['access_token'],
+                    'refresh_token' => $token['refresh_token'],
+                    'expires_at' => now()->addSeconds($token['expires_in']),
+                    'status' => 'active'
+                ]
+            );
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Token added successfully.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

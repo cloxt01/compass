@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import isJson from '../helper/isJson.js';
 
 async function handler(data) {
   const { email, timeout = 30000 } = data;
@@ -24,28 +25,42 @@ async function handler(data) {
 
     await page.type('#emailAddress', email, { delay: 50 });
 
-    // 🔑 tunggu request sebelum klik
-    const requestPromise = page.waitForRequest(req =>
-      req.url().includes('/passwordless/start') &&
-      req.method() === 'POST'
+    // pasang listener SEBELUM klik
+    const requestPromise = page.waitForRequest(
+      req =>
+        req.url().includes('/passwordless/start') &&
+        req.method() === 'POST',
+      { timeout }
     );
 
-    await page.click('button[data-cy="login"]');
+    // klik + tunggu request bersamaan
+    const [req] = await Promise.all([
+      requestPromise,
+      page.click('button[data-cy="login"]')
+    ]);
 
-    const req = await requestPromise;
+    const payload = req.postData();
+
+    // cookies masih aman selama request sudah ketangkep
+    const cookies = await page.cookies();
 
     return {
       status: 'OTP_SENT',
       data: {
-        cookies: await page.cookies(),
-        payload: req.postData()
+        payload: isJson(payload) ? JSON.parse(payload) : payload,
+        cookies: JSON.stringify(cookies)
       }
     };
 
   } catch (err) {
-    return { status: 'ERROR_OTP_SENT', reason: err.message };
+    return {
+      status: 'ERROR_OTP_SENT',
+      reason: err.message
+    };
   } finally {
-    if (browser) await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 

@@ -12,14 +12,14 @@
     </div>
 @endif
 
-<form method="POST" action="{{ route('api.external.send_otp', ['provider' => 'jobstreet']) }}">
+<form method="POST" action="{{ route('api.external.send-otp', ['provider' => 'jobstreet']) }}">
     @csrf
     <input type="hidden" name="uuid" id="uuid">
     <input type="text" name="email" placeholder="Email">
     <button type="submit">Submit</button>
 </form> 
 
-<form method="POST" action="{{ route('api.external.verify_otp', ['provider' => 'jobstreet']) }}">
+<form method="POST" action="{{ route('api.external.verify-otp', ['provider' => 'jobstreet']) }}">
     @csrf
     <input type="hidden" name="uuid" id="uuid_otp">
     <input type="hidden" name="user_id" id="user_id" value="{{ auth()->id() }}">
@@ -33,7 +33,7 @@
     document.getElementById('uuid_otp').value = uuid;
 
     // cegah refresh form pertama — post ke API route dan tangani JSON respons
-    const connectForm = document.querySelector('form[action="{{ route('api.external.send_otp', ['provider' => 'jobstreet']) }}"]');
+    const connectForm = document.querySelector('form[action="{{ route("api.external.send-otp", ["provider" => "jobstreet"]) }}"]');
     connectForm.addEventListener('submit', async function (e) {
     e.preventDefault();
 
@@ -61,7 +61,7 @@
     });
 
     // cegah refresh form kedua (OTP) — handle JSON response and show errors if any
-    const otpForm = document.querySelector('form[action="{{ route('internal.send_login_otp') }}"]');
+    const otpForm = document.querySelector('form[action="{{ route("api.external.verify-otp", ["provider" => "jobstreet"]) }}"]');
     otpForm.addEventListener('submit', async function (e) {
     e.preventDefault();
 
