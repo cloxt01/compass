@@ -1,0 +1,48 @@
+query GetProfileInsights($zone: Zone!, $locale: Locale!, $timezone: Timezone) {
+  viewer {
+    _id
+    profileInsights2(zone: $zone) {
+      searchImpressionCount
+      viewCount
+      activities {
+        __typename
+        date(locale: $locale, timezone: $timezone) {
+          shortLabel(locale: $locale, timezone: $timezone)
+          __typename
+        }
+        ... on ProfileInsightsJobSentActivity2 {
+          advertiser {
+            id
+            name
+            __typename
+          }
+          job {
+            id
+            title
+            url(zone: $zone, locale: $locale)
+            __typename
+          }
+          __typename
+        }
+        ... on ProfileInsightsMessageSentActivity2 {
+          advertiser {
+            id
+            name
+            __typename
+          }
+          __typename
+        }
+        ... on ProfileInsightsResumeDownloadedActivity2 {
+          advertiser {
+            id
+            name
+            __typename
+          }
+          __typename
+        }
+      }
+      __typename
+    }
+    __typename
+  }
+}

@@ -1,0 +1,8 @@
+query GetUserDetails {
+  viewer {
+    _id
+    trackingId
+    externalId
+    __typename
+  }
+}

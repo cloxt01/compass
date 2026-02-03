@@ -1,0 +1,27 @@
+query GetResumes($languageCode: LanguageCodeIso!) {
+  viewer {
+    _id
+    resumes(languageCode: $languageCode) {
+      id
+      createdDateUtc
+      isDefault
+      fileMetadata {
+        name
+        size
+        virusScanStatus
+        sensitiveDataInfo {
+          isDetected
+          __typename
+        }
+        uri
+        __typename
+      }
+      origin {
+        type
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

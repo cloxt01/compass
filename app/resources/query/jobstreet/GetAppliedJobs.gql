@@ -1,0 +1,119 @@
+query GetAppliedJobs($first: Int, $locale: Locale!, $timezone: Timezone!, $zone: Zone!, $selectedAnswerUris: [String!]!, $sortBy: AppliedJobSortByInput) {
+  viewer {
+    id
+    appliedJobs(first: $first, locale: $locale, sortBy: $sortBy) {
+      edges {
+        node {
+          id
+          hasAppliedWithResume
+          hasAppliedWithCoverLetter
+          isExternal
+          isPreferredApplicationEligible
+          isPreferredApplication
+          preferredApplicationMarkedAt {
+            dateTimeUtc
+            shortAbsoluteLabel(timezone: $timezone, locale: $locale)
+            __typename
+          }
+          applicationRequestId
+          isActive
+          notes
+          events {
+            status
+            timestamp {
+              dateTimeUtc
+              shortAbsoluteLabel(timezone: $timezone, locale: $locale)
+              __typename
+            }
+            __typename
+          }
+          appliedAt {
+            dateTimeUtc
+            shortAbsoluteLabel(timezone: $timezone, locale: $locale)
+            __typename
+          }
+          job {
+            id
+            title
+            location {
+              label(locale: $locale, type: SHORT)
+              __typename
+            }
+            abstract
+            createdAt {
+              dateTimeUtc
+              label(context: JOB_POSTED, length: SHORT, timezone: $timezone, locale: $locale)
+              __typename
+            }
+            advertiser {
+              id
+              name(locale: $locale)
+              __typename
+            }
+            salary {
+              label
+              currencyLabel(zone: $zone)
+              __typename
+            }
+            products {
+              branding {
+                logo {
+                  url
+                  __typename
+                }
+                __typename
+              }
+              __typename
+            }
+            tracking {
+              hasRoleRequirements
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    verificationNudges(
+      jobId: ""
+      selectedAnswerUris: $selectedAnswerUris
+      platform: WEB
+      source: JAS
+      zone: $zone
+    ) {
+      uri
+      ctaLabel
+      ctaUrl
+      description
+      rank
+      verificationType
+      __typename
+    }
+    __typename
+  }
+  priorityApplyCredit {
+    credit {
+      remainingCount
+      totalCredit
+      nextRenewalDate {
+        dateTimeUtc
+        shortAbsoluteLabel(timezone: $timezone, locale: $locale)
+        __typename
+      }
+      __typename
+    }
+    creditConfig {
+      creditValue
+      renewFrequency {
+        value
+        unit
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

@@ -1,0 +1,70 @@
+query GetUnconfirmedQualifications($languageCode: LanguageCodeIso!, $zone: Zone!, $isUnifiedSite: Boolean!) {
+  viewer {
+    _id
+    unconfirmedQualifications: qualifications(
+      status: unconfirmed
+      languageCode: $languageCode
+      zone: $zone
+      isUnifiedSite: $isUnifiedSite
+    ) {
+      ...unconfirmedQualification
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment unconfirmedQualification on Qualification {
+  ...qualification
+  tracking {
+    events {
+      key
+      value
+      __typename
+    }
+    __typename
+  }
+  __typename
+}
+
+fragment qualification on Qualification {
+  id
+  name {
+    text
+    ontologyId
+    __typename
+  }
+  institute {
+    text
+    ontologyId
+    __typename
+  }
+  completed
+  completionDate {
+    ... on Year {
+      year
+      __typename
+    }
+    ... on MonthYear {
+      month
+      year
+      __typename
+    }
+    __typename
+  }
+  formattedCompletion
+  highlights
+  status
+  verificationUrl
+  credential {
+    credentialInfo {
+      name
+      values
+      __typename
+    }
+    manageVerificationUrl
+    deleteVerificationUrl
+    __typename
+  }
+  __typename
+}

@@ -1,0 +1,24 @@
+query getMe {
+  getMe {
+    skills {
+      id
+      name
+      isNormalized
+      isCustom
+      __typename
+    }
+    certificates {
+      id
+      type
+      title
+      organization
+      notes
+      startDate
+      endDate
+      isPresent
+      __typename
+    }
+    whatsappLoginNumber
+    __typename
+  }
+}

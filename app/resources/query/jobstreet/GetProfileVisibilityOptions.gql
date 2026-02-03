@@ -1,0 +1,8 @@
+query GetProfileVisibilityOptions($locale: Locale!, $zone: Zone!) {
+  profileVisibilityOptions {
+    id
+    label: name(locale: $locale)
+    description(locale: $locale, zone: $zone)
+    __typename
+  }
+}

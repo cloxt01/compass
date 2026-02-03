@@ -1,0 +1,154 @@
+query GetJobApplicationProcess($jobId: ID!, $isAuthenticated: Boolean!, $locale: Locale!) {
+	jobApplicationProcess(jobId: $jobId) {
+		...LocationFragment
+		...ClassificationFragment
+		...DocumentsFragment
+		...QuestionnaireFragment
+		job {
+			...JobFragment
+			__typename
+		}
+		linkOut
+		extractedRoleTitles
+		__typename
+	}
+}
+
+fragment LocationFragment on JobApplicationProcess {
+	location {
+		id
+		name
+		__typename
+	}
+	state {
+		id
+		__typename
+	}
+	area {
+		id
+		name
+		__typename
+	}
+	__typename
+}
+
+fragment ClassificationFragment on JobApplicationProcess {
+	classification {
+		id
+		name
+		subClassification {
+			id
+			name
+			__typename
+		}
+		__typename
+	}
+	__typename
+}
+
+fragment DocumentsFragment on JobApplicationProcess {
+	documents {
+		lastAppliedResumeIdPrefill @include(if: $isAuthenticated)
+		selectionCriteriaRequired
+		lastWrittenCoverLetter @include(if: $isAuthenticated) {
+			content
+			__typename
+		}
+		__typename
+	}
+	__typename
+}
+
+fragment QuestionnaireFragment on JobApplicationProcess {
+	questionnaire {
+		questions @include(if: $isAuthenticated) {
+			id
+			text
+			__typename
+			... on SingleChoiceQuestion {
+				lastAnswer {
+					id
+					text
+					uri
+					__typename
+				}
+				options {
+					id
+					text
+					uri
+					__typename
+				}
+				__typename
+			}
+			... on MultipleChoiceQuestion {
+				lastAnswers {
+					id
+					text
+					uri
+					__typename
+				}
+				options {
+					id
+					text
+					uri
+					__typename
+				}
+				__typename
+			}
+			... on PrivacyPolicyQuestion {
+				url
+				options {
+					id
+					text
+					uri
+					__typename
+				}
+				__typename
+			}
+		}
+		__typename
+	}
+	__typename
+}
+
+fragment JobFragment on Job {
+	id
+	createdAt {
+		shortLabel
+		__typename
+	}
+	content
+	title
+	advertiser {
+		id
+		name(locale: $locale)
+		__typename
+	}
+	abstract
+	source
+	products {
+		branding {
+			id
+			logo {
+				url
+				__typename
+			}
+			__typename
+		}
+		displayTags {
+			label(locale: $locale)
+			__typename
+		}
+		__typename
+	}
+	tracking {
+		isPrivateAdvertiser
+		hasRoleRequirements
+		__typename
+	}
+	location {
+		label(locale: $locale, type: SHORT)
+		__typename
+	}
+	__typename
+}

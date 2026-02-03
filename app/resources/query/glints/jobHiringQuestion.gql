@@ -1,0 +1,35 @@
+query jobHiringQuestion($jobId: UUID!) {
+  getJobHiringQuestions(jobId: $jobId) {
+    predefinedQuestions {
+      name
+      type
+      required
+      __typename
+    }
+    employerScreeningQuestions {
+      label
+      labelLokaliseVariables {
+        key
+        value
+        __typename
+      }
+      labelLokaliseKey
+      questionType
+      name
+      questions {
+        id
+        subLabel
+        subLabelLokaliseKey
+        responseOptions {
+          value
+          lokaliseKey
+          mappedValue
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

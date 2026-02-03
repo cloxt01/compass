@@ -1,0 +1,10 @@
+query GetPublicProfile($zone: Zone!, $locale: Locale!, $platform: Platform!) {
+  viewer {
+    publicProfile {
+      url(zone: $zone, locale: $locale, platform: $platform)
+      displayUrl(zone: $zone)
+      __typename
+    }
+    __typename
+  }
+}

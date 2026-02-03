@@ -1,0 +1,13 @@
+query getEnabledFeatureFlags($deviceId: String!, $platform: String, $featureFlagNames: [String!]) {
+  getEnabledFeatureFlags(
+    data: {deviceId: $deviceId, platform: $platform, featureFlagNames: $featureFlagNames}
+  ) {
+    name
+    variant {
+      type
+      value
+      __typename
+    }
+    __typename
+  }
+}

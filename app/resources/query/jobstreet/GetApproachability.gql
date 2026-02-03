@@ -1,0 +1,10 @@
+query GetApproachability {
+  viewer {
+    _id
+    approachability {
+      approachable
+      __typename
+    }
+    __typename
+  }
+}

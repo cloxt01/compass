@@ -1,0 +1,9 @@
+query getCustomSlugPagesWithActiveJobs($countryCode: String) {
+  getCustomSlugPagesWithActiveJobs(countryCode: $countryCode, pageSize: 1) {
+    pageInfo {
+      totalCount
+      __typename
+    }
+    __typename
+  }
+}
