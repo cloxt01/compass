@@ -1,6 +1,7 @@
 import { Worker } from 'bullmq';
 import updateStatus from './helper/updateStatusJob.js';
 import checkStatus from './helper/checkStatusJob.js';
+import getJob from './helper/getJob.js';
 import logger from './utils/logger.js';
 import connection from './redis.js';
 
@@ -37,11 +38,15 @@ const worker = new Worker(
         let status = await checkStatus(id);
         if ( status != 'OTP_SENT') {
           logger.info(`[ID] ${id} => [STATUS] ${status}`);
-          throw new Error(`Job ${id} tidak dalam status OTP_SENT`);
+          throw new Error(`[ID] ${id} tidak dalam status OTP_SENT`);
         }
-          await import(`./jobs/verify-otp-${data.provider}.js`);
-        const { default: handler } = await import(`./jobs/verify-otp-${data.provider}.js`);
-        logger.info("Processing verify-otp job for provider: " + data.provider);
+        
+        const session = await getJob(id);
+        logger.info(`[SESSION] ${session}`);
+        const { payload, cookies, provider } = session;
+        await import(`./jobs/verify-otp-${provider}.js`);
+        const { default: handler } = await import(`./jobs/verify-otp-${provider}.js`);
+        logger.info("Processing verify-otp job for provider: " + provider);
       }
 
     } catch (err) {

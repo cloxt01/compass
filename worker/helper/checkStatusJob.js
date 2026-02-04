@@ -1,9 +1,5 @@
 import connection from '../redis.js';
-
-
-function jobKey(jobId) {
-  return `${process.env.REDIS_PREFIX}job:${jobId}`;
-}
+import jobKey from './jobKey.js';
 
 async function checkStatus(jobId) {
   const key = jobKey(jobId);

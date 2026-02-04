@@ -2,32 +2,31 @@ import puppeteer from 'puppeteer';
 import isJson from '../helper/isJson.js';
 
 async function handler(data) {
-  const { email, timeout = 30000 } = data;
+  const { email, timeout = 60000 } = data;
   let browser;
 
   try {
     browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage'
       ]
     });
+    
 
     const page = await browser.newPage();
+    await page.setUserAgent(process.env.USER_AGENT);
+    await page.setViewport({ width: 1200, height: 800 });
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+      Object.defineProperty(navigator, 'plugins', { get: () => [1,2,3] });
+      Object.defineProperty(navigator, 'languages', { get: () => ['en-US','en'] });
+    });
     page.setDefaultTimeout(timeout);
 
-    // Block resource yang nggak perlu
-    await page.setRequestInterception(true);
-    page.on('request', req => {
-      const type = req.resourceType();
-      if (['stylesheet', 'image', 'font'].includes(type)) {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
+
 
     await page.goto(
       'https://id.jobstreet.com/id/oauth/login?returnUrl=%2F%3Ficmpid%3Djs_global_landing_page',
@@ -62,7 +61,7 @@ async function handler(data) {
     return {
       status: 'OTP_SENT',
       data: {
-        payload: isJson(req.postData()) ? JSON.parse(req.postData()) : req.postData(),
+        payload: req.postData(),
         cookies: JSON.stringify(cookies)
       }
     };

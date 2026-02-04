@@ -73,7 +73,6 @@ class ExternalAccountController extends Controller {
                     'name' => 'verify-otp',
                     'data' => [
                         'user_id' => $request->input('user_id'),
-                        'provider' => $provider,
                         'email' => $request->input('email'),
                     ],
                 ], JSON_UNESCAPED_SLASHES
