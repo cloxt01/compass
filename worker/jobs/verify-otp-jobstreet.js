@@ -23,30 +23,20 @@ async function handler(data) {
       { waitUntil: 'networkidle2' }
     );
 
-    await page.type('#emailAddress', email, { delay: 50 });
-
     // pasang listener SEBELUM klik
     const requestPromise = page.waitForRequest(
       req =>
-        req.url().includes('/passwordless/start') &&
+        req.url().includes('/passwordless/verify-redirect?') &&
         req.method() === 'POST',
       { timeout }
     );
 
-    const beforeCookies = await page.cookies();
-
-    const [req] = await Promise.all([
-      requestPromise,
-      page.click('button[data-cy="login"]')
-    ]);
 
     return {
       status: 'OTP_SENT',
       data: {
-        payload: isJson(req.postData())
-          ? JSON.parse(req.postData())
-          : req.postData(),
-        cookies: JSON.stringify(beforeCookies)
+        payload: isJson(payload) ? JSON.parse(payload) : payload,
+        cookies: JSON.stringify(cookies)
       }
     };
 

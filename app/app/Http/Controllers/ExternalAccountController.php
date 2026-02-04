@@ -7,8 +7,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Http;
-use App\Jobs\ProcessConnectAccount;
 
+use App\Jobs\ProcessConnectAccount;
+use App\Clients\Token;
 
 
 class ExternalAccountController extends Controller {
@@ -49,6 +50,42 @@ class ExternalAccountController extends Controller {
     }
 
     public function verify_otp(Request $request, $provider){
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'code' => 'required|string|max:20',
+                'uuid' => 'required|string|max:255',
+                'user_id' => 'required|integer'
+            ]);
+
+            $client = new Token();
+            $response = $client->verify_otp($request, $provider);
+            $isJson = $response->headers()['Content-Type'] === 'application/json';
+            
+            if (!$isJson || isset($response['error'])) {
+                return response()->json(['status' => 'error', 'errors' => ['error' => $response['error'], 'message' => $response['error_description']]], 400);
+            }
+
+            Redis::connection()->rpush(
+                ('bull:compass-queue:wait'),
+                 json_encode([
+                    'id' => Str::uuid()->toString(),
+                    'name' => 'verify-otp',
+                    'data' => [
+                        'user_id' => $request->input('user_id'),
+                        'provider' => $provider,
+                        'email' => $request->input('email'),
+                        'uuid' => $request->input('uuid')
+                    ],
+                ], JSON_UNESCAPED_SLASHES
+                )
+            );
+            return response()->json(['status' => 'success', 'data' => $response], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw ValidationException::withMessages($e->errors());
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'An error occurred', 'errors' => $e->getMessage()], 500);
+        }
     }
 
     public function disconnect(Request $request, $provider){

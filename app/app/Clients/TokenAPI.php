@@ -10,10 +10,9 @@ use App\Infrastructure\Token\DbTokenProvider;
 class TokenAPI
 {
     const host = [
-        'jobsreet' => 'https://id.jobstreet.com/oauth/token',
+        'jobsreet' => 'https://login.seek.com',
         'glints' => 'https://www.glints.com'
     ];
-
     public function api()
     {
         return Http::withHeaders([
@@ -34,7 +33,7 @@ class TokenAPI
     {
         {
             try {
-                $response = $this->api->api()->post($this->api, [
+                $response = $this->api()->post(self::host['jobsreet']. '/oauth/token', [
                     "client_id"             => config('jobooster.client_id'),
                     "redirect_uri"          => "https://id.jobstreet.com/oauth/callback/",
                     "initial_scope"         => "openid profile email offline_access",
