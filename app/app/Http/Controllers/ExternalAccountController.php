@@ -49,6 +49,7 @@ class ExternalAccountController extends Controller {
         }
     }
 
+
     public function verify_otp(Request $request, $provider){
         try {
             $request->validate([
