@@ -44,11 +44,18 @@ async function handler(data) {
         req.method() === 'POST',
       { timeout }
     );
+    const responsePromise = page.waitForResponse(
+      res =>
+        res.url().includes('/passwordless/start') &&
+        res.status() === 200,
+      { timeout }
+    );
 
     await page.click('button[data-cy="login"]');
 
     // Tunggu request selesai sebelum return
     const req = await requestPromise;
+    const res = await responsePromise;
 
     const cookies = await page.cookies();
 

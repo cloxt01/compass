@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Http;
@@ -27,13 +26,12 @@ class ExternalAccountController extends Controller {
             $uuid = $request->input('uuid');
             $email = $request->input('email');
             $payload = json_encode([
-                    'id' => Str::uuid()->toString(),
+                    'id' => $uuid,
                     'name' => 'send-otp',
                     'data' => [
                         'user_id' => $user_id,
                         'provider' => $provider,
-                        'email' => $email,
-                        'uuid' => $uuid,
+                        'email' => $email
                     ],
                 ], JSON_UNESCAPED_SLASHES
                 );
@@ -71,13 +69,12 @@ class ExternalAccountController extends Controller {
             Redis::connection()->rpush(
                 ('bull:compass-queue:wait'),
                  json_encode([
-                    'id' => Str::uuid()->toString(),
+                    'id' => $request->input('uuid'),
                     'name' => 'verify-otp',
                     'data' => [
                         'user_id' => $request->input('user_id'),
                         'provider' => $provider,
                         'email' => $request->input('email'),
-                        'uuid' => $request->input('uuid')
                     ],
                 ], JSON_UNESCAPED_SLASHES
                 )

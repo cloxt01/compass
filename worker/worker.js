@@ -12,8 +12,7 @@ const worker = new Worker(
     const { id, name, data } = payload;
 
     logger.info(`[GOT] [ID: ${id}] <-> [NAME: ${name}]`);
-    console.log(`[STATUS] ${process.env.APP_URL}/api/job-status/${id}`);
-
+    // console.log(`[STATUS] ${process.env.APP_URL}/api/job-status/${id}`);
 
 
     try {
@@ -46,9 +45,9 @@ const worker = new Worker(
       }
 
     } catch (err) {
-      await updateStatus(id, 'FAILED', {
-        error: err.message
-      });
+      // await updateStatus(id, 'FAILED', {
+      //   error: err.message
+      // });
 
       throw err;
     }

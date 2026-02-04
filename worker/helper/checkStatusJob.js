@@ -7,7 +7,6 @@ function jobKey(jobId) {
 
 async function checkStatus(jobId) {
   const key = jobKey(jobId);
-  console.log("Checking status for key: " + key);
   const status = await connection.hget(key, 'status');
   return status || null;
 }
