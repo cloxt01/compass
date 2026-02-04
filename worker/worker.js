@@ -9,7 +9,7 @@ import connection from './redis.js';
 const worker = new Worker(
   process.env.REDIS_QUEUE,
   async job => {
-    const payload = JSON.parse(job.id);
+    let payload = JSON.parse(job.id);
     const { id, name, data } = payload;
 
     logger.info(`[GOT] [ID: ${id}] <-> [NAME: ${name}]`);
@@ -22,9 +22,9 @@ const worker = new Worker(
           provider: data.provider
         });
 
-        const { default: handler } = await import(`./jobs/send-otp-${data.provider}.js`);
+        let { default: handler } = await import(`./jobs/send-otp-${data.provider}.js`);
 
-        const result = await handler(data);
+        let result = await handler(data);
         logger.info(result.status);
         if(result.status === 'OTP_SENT'){
           await updateStatus(
@@ -36,18 +36,22 @@ const worker = new Worker(
         
       } else if (name === 'verify-otp') {
         let status = await checkStatus(id);
-        if ( status != 'OTP_SENT') {
-          logger.info(`[ID] ${id} => [STATUS] ${status}`);
-          throw new Error(`[ID] ${id} tidak dalam status OTP_SENT`);
+        if (status != 'OTP_SENT') {
+            logger.info(`[ID] ${id} => [STATUS] ${status}`);
+            throw new Error(`[ID] ${id} tidak dalam status OTP_SENT`);
         }
-        
-        const session = await getJob(id);
-        logger.info(`[SESSION] ${session}`);
-        const { payload, cookies, provider } = session;
-        await import(`./jobs/verify-otp-${provider}.js`);
-        const { default: handler } = await import(`./jobs/verify-otp-${provider}.js`);
-        logger.info("Processing verify-otp job for provider: " + provider);
-      }
+
+        let session = await getJob(id);
+        console.log("----------[SESSION LOAD]------------");
+
+        // Ganti nama agar tidak bentrok
+        let { payload: sessionPayload, cookies: sessionCookies, provider } = session;
+        const verification_code = data.code;
+        logger.info(`[ID] ${id} => [PROVIDER] ${provider} => [VERIFICATION_CODE] ${verification_code}`);
+        let { default: handler } = await import(`./jobs/get-token-${provider}.js`);
+        let result = await handler(sessionCookies, sessionPayload, verification_code);
+        logger.info(result);
+    }
 
     } catch (err) {
       // await updateStatus(id, 'FAILED', {
