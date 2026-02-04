@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PanelController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Redis;
 
 Route::get('/debug/test', function() {
     return response()->json([
@@ -23,8 +24,11 @@ Route::get('/debug/routes', function() {
     });
 });
 Route::get('/debug/redis', function () {
-    \Illuminate\Support\Facades\Redis::set('test', 'ok');
-    return \Illuminate\Support\Facades\Redis::get('test');
+    Redis::select(1);
+    Redis::set('test', 'ok');
+    Redis::rpush('queue:test', 'item1');
+    $list = Redis::lrange('queue:test', 0, -1);
+    return $list;
 });
 
 // Guest routes

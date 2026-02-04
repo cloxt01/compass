@@ -12,6 +12,8 @@ const worker = new Worker(
     const { id, name, data } = payload;
 
     logger.info(`[GOT] [ID: ${id}] <-> [NAME: ${name}]`);
+    console.log(`[STATUS] https://${process.env.APP_URL}/job-status/${id}`);
+
 
     await updateStatus(id, 'PROCESSING');
 
@@ -24,7 +26,6 @@ const worker = new Worker(
         const { default: handler } = await import(`./jobs/send-otp-${data.provider}.js`);
 
         const result = await handler(data);
-        console.log(result);
         await updateStatus(id, result.status, {
           ...result.data
         });

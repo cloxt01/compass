@@ -16,7 +16,7 @@ class ExternalAccountController extends Controller {
 
     public function send_otp(Request $request, $provider){
         Log::info("Sending OTP to external platform: " . $provider);
-
+        
         try{
             $request->validate([
                 'uuid' => 'required|string|max:255',
@@ -25,10 +25,7 @@ class ExternalAccountController extends Controller {
             $user_id = auth()->user()->id;
             $uuid = $request->input('uuid');
             $email = $request->input('email');
-            
-            Redis::connection()->rpush(
-                ('bull:compass-queue:wait'),
-                 json_encode([
+            $payload = json_encode([
                     'id' => Str::uuid()->toString(),
                     'name' => 'send-otp',
                     'data' => [
@@ -38,7 +35,12 @@ class ExternalAccountController extends Controller {
                         'uuid' => $uuid,
                     ],
                 ], JSON_UNESCAPED_SLASHES
-                )
+                );
+            Log::info(gettype($payload));
+            Log::info( $payload);
+            Redis::connection()->rpush(
+                ('bull:compass-queue:wait'),
+                 $payload
                 
             );
 

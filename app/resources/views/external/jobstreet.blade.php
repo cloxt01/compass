@@ -47,7 +47,9 @@
             headers: {
                 'X-CSRF-TOKEN': this.querySelector('input[name=_token]').value,
                 'Accept': 'application/json'
-            }
+            },
+            // send cookies so the session-based CSRF token and auth session are available
+            credentials: 'same-origin'
         });
 
         const text = await res.text();

@@ -7,7 +7,7 @@ async function handler(data) {
 
   try {
     browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -23,7 +23,7 @@ async function handler(data) {
       { waitUntil: 'networkidle2' }
     );
 
-    await page.type('#emailAddress', email, { delay: 50 });
+    await page.type('#emailAddress', email, { delay: 15000 });
 
     // pasang listener SEBELUM klik
     const requestPromise = page.waitForRequest(
