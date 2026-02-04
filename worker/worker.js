@@ -12,10 +12,9 @@ const worker = new Worker(
     const { id, name, data } = payload;
 
     logger.info(`[GOT] [ID: ${id}] <-> [NAME: ${name}]`);
-    console.log(`[STATUS] https://${process.env.APP_URL}/job-status/${id}`);
+    console.log(`[STATUS] ${process.env.APP_URL}/api/job-status/${id}`);
 
 
-    await updateStatus(id, 'PROCESSING');
 
     try {
       if (name === 'send-otp') {
@@ -26,12 +25,19 @@ const worker = new Worker(
         const { default: handler } = await import(`./jobs/send-otp-${data.provider}.js`);
 
         const result = await handler(data);
-        await updateStatus(id, result.status, {
-          ...result.data
-        });
+        logger.info(result.status);
+        if(result.status === 'OTP_SENT'){
+          await updateStatus(
+            id, result.status, {...result.data });
+        } else {
+          await updateStatus(
+            id, result.status, { reason: result.reason });
+        }
+        
       } else if (name === 'verify-otp') {
-        $checkjob = await checkStatus(id);
-        if ($checkjob !== 'OTP_SENT') {
+        let status = await checkStatus(id);
+        if ( status != 'OTP_SENT') {
+          logger.info(`[ID] ${id} => [STATUS] ${status}`);
           throw new Error(`Job ${id} tidak dalam status OTP_SENT`);
         }
           await import(`./jobs/verify-otp-${data.provider}.js`);

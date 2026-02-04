@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 
 use App\Jobs\ProcessConnectAccount;
 use App\Clients\Token;
+use App\Support\JSONHelper;
 
 
 class ExternalAccountController extends Controller {
@@ -63,12 +64,10 @@ class ExternalAccountController extends Controller {
 
             $client = new Token();
             $response = $client->verify_otp($request, $provider);
-            $isJson = $response->headers()['Content-Type'] === 'application/json';
-            
-            if (!$isJson || isset($response['error'])) {
-                return response()->json(['status' => 'error', 'errors' => ['error' => $response['error'], 'message' => $response['error_description']]], 400);
+            if (JSONHelper::is_json($response)) {
+                return response()->json(['status' => 'error', 'message' => 'Invalid email or verification_code'], 500);
             }
-
+            
             Redis::connection()->rpush(
                 ('bull:compass-queue:wait'),
                  json_encode([

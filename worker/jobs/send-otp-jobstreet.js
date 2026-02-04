@@ -7,7 +7,7 @@ async function handler(data) {
 
   try {
     browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -18,14 +18,26 @@ async function handler(data) {
     const page = await browser.newPage();
     page.setDefaultTimeout(timeout);
 
+    // Block resource yang nggak perlu
+    await page.setRequestInterception(true);
+    page.on('request', req => {
+      const type = req.resourceType();
+      if (['stylesheet', 'image', 'font'].includes(type)) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
+
     await page.goto(
       'https://id.jobstreet.com/id/oauth/login?returnUrl=%2F%3Ficmpid%3Djs_global_landing_page',
-      { waitUntil: 'networkidle2' }
+      { waitUntil: 'domcontentloaded' }
     );
 
-    await page.type('#emailAddress', email, { delay: 15000 });
+    await page.waitForSelector('#emailAddress', { timeout: 60000 });
+    await page.type('#emailAddress', email, { delay: 50 });
 
-    // pasang listener SEBELUM klik
+    // Pasang listener SEBELUM klik tombol login
     const requestPromise = page.waitForRequest(
       req =>
         req.url().includes('/passwordless/start') &&
@@ -33,20 +45,18 @@ async function handler(data) {
       { timeout }
     );
 
-    const beforeCookies = await page.cookies();
+    await page.click('button[data-cy="login"]');
 
-    const [req] = await Promise.all([
-      requestPromise,
-      page.click('button[data-cy="login"]')
-    ]);
+    // Tunggu request selesai sebelum return
+    const req = await requestPromise;
+
+    const cookies = await page.cookies();
 
     return {
       status: 'OTP_SENT',
       data: {
-        payload: isJson(req.postData())
-          ? JSON.parse(req.postData())
-          : req.postData(),
-        cookies: JSON.stringify(beforeCookies)
+        payload: isJson(req.postData()) ? JSON.parse(req.postData()) : req.postData(),
+        cookies: JSON.stringify(cookies)
       }
     };
 
