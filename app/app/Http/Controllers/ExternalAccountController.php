@@ -13,8 +13,11 @@ use App\Support\JSONHelper;
 
 
 class ExternalAccountController extends Controller {
+    function __construct(){
+        $this->token_client = new Token();
+    }
 
-    public function send_otp(Request $request, $provider){
+    public function passwordless_login(Request $request, $provider){
         Log::info("Sending OTP to external platform: " . $provider);
         
         try{
@@ -27,7 +30,7 @@ class ExternalAccountController extends Controller {
             $email = $request->input('email');
             $payload = json_encode([
                     'id' => $uuid,
-                    'name' => 'send-otp',
+                    'operation' => 'passwordless-login',
                     'data' => [
                         'user_id' => $user_id,
                         'provider' => $provider,
@@ -40,7 +43,6 @@ class ExternalAccountController extends Controller {
             Redis::connection()->rpush(
                 ('bull:compass-queue:wait'),
                  $payload
-                
             );
 
             return response()->json(['status' => 'started'], 200);
@@ -49,7 +51,6 @@ class ExternalAccountController extends Controller {
             return response()->json(['status' => 'error', 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
         }
     }
-
 
     public function verify_otp(Request $request, $provider){
         try {
@@ -60,25 +61,12 @@ class ExternalAccountController extends Controller {
                 'user_id' => 'required|integer'
             ]);
 
-            $client = new Token();
-            $response = $client->verify_otp($request, $provider);
+            $response = $this->token_client->verify_otp($request, $provider);
             if (JSONHelper::is_json($response)) {
-                return response()->json(['status' => 'error', 'message' => 'Invalid email or verification_code'], 500);
+                throw ValidationException::withMessages('Invalid email or verification_code');
             }
             
-            Redis::connection()->rpush(
-                ('bull:compass-queue:wait'),
-                 json_encode([
-                    'id' => $request->input('uuid'),
-                    'name' => 'verify-otp',
-                    'data' => [
-                        'user_id' => $request->input('user_id'),
-                        'code' => $request->input('code'),
-                        'email' => $request->input('email'),
-                    ],
-                ], JSON_UNESCAPED_SLASHES
-                )
-            );
+            Redis::connection()->hset(("otp:". $request->input('uuid')), "otp", $request->input('code'));
             return response()->json(['status' => 'success', 'data' => $response], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw ValidationException::withMessages($e->errors());

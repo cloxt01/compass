@@ -13,7 +13,7 @@
 @endif
 
 {{-- FORM 1: SEND OTP (ASYNC / FETCH) --}}
-<form method="POST" action="{{ route('api.external.send-otp', ['provider' => 'jobstreet']) }}" id="sendOtpForm">
+<form method="POST" action="{{ route('api.external.passwordless-login', ['provider' => 'jobstreet']) }}" id="sendOtpForm">
     @csrf
     <input type="hidden" name="uuid" id="uuid">
     <input type="text" name="email" placeholder="Email">

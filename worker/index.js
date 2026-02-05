@@ -2,6 +2,7 @@ import 'dotenv/config';
 import logger from './utils/logger.js';
 import worker from './worker.js';
 import connection from './redis.js';
+import checkStatus from './helper/checkStatusJob.js';
 
 // Event Redis
 connection.on('connect', () => logger.info('Connection successful to Redis'));
@@ -12,12 +13,15 @@ worker.on('waiting', job => {
   logger.info(`Job menunggu: ${job.id}`);
 });
 
-worker.on('completed', job => {
-  logger.info(`Job selesai: ${job.id.id}`);
+worker.on('completed', async job => {
+  const { id } = JSON.parse(job.id);
+  const status = await checkStatus(id);
+  logger.info(`[COMPLETED] [${id}] => [STATUS] ${status}`);
+
 });
 
 worker.on('failed', (job, err) => {
-  logger.error(`Job gagal: ${job?.id}`, err?.message || err);
+  logger.error(`Job gagal: ${JSON.parse(job?.id).id}`, err?.message || err);
 });
 
 // Shutdown aman
@@ -27,5 +31,3 @@ process.on('SIGINT', async () => {
   connection.quit();
   process.exit(0);
 });
-
-export default worker;
