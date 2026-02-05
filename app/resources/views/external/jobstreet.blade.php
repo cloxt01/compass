@@ -4,65 +4,100 @@
 
 <h1>Jobstreet Form</h1>
 
-@if ($errors->any())
-    <div class="alert alert-danger">
-        @foreach ($errors->all() as $error)
-            <p>{{ $error }}</p>
-        @endforeach
-    </div>
-@endif
+<div id="errors"></div>
 
-{{-- FORM 1: SEND OTP (ASYNC / FETCH) --}}
 <form method="POST" action="{{ route('api.external.passwordless-login', ['provider' => 'jobstreet']) }}" id="sendOtpForm">
     @csrf
-    <input type="hidden" name="uuid" id="uuid">
-    <input type="text" name="email" placeholder="Email">
+    <input type="hidden" name="request_id" id="request_id_send">
+    <input type="text" name="email" placeholder="Email" auto-complete="on">
     <button type="submit">Submit</button>
 </form> 
 
-{{-- FORM 2: VERIFY OTP (NORMAL SUBMIT, BIAR $errors HIDUP) --}}
-<form method="POST" action="{{ route('api.external.verify-otp', ['provider' => 'jobstreet']) }}">
+<form method="POST" action="{{ route('api.external.verify-otp', ['provider' => 'jobstreet']) }}" id="verifyOtpForm">
     @csrf
-    <input type="hidden" name="uuid" id="uuid_otp">
+    <input type="hidden" name="request_id" id="request_id_verify">
     <input type="hidden" name="email" value="{{ auth()->user()->email }}">
     <input type="hidden" name="user_id" value="{{ auth()->id() }}">
-    <input type="text" name="code" placeholder="XXXXXX">
+    <input type="text" name="verification_code" placeholder="XXXXXX">
     <button type="submit">Send OTP</button>
 </form>
 
 <script>
-    // satu UUID, konsisten
-    const uuid = crypto.randomUUID();
-    document.getElementById('uuid').value = uuid;
-    document.getElementById('uuid_otp').value = uuid;
-
-    // FORM 1 AJA yang pakai fetch
-    const connectForm = document.getElementById('sendOtpForm');
-    connectForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const res = await fetch(this.action, {
-            method: 'POST',
-            body: new FormData(this),
-            headers: {
-                'X-CSRF-TOKEN': this.querySelector('input[name=_token]').value,
-                'Accept': 'application/json'
-            },
-            // send cookies so the session-based CSRF token and auth session are available
-            credentials: 'same-origin'
+    async function sendForm(form){
+        const formData = new FormData(form);
+        const jsonData = {};
+        formData.forEach((value, key) => {
+            jsonData[key] = value;
         });
+        const options = {
+            method: 'POST',
+            body: JSON.stringify(jsonData),
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        };
+        return await fetch(form.action, options);
+    }
+    function clearElement(){
+        const errorElement = document.getElementById('errors');
+        errorElement.innerHTML = "";
+    }
+    function formEvent(event, form){
+        event.preventDefault();
+        return sendForm(form);
+    }
+    function handle422(errors){
+        Object.keys(errors).forEach(function(field) {
+            errors[field].forEach(function(msg) {
+                errorElement.innerHTML += '<p>' + msg + '</p>';
+            });
+        });
+    }
 
-        const text = await res.text();
-        let body = text;
-        try { body = JSON.parse(text); } catch (_) {}
+    const request_id = crypto.randomUUID();
+    const request_id_send = document.getElementById('request_id_send');
+    const request_id_verify = document.getElementById('request_id_verify');
+    request_id_send.value = request_id;
+    request_id_verify.value = request_id;
+    const errorElement = document.getElementById('errors');
 
-        if (!res.ok) {
-            alert(body.message || 'Failed sending OTP');
-            return;
+    
+
+    const formSendOtp = document.getElementById('sendOtpForm');
+    const formVerifyOtp = document.getElementById('verifyOtpForm');
+    
+    formSendOtp.addEventListener(
+        'submit',
+        async function (event) {
+            clearElement();
+            event.preventDefault();
+
+            const res = await formEvent(event, formSendOtp);
+            const data = await res.json(); 
+
+            switch(res.status){
+                case 422:
+                    const errors = data.errors;
+                    handle422(errors);
+                    break;
+
+                default:
+                    console.log('Unexpected error');
+                    break;
+            }
+            
         }
+    )
+    formVerifyOtp.addEventListener(
+        'submit',
+        function (event) {
+            const result = formEvent(event, formVerifyOtp);
+            alert(result);
+        }
+    )
 
-        alert('OTP sent');
-    });
 </script>
 
 @endsection

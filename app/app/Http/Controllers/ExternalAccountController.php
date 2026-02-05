@@ -7,72 +7,68 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Http;
 
-use App\Jobs\ProcessConnectAccount;
-use App\Clients\Token;
-use App\Support\JSONHelper;
+use App\Clients\JobstreetToken;
+use App\Exceptions\UnknownOperation;
+
 
 
 class ExternalAccountController extends Controller {
     function __construct(){
-        $this->token_client = new Token();
     }
 
     public function passwordless_login(Request $request, $provider){
-        Log::info("Sending OTP to external platform: " . $provider);
-        
-        try{
-            $request->validate([
-                'uuid' => 'required|string|max:255',
-                'email' => 'required|email'
-            ]);
-            $user_id = auth()->user()->id;
-            $uuid = $request->input('uuid');
-            $email = $request->input('email');
-            $payload = json_encode([
-                    'id' => $uuid,
+        $request->validate([
+        'request_id' => 'required|string|max:255',
+        'email' => 'required|email'
+        ]);
+        $user_id = auth()->user()->id;
+        $success = Redis::connection()->rpush(
+            ('bull:compass-queue:wait'),
+                json_encode([
+                    'request_id' => $request->input('request_id'),
                     'operation' => 'passwordless-login',
                     'data' => [
                         'user_id' => $user_id,
                         'provider' => $provider,
-                        'email' => $email
+                        'email' => $request->input('email')
                     ],
                 ], JSON_UNESCAPED_SLASHES
-                );
-            Log::info(gettype($payload));
-            Log::info( $payload);
-            Redis::connection()->rpush(
-                ('bull:compass-queue:wait'),
-                 $payload
-            );
-
-            return response()->json(['status' => 'started'], 200);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['status' => 'error', 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+            )
+        );
+        if(!$success){
+            return response()->json(['status' => 'failed', 'message' => 'Gagal kirim ke redis'], 500);
         }
+        return response()->json(['status' => 'started'], 200);
+        
+        
+
     }
 
     public function verify_otp(Request $request, $provider){
         try {
             $request->validate([
-                'email' => 'required|email',
-                'code' => 'required|string|max:20',
-                'uuid' => 'required|string|max:255',
-                'user_id' => 'required|integer'
+                'verification_code' => 'required|string|max:20',
+                'request_id' => 'required|string|max:255'
             ]);
-
-            $response = $this->token_client->verify_otp($request, $provider);
-            if (JSONHelper::is_json($response)) {
-                throw ValidationException::withMessages('Invalid email or verification_code');
-            }
+            $client = match($provider) {
+                'jobstreet' => new JobstreetToken,
+                default => throw new UnknownOperation("Provider not supported: " . $provider)
+            };
             
-            Redis::connection()->hset(("otp:". $request->input('uuid')), "otp", $request->input('code'));
-            return response()->json(['status' => 'success', 'data' => $response], 200);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            throw ValidationException::withMessages($e->errors());
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'An error occurred', 'errors' => $e->getMessage()], 500);
+            $is_verified = $client->token_client->verify_otp($request, $provider);
+            if ($is_verified) {
+                return response()->json(['status' => 'failed', 'data' => 'Invalid OTP'], 200);
+            }
+            $success = Redis::connection()->hset(("otp:". $request->input('request_id')), "otp", $request->input('verification_code'));
+            if(!$success){
+                throw new Exception("Gagal kirim ke redis");
+            }
+
+            return response()->json(['status' => 'success', 'data' => (string) $response->body()], 200);
+        } catch(\Exception $e){
+            return response()->json(['status' => 'failed', 'message' => $e->getMessage()], 500);
         }
+        
     }
 
     public function disconnect(Request $request, $provider){
@@ -106,7 +102,7 @@ class ExternalAccountController extends Controller {
             if (!$user) throw new \Exception("User not found");
 
             $user->jobstreetAccount()->updateOrCreate(
-                ['user_id' => $user->id], // filter
+                ['user_id' => $user->id], 
                 [
                     'access_token' => $token['access_token'],
                     'refresh_token' => $token['refresh_token'],

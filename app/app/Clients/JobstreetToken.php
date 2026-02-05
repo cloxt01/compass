@@ -1,17 +1,16 @@
 <?php
 
 namespace App\Clients;
+use App\Support\DataHelper;
+use App\Exceptions\UnknownOperation;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 
-class Token extends api
+class JobstreetToken extends api
 {
-    const host = [
-        'jobstreet' => 'https://login.seek.com',
-        'glints' => null
-    ];
+    const host = 'https://login.seek.com';
 
     public function __construct()
     {
@@ -51,6 +50,7 @@ class Token extends api
         }
         
         $response = $this->api()->post(self::host[$provider] . '/passwordless/verify', $payload);
-        return $response;
+        ;
+        return DataHelper::is_json($response) ? false : true;
         }
     }

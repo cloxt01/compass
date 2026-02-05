@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
 
-class Job {
-    public function job_status($jobId)
+class RequestController {
+    public function request_info($request_id)
     {
-        $status = Redis::hgetall("job:$jobId");
+        $status = Redis::hgetall("job:$request_id");
         return response()->json([
-            'job_id' => $jobId,
+            'request_id' => $request_id,
             'status' => $status['status'] ?? 'UNKNOWN',
             'data' => $status
         ], 200);

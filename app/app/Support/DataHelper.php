@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-class JSONHelper {
+class DataHelper {
     public static function is_json(string $data): bool
     {
         json_decode($data);
