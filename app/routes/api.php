@@ -26,7 +26,7 @@ Route::prefix('panel')->group(function() {
 // --------------------
 Route::prefix('external')->middleware(['web', 'auth'])->group(function() {
     Route::get('/{provider}/disconnect', [ExternalAccountController::class, 'disconnect'])->name('api.external.disconnect');
-    Route::get('/{provider}/add-token', [ExternalAccountController::class, 'add_token'])->name('api.external.add-token');
+    Route::post('/{provider}/save-token', [ExternalAccountController::class, 'save_token'])->name('api.external.save-token');
     Route::post('/{provider}/passwordless-login', [ExternalAccountController::class, 'passwordless_login'])->name('api.external.passwordless-login');
     Route::post('/{provider}/verify-otp', [ExternalAccountController::class, 'verify_otp'])->name('api.external.verify-otp');
 

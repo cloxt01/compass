@@ -42,21 +42,20 @@ async function handler(id, data) {
     if (!otp) {
         throw new Error('OTP timeout');
     }
-
-    await updateStatus(id, 'VERIFYING_OTP');
-    await page.waitForSelector(config.puppeteer.jobstreet.selector.otpInput, { timeout: config.puppeteer.jobstreet.timeout.otpInput });
-    await page.type(config.puppeteer.jobstreet.selector.otpInput, otp, { delay: config.puppeteer.jobstreet.timeout.otpTyping });
-    await page.click(config.puppeteer.jobstreet.selector.submitOtp);
-
-    
-    const res = await page.waitForResponse(
+    const tokenPromise = page.waitForResponse(
       res =>
         res.url().includes('/oauth/token') &&
         res.status() === 200 &&
         res.request().method() === 'POST',
       { timeout: 15000 }
     );
+    await updateStatus(id, 'VERIFYING_OTP');
+    await page.waitForSelector(config.puppeteer.jobstreet.selector.otpInput, { timeout: config.puppeteer.jobstreet.timeout.otpInput });
+    await page.type(config.puppeteer.jobstreet.selector.otpInput, otp, { delay: config.puppeteer.jobstreet.timeout.otpTyping });
+    
+    const res = await tokenPromise;
     const token = await res.json();
+    
     await updateStatus(id, 'LOGIN_SUCCESS', {
       token: JSON.stringify(token)
     });
