@@ -31,26 +31,21 @@ class JobstreetToken extends api
         ];
     }
     
-    public function verify_otp(Request $request, $provider)
+    public  function verify_otp($email, $code, $provider)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'code' => 'required|string|max:20'
-            ]);
-        
-        if ($provider === 'jobstreet'){
-            $payload = [
+        match($provider) {
+            'jobstreet' => $payload = [
                 "client_id" => config('compass.client_id'),
                 "connection" => "email",
-                "email" => $request->input('email'),
-                "verification_code" => $request->input('code'),
-            ];
-        } else {
-            throw new UnknownOperation("Provider not supported: " . $provider);
-        }
-        
-        $response = $this->api()->post(self::host[$provider] . '/passwordless/verify', $payload);
-        ;
+                "email" => $email,
+                "verification_code" => $code,
+            ],
+            default => throw new UnknownOperation($provider)
+        };
+    
+        $response = $this->api()->post(self::host . '/passwordless/verify', $payload);
+        Log::info($response);
+        Log::info(DataHelper::is_json($response));
         return DataHelper::is_json($response) ? false : true;
         }
     }

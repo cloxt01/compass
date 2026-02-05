@@ -4,9 +4,9 @@ namespace App\Exceptions;
 
 class UnknownOperation extends Exception
 {
-    public function __construct($message = "Operation tidak ditemukan", $code = 0, ?\Throwable $previous = null)
+    public function __construct($provider , $code = 400, ?\Throwable $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct(`Provider not supported: ${$provider}`, $code, $previous);
     }
     
 }

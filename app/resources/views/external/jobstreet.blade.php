@@ -1,10 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+@vite('resources/js/app.js')
 
 <h1>Jobstreet Form</h1>
 
 <div id="errors"></div>
+<div id="response"></div>
 
 <form method="POST" action="{{ route('api.external.passwordless-login', ['provider' => 'jobstreet']) }}" id="sendOtpForm">
     @csrf
@@ -16,44 +18,77 @@
 <form method="POST" action="{{ route('api.external.verify-otp', ['provider' => 'jobstreet']) }}" id="verifyOtpForm">
     @csrf
     <input type="hidden" name="request_id" id="request_id_verify">
-    <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+    <input id="verifyEmailInput" type="hidden" name="email">
     <input type="hidden" name="user_id" value="{{ auth()->id() }}">
     <input type="text" name="verification_code" placeholder="XXXXXX">
     <button type="submit">Send OTP</button>
 </form>
 
 <script>
-    async function sendForm(form){
+    // UTILS
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // HTTP
+    async function request(url, method = 'POST', data = null) {
+        try {
+            const res = await axios({ url, method, data, headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' } });
+            return { status: res.status, data: res.data };
+        } catch (err) {
+            if (err.response) {
+                return { status: err.response.status, errors: err.response.data.errors || {} };
+            }
+            return { status: 0, errors: { network: ['Network error'] } };
+        }
+    }
+
+    async function sendForm(form) {
         const formData = new FormData(form);
         const jsonData = {};
-        formData.forEach((value, key) => {
-            jsonData[key] = value;
-        });
-        const options = {
-            method: 'POST',
-            body: JSON.stringify(jsonData),
-            headers: {
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json'
-            }
-        };
-        return await fetch(form.action, options);
+        formData.forEach((value, key) => { jsonData[key] = value; });
+        return await request(form.action, 'POST', jsonData);
     }
+    async function requestInfo(id) {
+        const url = `${window.location.origin}/api-v1/request/${encodeURIComponent(id)}`;
+        return await request(url, 'GET');
+    }
+
+    // DOM
+
     function clearElement(){
-        const errorElement = document.getElementById('errors');
-        errorElement.innerHTML = "";
+        document.getElementById('errors').innerHTML = "";
+        document.getElementById('response').innerHTML = ""
     }
-    function formEvent(event, form){
+    async function formEvent(event, form){
         event.preventDefault();
-        return sendForm(form);
+        return await sendForm(form);
     }
-    function handle422(errors){
+    function displayErrors(errors, container){
         Object.keys(errors).forEach(function(field) {
             errors[field].forEach(function(msg) {
-                errorElement.innerHTML += '<p>' + msg + '</p>';
+                container.innerHTML += '<p>' + msg + '</p>';
             });
         });
+    }
+    function displayResponse(data){
+        const responseElement = document.getElementById('response');
+        responseElement.innerHTML = '<p>' + JSON.stringify(data) + '</p>';
+    }
+
+    // LOGIC
+    async function startPolling() {
+        while (polling_running) {
+            const status = await requestInfo(request_id);
+            console.log(status);
+            if (status.status === 200) {
+                displayResponse(status.data);
+            } else {
+                displayErrors(status.errors, errorElement);
+            }
+            await delay(3000);
+
+        }
     }
 
     const request_id = crypto.randomUUID();
@@ -62,12 +97,16 @@
     request_id_send.value = request_id;
     request_id_verify.value = request_id;
     const errorElement = document.getElementById('errors');
+    const verifyEmailInput = document.getElementById('verifyEmailInput');
 
     
 
     const formSendOtp = document.getElementById('sendOtpForm');
     const formVerifyOtp = document.getElementById('verifyOtpForm');
+    let polling_running = false
+
     
+
     formSendOtp.addEventListener(
         'submit',
         async function (event) {
@@ -75,12 +114,14 @@
             event.preventDefault();
 
             const res = await formEvent(event, formSendOtp);
-            const data = await res.json(); 
-
-            switch(res.status){
+            switch(res.status){ 
                 case 422:
-                    const errors = data.errors;
-                    handle422(errors);
+                case 500:
+                    const errors = res.errors;
+                    displayErrors(errors, errorElement);
+                    break;
+                case 200:
+                    displayResponse(res.data);
                     break;
 
                 default:
@@ -92,12 +133,34 @@
     )
     formVerifyOtp.addEventListener(
         'submit',
-        function (event) {
-            const result = formEvent(event, formVerifyOtp);
-            alert(result);
+        async function (event) {
+            clearElement();
+            event.preventDefault();
+
+            const email = formSendOtp.querySelector('input[name="email"]').value;
+            verifyEmailInput.value = email;
+
+            const res = await formEvent(event, formVerifyOtp);
+
+            switch(res.status){
+                case 400:
+                case 422:
+                case 500:
+                    const errors = res.errors;
+                    displayErrors(errors, errorElement);
+                    break;
+                case 200:
+                    displayResponse(res.data);
+                    polling_running = true
+                    startPolling();
+                    break;
+                default:
+                    console.log('Unexpected error');
+                    break;
+            }
+            
         }
     )
-
 </script>
 
 @endsection

@@ -36,27 +36,25 @@ class ExternalAccountController extends Controller {
             )
         );
         if(!$success){
-            return response()->json(['status' => 'failed', 'message' => 'Gagal kirim ke redis'], 500);
+            return response()->json(['status' => 'failed', 'errors' => ['server' => ['redis connection failed']]], 500);
         }
         return response()->json(['status' => 'started'], 200);
-        
-        
-
     }
 
     public function verify_otp(Request $request, $provider){
         try {
             $request->validate([
+                'email' => 'required|email',
                 'verification_code' => 'required|string|max:20',
                 'request_id' => 'required|string|max:255'
             ]);
             $client = match($provider) {
                 'jobstreet' => new JobstreetToken,
-                default => throw new UnknownOperation("Provider not supported: " . $provider)
+                default => throw new UnknownOperation($provider)
             };
             
-            $is_verified = $client->token_client->verify_otp($request, $provider);
-            if ($is_verified) {
+            $is_verified = $client->verify_otp($request->input('email'), $request->input('verification_code'), $provider);
+            if (!$is_verified) {
                 return response()->json(['status' => 'failed', 'data' => 'Invalid OTP'], 200);
             }
             $success = Redis::connection()->hset(("otp:". $request->input('request_id')), "otp", $request->input('verification_code'));
@@ -64,9 +62,11 @@ class ExternalAccountController extends Controller {
                 throw new Exception("Gagal kirim ke redis");
             }
 
-            return response()->json(['status' => 'success', 'data' => (string) $response->body()], 200);
+            return response()->json(['status' => 'success', 'data' => 'OK'], 200);
+        } catch(\UnknownOperation $e){
+            return response()->json(['status' => 'failed', 'errors' => ['provider' =>[$e->getMessage()]]], 400);
         } catch(\Exception $e){
-            return response()->json(['status' => 'failed', 'message' => $e->getMessage()], 500);
+            return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);
         }
         
     }

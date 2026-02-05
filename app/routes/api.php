@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
-use App\Htto\Controllers\RequestController;
+use App\Http\Controllers\RequestController;
 use App\Http\Controllers\InternalController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PanelController;
@@ -12,7 +12,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/request/{jobId}', [RequestController::class, 'request_info'])->name('api.request.info');
+Route::get('/request/{id}', [RequestController::class, 'request_info'])->name('api.request.info');
 
 // --------------------
 // Panel API (requires authentication token)

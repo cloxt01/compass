@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\Redis;
 
 
 class RequestController {
-    public function request_info($request_id)
+    public function request_info(string $id)
     {
-        $status = Redis::hgetall("job:$request_id");
+        $status = Redis::hgetall("job:$id");
         return response()->json([
-            'request_id' => $request_id,
+            'request_id' => $id,
             'status' => $status['status'] ?? 'UNKNOWN',
             'data' => $status
         ], 200);
