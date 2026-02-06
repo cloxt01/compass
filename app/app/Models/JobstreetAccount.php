@@ -24,7 +24,7 @@ class JobstreetAccount extends Model
 
         return now()->addSeconds($bufferSeconds)->greaterThanOrEqualTo($this->expired_at);
     }
-    public function updateToken($token)
+    public function updateToken(array $token)
     {
         if(!isset($token['access_token'])){
             return;

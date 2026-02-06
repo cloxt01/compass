@@ -105,6 +105,7 @@ class ExternalAccountController extends Controller {
     public function save_token(Request $request)
     {
         try {
+            
             $request->validate([
                 'token' => 'required|json'
             ]);
@@ -114,10 +115,11 @@ class ExternalAccountController extends Controller {
                 return response()->json(['status' => 'failed', 'errors' => ['token' =>['Invalid token format']]], 400);
             }
             $user = User::find(auth()->user()->id);
-            Log::info($user);
 
-            $add = $user->jobstreetAccount->updateToken($token);
-            Log::info("Status add token: " .$add);
+            $add = $user->jobstreetAccount()->updateOrCreate(
+                ['user_id' => $user->id],
+                $token
+            );
 
             return response()->json([
                 'redirect' => route('external.index')
