@@ -1,25 +1,20 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Jobstreet;
 
 use App\Clients\JobstreetAPI;
-use App\Clients\GlintsAPI;
-use App\Support\QueryHelper;
+use App\Services\JobstreetService;
 
-class SearchJobs
+class SearchJobs extends JobstreetService 
 {
-    protected JobstreetAPI | GlintsAPI $client;
-
-    public function __construct(GlintsAPI | JobstreetAPI $client)
+    public function __construct(JobstreetAPI $client)
     {
-        $this->client = $client;
+        parent::__construct($client);
     }
 
-    public function search(array $params = []): array
-    {
-        if ($this->client instanceof JobstreetAPI){
-            $path = '/api/jobsearch/v5/me/search';
-            $params = [
+    public function search(){
+        $path = '/api/jobsearch/v5/me/search';
+        $params = [
             'siteKey' => 'ID-Main',
             'sourcesystem' => 'houston',
             'eventCaptureSessionId' => $this->client->sessionId ?? '',
@@ -32,11 +27,7 @@ class SearchJobs
             'include' => 'seogptTargeting,relatedsearches',
             'locale' => 'id-ID',
             'source' => 'FE_SERP' ]; 
-        } else {
-            $path = '/api/jobsearch/v5/me/search';
-            $params = [];
-        }
-
         return $this->client->get($path, $params);
     }
+    
 }

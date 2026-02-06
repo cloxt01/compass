@@ -1,43 +1,45 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Services;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use \App\Jobs\ProcessAuthentication;
 
+use App\Clients\JobstreetAPI;
+use App\Services\Jobstreet\ReviewPage;
+use App\Services\Jobstreet\Documents;
+use App\Services\Jobsstreet\AppliedJobs;
+use App\Services\Jobstreet\SearchJobs;
 
-class JobstreetService
+class JobstreetService extends Service
 {
-    public function login(Request $request)
+    protected $client;
+    protected ReviewPage $review;
+    protected Documents $document;
+    protected AppliedJobs $applied_jobs;
+    protected SearchJobs $search_jobs;
+
+
+    public function __construct(JobstreetAPI $client)
     {
-        $email = $request->input('email');
+        parent::__construct($client);
 
-        try {
-            ProcessAuthentication::dispatch(Str::uuid()->toString(), $email)->onQueue('authentication_queue');
-            Log::info("Login started for email: $email");
-            return ['status' => true, 'message' => 'Proses autentikasi dimulai.', 'otp_required' => true];
-        } catch (\Exception $e) {
-            Log::error(json_encode(['status' => false, 'message' => $e->getMessage()]));
-            return response()->json(['status' => false, 'message' => 'Gagal memulai proses autentikasi.']);
-        }
     }
 
-    public function submit_otp(Request $request)
+    public function review()
     {
-        $otp = $request->input('otp');
-
-
-        $send = file_put_contents(base_path('resources/js/login-automation/otp.json'), json_encode(['otp' => $otp]));
-
-        Log::info($send ? "OTP dikirim : " . $otp: "Gagal mengirim OTP.");
-
-        return response()->json(['status' => $send ? true : false, 'message' => $send ? 'OTP dikirim' : 'Gagal mengirim OTP.']);
+        return new ReviewPage($this->client);
     }
-
-    public function show_otpForm(){
-        return view('auth.verification_otp');
+    public function documents()
+    {
+        return new Documents($this->client);
     }
-
+    public function applied_jobs()
+    {
+        return new AppliedJobs($this->client);
+    }
+    public function search_jobs()
+    {
+        return new SearchJobs($this->client);
+    }
+    
 }
