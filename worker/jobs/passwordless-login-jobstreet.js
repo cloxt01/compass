@@ -1,10 +1,14 @@
-import puppeteer, { TimeoutError } from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import isJson from '../helper/isJson.js';
 import logger from '../utils/logger.js';
 import updateStatus from '../helper/updateStatusJob.js';
 import getOtp from '../helper/getOtp.js';
 import setupPage from '../helper/puppeter/setupPage.js';
-import config from '../config.js'
+import config from '../config.js';
+
+// Add stealth plugin
+puppeteer.use(StealthPlugin());
 
 
 async function handler(id, data) {
@@ -18,15 +22,21 @@ async function handler(id, data) {
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
+        '--disable-blink-features=AutomationControlled',
         '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
+        '--disable-gpu',
         '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu'
+        '--no-default-browser-check',
+        '--disable-extensions',
       ]
     });
     const page = await browser.newPage();
+    // Mask webdriver property
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => false,
+      });
+    });
     await setupPage(page);
     await page.goto(config.puppeteer.jobstreet.url, { waitUntil: 'domcontentloaded'});
     await page.waitForSelector(config.puppeteer.jobstreet.selector.emailInput, { timeout: config.puppeteer.jobstreet.timeout.emailInput});

@@ -10,7 +10,7 @@ use App\Models\JobstreetAccount;
 use App\Services\JobstreetService;
 use App\Clients\JobstreetAPI;
 
-$user = User::find(2);
+$user = User::find(1);
 $account = $user->jobstreetAccount;
 if(!$account){
     echo("Account not found");
