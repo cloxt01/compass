@@ -17,6 +17,9 @@ use App\Exceptions\UnknownProvider;
 
 class ExternalAccountController extends Controller {
     function __construct(){
+        $this->redis = Redis::connection();
+        if(!$this->redis->ping())
+        return response()->json(['status' => 'failed', 'errors' => ['redis' => ['Redis connection failed']]], 500);;
     }
 
     public function passwordless_login(Request $request, $provider){
@@ -25,7 +28,7 @@ class ExternalAccountController extends Controller {
         'email' => 'required|email'
         ]);
         $user_id = auth()->user()->id;
-        $success = Redis::connection()->rpush(
+        $success = $this->redis->rpush(
             ('bull:compass-queue:wait'),
                 json_encode([
                     'request_id' => $request->input('request_id'),
@@ -53,18 +56,25 @@ class ExternalAccountController extends Controller {
             ]);
             $client = match($provider) {
                 'jobstreet' => new JobstreetToken,
-                // Other providers
+                // Provider lainn
                 default => throw new UnknownProvider($provider)
             };
             
             $is_verified = $client->verify_otp($request->input('email'), $request->input('verification_code'));
-            if (!$is_verified) {
-                return response()->json(['status' => 'failed', 'data' => 'Invalid OTP'], 200);
+
+            switch($is_verified){
+                case 'blocked':
+                    return response()->json(['status' => 'failed', 'errors' => [$provider.'_server' => ['Too many requests, please unblock your account in email inbox']]], 429);
+                case 'unverified':
+                    return response()->json(['status' => 'failed', 'data' => 'Invalid OTP'], 200);
+                case 'failed':
+                    return response()->json(['status' => 'failed', 'errors' => ['server' => ['Server error, please try again later.']]], 500);
+                case 'verified':
+                    break;
             }
-            $success = Redis::connection()->hset(("otp:". $request->input('request_id')), "otp", $request->input('verification_code'));
-            if(!$success){
-                throw new Exception("Gagal kirim ke redis");
-            }
+            $this->redis->hset(("otp:". $request->input('request_id')), "otp", $request->input('verification_code'));
+            $this->redis->expire("otp:". $request->input('request_id'), 3600);
+            
 
             return response()->json(['status' => 'success', 'data' => 'OK'], 200);
         } catch(\UnknownProvider $e){

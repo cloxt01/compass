@@ -44,10 +44,19 @@ class JobstreetToken extends api
             "verification_code" => $code,
         ];
     
-        $response = $this->api()->post('/passwordless/verify', $payload);
-        Log::info($response);
-        Log::info(DataHelper::is_json($response));
-        return DataHelper::is_json($response) ? false : true;
+        $response = $this->post('/passwordless/verify', $payload);
+
+        switch($response['http_code']){
+            case 200:
+                return 'verified';
+            case 400:
+                return 'unverified';
+            case 429:
+                return 'blocked';
+            default:
+                return 'failed';
+        }
+        
     }
     public function refreshToken(JobstreetAccount $account): array | null
     {
