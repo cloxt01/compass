@@ -30,28 +30,30 @@ class api {
     public function get(string $path, array $params = []): array
     {
         try {
-            $response = $this->api()->get($path, $params);
-
-            if ($response->failed()) {
-                return [
-                    'url' => $this->host.$path,
-                    'params' => $params,
-                    'status' => 'error',
-                    'http_code' => $response->status(),
-                    'data' => $response->json() ?? $response->body()
-                ];
-            }
-
+            $res = $this->api()->get($path, $params)->throw();
             return [
                 'status' => 'success',
-                'http_code' => $response->status(),
-                'data' => $response->json()
+                'http_code' => $res->status(),
+                'data' => $res->json()
             ];
-        } catch (RequestException $e) {
+
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
             return [
-                'status' => 'error',
+                'status' => 'connection_error',
+                'http_code' => 0,
+                'message' => 'Gagal terhubung ke server (Timeout/Down)'
+            ];
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            return [
+                'status' => 'http_error',
+                'http_code' => $e->response->status(),
+                'data' => $e->response->json() ?: $e->response->body()
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 'system_error',
                 'http_code' => 500,
-                'message' => $e->getMessage()
+                'message' => 'Internal logic error: ' . $e->getMessage()
             ];
         }
     }
@@ -59,27 +61,31 @@ class api {
     public function post(string $path, array $data = []): array
     {
         try {
-
-            $response = $this->api()->post($path, $data);
-
-            if ($response->failed()) {
-                return [
-                    'status' => 'error',
-                    'http_code' => $response->status(),
-                    'data' => $response->json() ?? $response->body()
-                ];
-            }
+            $res = $this->api()->post($path, $data)->throw();
 
             return [
                 'status' => 'success',
-                'http_code' => $response->status(),
-                'data' => $response->json()
+                'http_code' => $res->status(),
+                'data' => $res->json()
             ];
-        } catch (RequestException $e) {
+
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
             return [
-                'status' => 'error',
+                'status' => 'connection_error',
+                'http_code' => 0,
+                'message' => 'Gagal terhubung ke server (Timeout/Down)'
+            ];
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            return [
+                'status' => 'http_error',
+                'http_code' => $e->response->status(),
+                'data' => $e->response->json() ?: $e->response->body()
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 'system_error',
                 'http_code' => 500,
-                'message' => $e->getMessage()
+                'message' => 'Internal logic error: ' . $e->getMessage()
             ];
         }
     }

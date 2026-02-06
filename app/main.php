@@ -24,5 +24,6 @@ print_r($account->access_token);
 $service = new JobstreetService($client);
 
 $search = $service->search_jobs()->search();
-
+$resume = $service->documents()->get_resumes();
 print_r($search);
+print_r($resume);

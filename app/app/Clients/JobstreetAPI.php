@@ -52,29 +52,39 @@ class JobstreetAPI extends api
                 "variables" => QueryHelper::buildGraphQLVariables($this, $operation, $variables) ?? new \stdClass(),
                 "query" => QueryHelper::loadGraphQLQuery($this, $operation)
             ];
-            $response = $this->api()->post($this->host . '/graphql', $payload);
+            $response = $this->post($this->host . '/graphql', $payload);
 
-            $decoded = $response->json() ?? null;
 
             $out = [];
 
-            if (!$response->successful()) {
-                $out['ok'] = false;
-                $out['type'] = 'http_error';
-                $out['http_code'] = $response->status();
-                $out['data'] = $decoded ?? $response->body();
-            } elseif (isset($decoded['errors'])) {
-                $out['ok'] = false;
-                $out['type'] = 'graphql_error';
-                $out['http_code'] = 200;
-                $out['errors'] = $decoded['errors'];
-            } else {
-                $out['ok'] = true;
-                $out['http_code'] = 200;
-                $out['data'] = $decoded['data'];
-            }
+            switch ($response['status']) {
+                case 'success':
+                    $out['ok'] = true;
+                    $out['http_code'] = $response['http_code'];
+                    $out['data'] = $response['data'];
+                    break; 
 
-            // Options
+                case 'system_error':
+                case 'connection_error':
+                    $out['ok'] = false;
+                    $out['type'] = $response['status'];
+                    $out['http_code'] = $response['http_code'];
+                    $out['message'] = $response['message'];
+                    break;
+
+                case 'http_error':
+                    $out['ok'] = false;
+                    $out['type'] = 'http_error';
+                    $out['http_code'] = $response['http_code'];
+                    $out['data'] = $response['data'];
+                    break;
+
+                default:
+                    $out['ok'] = false;
+                    $out['type'] = 'unknown';
+                    $out['message'] = 'Terjadi kesalahan yang tidak terdefinisi';
+                    break;
+            }
 
             if ($options['headers']) {
                 $out['headers'] = $response->headers();
@@ -115,7 +125,7 @@ class JobstreetAPI extends api
         } catch(\Exception $e) {
             return [
             'ok' => false,
-            'type' => 'general_exception',
+            'type' => 'graphql_exception',
             'message' => $e->getMessage(),
             ];
         }

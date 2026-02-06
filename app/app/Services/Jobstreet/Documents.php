@@ -14,12 +14,13 @@ class Documents extends JobstreetService
         parent::__construct($client);
     }
 
-    public function load(): ?array
+    public function load(): array
     {
         if($this->data){
             return $this->data;
         }
-        $this->data = $client->graphql('DocumentsQuery');
+        $this->data = $this->client->graphql('DocumentsQuery');
+        return $this->data;
     }
 
     public function get_resumes(): array
