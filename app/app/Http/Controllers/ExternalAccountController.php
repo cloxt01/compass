@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Http;
 
 use App\Models\User;
-use App\Clients\JobstreetToken;
+use App\Services\JobstreetToken;
 use App\Exceptions\UnknownOperation;
+use App\Exceptions\UnknownProvider;
 
 
 
@@ -52,10 +53,11 @@ class ExternalAccountController extends Controller {
             ]);
             $client = match($provider) {
                 'jobstreet' => new JobstreetToken,
-                default => throw new UnknownOperation($provider)
+                // Other providers
+                default => throw new UnknownProvider($provider)
             };
             
-            $is_verified = $client->verify_otp($request->input('email'), $request->input('verification_code'), $provider);
+            $is_verified = $client->verify_otp($request->input('email'), $request->input('verification_code'));
             if (!$is_verified) {
                 return response()->json(['status' => 'failed', 'data' => 'Invalid OTP'], 200);
             }
@@ -65,7 +67,7 @@ class ExternalAccountController extends Controller {
             }
 
             return response()->json(['status' => 'success', 'data' => 'OK'], 200);
-        } catch(\UnknownOperation $e){
+        } catch(\UnknownProvider $e){
             return response()->json(['status' => 'failed', 'errors' => ['provider' =>[$e->getMessage()]]], 400);
         } catch(\Exception $e){
             return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);
@@ -81,7 +83,7 @@ class ExternalAccountController extends Controller {
             if ($user->jobstreetAccount) {
                 $user->jobstreetAccount()->delete();
                 $user->refresh();
-                return redirect()->refresh();
+                return redirect()->route('external.index');
             }
             return response()->json(['success' => false, 'message' => 'Account not found'], 404);
 
@@ -104,16 +106,8 @@ class ExternalAccountController extends Controller {
             $user = User::find(auth()->user()->id);
             Log::info($user);
 
-            $add = $user->jobstreetAccount()->updateOrCreate(
-                ['user_id' => $user->id], 
-                [
-                    'access_token' => $token['access_token'],
-                    'refresh_token' => $token['refresh_token'],
-                    'expires_at' => now()->addSeconds($token['expires_in']),
-                    'status' => 'active'
-                ]
-            );
-            Log::info("Status add: " .$add);
+            $add = $user->jobstreetAccount->updateToken($token);
+            Log::info("Status add token: " .$add);
 
             return response()->json([
                 'redirect' => route('external.index')

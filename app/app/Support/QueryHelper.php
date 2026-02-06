@@ -10,7 +10,7 @@ use App\Exceptions\UnknownOperation;
 use Illuminate\Support\Facades\DB;
 
 class QueryHelper {
-    private static function generateUUID() {
+    public static function generateUUID() {
         return sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             mt_rand(0, 0xffff), mt_rand(0, 0xffff),

@@ -17,7 +17,7 @@ Route::get('/request/{id}', [RequestController::class, 'request_info'])->name('a
 // --------------------
 // Panel API (requires authentication token)
 // --------------------
-Route::prefix('panel')->group(function() {
+Route::prefix('panel')->middleware(['web', 'auth'])->group(function() {
     Route::post('/start', [PanelController::class, 'start'])->name('panel.start');
 });
 

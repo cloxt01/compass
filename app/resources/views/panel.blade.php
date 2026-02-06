@@ -28,7 +28,7 @@
 
     <label>
         <input type="checkbox" 
-            name="platforms[]" 
+            name="providers[]" 
             value="jobstreet" 
             {{ $hasJobstreet ? 'checked' : '' }} 
             {{ $hasJobstreet ? '' : 'disabled' }}>

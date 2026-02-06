@@ -13,9 +13,10 @@ class api {
 
     public function __construct(?string $token = null, ?string $cookie = null) {}
 
-    public function api()
+    private function api()
     {
         return Http::withHeaders($this->headers)
+        ->baseUrl($this->host)
         ->acceptJson()
         ->timeout(20)
         ->connectTimeout(10)
@@ -29,7 +30,7 @@ class api {
     public function get(string $path, array $params = []): array
     {
         try {
-            $response = $this->api()->get($this->host.$path, $params);
+            $response = $this->api()->get($path, $params);
 
             if ($response->failed()) {
                 return [
@@ -58,7 +59,8 @@ class api {
     public function post(string $path, array $data = []): array
     {
         try {
-            $response = $this->api()->post($this->host.$path, $body);
+
+            $response = $this->api()->post($path, $data);
 
             if ($response->failed()) {
                 return [

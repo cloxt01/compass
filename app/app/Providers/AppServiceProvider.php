@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\JobstreetAccount;
+use App\Observers\JobstreetAccountObserver;
+
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
@@ -21,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        JobstreetAccount::observe(JobstreetAccountObserver::class);
+
          if (config('app.env') !== 'local') {
             URL::forceScheme('https');
         }
