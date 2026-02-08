@@ -25,7 +25,7 @@ class QueryHelper {
 
         
         if (!file_exists($path)) {
-            throw new UnknownOperation();
+            throw new UnknownOperation($operationName);
             // throw new UnknownOperation("File query tidak ditemukan di: " . $path);
         }
 

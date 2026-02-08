@@ -3,10 +3,10 @@
 namespace App\Services\Jobstreet;
 
 use App\Clients\JobstreetAPI;
-use App\Services\JobstreetService;
+use App\Services\Adapters\JobstreetAdapter;
 
 
-class ReviewPage extends JobstreetService
+class JobstreetProfile extends JobstreetAdapter
 {
     protected $data = null;
 
@@ -19,11 +19,37 @@ class ReviewPage extends JobstreetService
     public function load(): array
     {
         if ($this->data === null) {
-            $this->data = $this->client->graphql('ReviewPage')['data'];
+            $review = $this->client->graphql('ReviewPage')['data'] ?? [];
+            $document = $this->client->graphql('DocumentsQuery')['data'] ?? [];
+
+            print_r("----- REVIEW -----");
+            print_r($review);
+            print_r("----- DOCUMENT -----");
+            print_r($document);
+
+            if (!isset($review['data']['viewer']) && !isset($document['data']['viewer'])) {
+                return [];
+            }
+            $this->data = array_merge($review, $document);
         }
-        return $this->data;
+        return $this->data ?? [];
     }
 
+    public function get_resumes(): array
+    {
+        return $this->load()['data']['viewer']['resumes'] ?? [];
+    }
+
+    public function get_roles(): array
+    {
+        return $this->load()['data']['viewer']['roles'] ?? [];
+    }
+
+    public function get_latest_resume(): array
+    {
+
+        return end($this->load()['data']['viewer']['resumes']) ?? [];
+    }
     public function get_latest_roles(): array
     {
         return $this->load()['data']['viewer']['roles'][0] ?? [];
@@ -49,4 +75,6 @@ class ReviewPage extends JobstreetService
     {
         return $this->load()['data']['viewer']['referenceChecks'] ?? [];
     }
+
+    
 }

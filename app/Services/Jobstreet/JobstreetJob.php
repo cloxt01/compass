@@ -2,10 +2,11 @@
 
 namespace App\Services\Jobstreet;
 
+use Illuminate\Support\Facades\Log;
 use App\Clients\JobstreetAPI;
-use App\Services\JobstreetService;
+use App\Services\Adapters\JobstreetAdapter;
 
-class Job extends JobstreetService
+class JobstreetJob extends JobstreetAdapter
 {
     protected ?array $data = null;
 
@@ -36,7 +37,8 @@ class Job extends JobstreetService
         }
         return $data;
     }
-    public function search(array $params = []){
+    public function search(array $params = []): array
+    {
         $path = '/api/jobsearch/v5/me/search';
         $params = [
             'siteKey' => 'ID-Main',
@@ -45,7 +47,27 @@ class Job extends JobstreetService
             'where' => $params['location'],
             'pageSize' => (int)($params['pageSize']),
             'locale' => 'id-ID'];
-        return $this->client->get($path, $params);
+        return $this->client->get($path, $params) ?? [];
+    }
+
+    public function details(string $jobId): array
+    {
+        $details = $this->client->graphql('jobDetailsWithPersonalised', ['jobId' => $jobId])['data']['data']['jobDetails'];
+        $process = $this->client->graphql('GetJobApplicationProcess', ['jobId' => $jobId])['data']['data']['jobApplicationProcess'];
+
+        $resp = array_merge($details['job'], $process);
+        
+        return ["job" => $resp] ?? [];
+    }
+    public function apply(array $payload): bool
+    {
+        $resp = $this->client->graphql('ApplySubmitApplication', $payload);
+        if($resp['ok'] && $resp['data']['data']['submitApplication']['__typename'] === 'SubmitApplicationSuccess'){
+            return true;
+        } else {
+            Log::error("Gagal melamar pekerjaan: " . json_encode($resp));
+            return false;
+        }
     }
 }
 

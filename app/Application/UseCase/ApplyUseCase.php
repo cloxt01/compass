@@ -1,37 +1,33 @@
 <?php
 
+namespace App\Application\UseCase;
+
+use Illuminate\Support\Facades\Log;
+
+use App\Infrastructure\Contracts\PlatformAdapter;
+
 class ApplyUseCase {
-    protected JobstreetService|GlintsService $service;
-    protected ApplicationExecutor $executor;
-    protected PayloadBuilder $payloadBuilder;
-    protected JobDetailsReader $jobDetailsReader;
 
     public function __construct(
-        JobstreetService|GlintsService $service,
-        JobDetailsReader $jobDetailsReader,
-        DecisionService $decision,
-        PayloadBuilder $payloadBuilder,
-        ApplicationExecutor $executor,
+        private PlatformAdapter $adapter
     ) {
-        $this->service = $service;
-        $this->jobDetailsReader = $jobDetailsReader;
-        $this->decision = $decision;
-        $this->payloadBuilder = $payloadBuilder($this->service);
-        $this->executor = $executor;
+        $this->adapter = $adapter;
     }
 
     public function apply(string $jobId): bool {
+        $job = $this->adapter->loadJob($jobId);
+        $profile = $this->adapter->loadProfile();
+        if(empty($job)){
+            Log::error("Gagal memuat detail pekerjaan untuk ID: " . $jobId);
+            return false;
+        }
+        if(!$this->adapter->canApply($job)['canApply']){
+            Log::warning("Tidak dapat melamar pekerjaan ID: " . $jobId . " karena tidak memenuhi syarat.");
+            Log::warning(json_encode($this->adapter->canApply($job)['issues']));
+            return false;
+        }
 
-        if (!$this->jobDetailsReader->load($jobId)) {
-            throw new \App\Exceptions\CantApply("Job details could not be loaded.");
-        }
-        $decision = $this->decision->canApply($this->jobDetailsReader);
-        if(!$decision->canApply()['canApply']){
-            Log::info("Cannot apply for job $jobId: ".json_encode($decision->canApply()['issues']));
-            throw new \App\Exceptions\CantApply("You are not eligible to apply for this job.");
-        }
-        
-        $payload = $this->payloadBuilder->build($this->jobDetailsReader);
-        return $this->executor->execute($payload);
+        $payload = $this->adapter->buildPayload($job, $profile);
+        return $this->adapter->execute($payload);
     }
 }
