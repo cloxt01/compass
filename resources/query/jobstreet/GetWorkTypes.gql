@@ -1,0 +1,10 @@
+query GetWorkTypes {
+  viewer {
+    _id
+    workTypes {
+      id
+      __typename
+    }
+    __typename
+  }
+}

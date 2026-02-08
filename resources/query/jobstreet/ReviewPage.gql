@@ -1,0 +1,152 @@
+query ReviewPage($jobId: ID!, $zone: Zone!, $languageCode: LanguageCodeIso!, $locale: Locale!) {
+  viewer {
+    _id
+    profileVisibility {
+      level
+      __typename
+    }
+    profileVisibility2 {
+      id
+      __typename
+    }
+    roles {
+      ...role
+      __typename
+    }
+    skills {
+      ...skill
+      __typename
+    }
+    qualifications(
+      includeVerified: true
+      status: confirmed
+      zone: $zone
+      languageCode: $languageCode
+    ) {
+      ...qualification
+      __typename
+    }
+    referenceChecks {
+      id
+      references {
+        refereeFullName
+        organisationName
+        relationshipText(locale: $locale)
+        fromDate {
+          shortAbsoluteLabel(locale: $locale)
+          __typename
+        }
+        toDate {
+          shortAbsoluteLabel(locale: $locale)
+          __typename
+        }
+        candidateRoleTitle
+        refereeRoleTitle
+        referenceDate {
+          shortAbsoluteLabel(locale: $locale)
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+  jobApplicationProcess(jobId: $jobId) {
+    documents {
+      selectionCriteriaRequired
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment role on Role {
+  id
+  title {
+    text
+    ontologyId
+    __typename
+  }
+  company {
+    text
+    ontologyId
+    __typename
+  }
+  seniority {
+    text
+    ontologyId
+    __typename
+  }
+  from {
+    year
+    month
+    __typename
+  }
+  to {
+    year
+    month
+    __typename
+  }
+  achievements
+  tracking {
+    events {
+      key
+      value
+      __typename
+    }
+    __typename
+  }
+  __typename
+}
+
+fragment skill on Skill {
+  keyword {
+    text
+    ontologyId
+    __typename
+  }
+  __typename
+}
+
+fragment qualification on Qualification {
+  id
+  name {
+    text
+    ontologyId
+    __typename
+  }
+  institute {
+    text
+    ontologyId
+    __typename
+  }
+  completed
+  completionDate {
+    ... on Year {
+      year
+      __typename
+    }
+    ... on MonthYear {
+      month
+      year
+      __typename
+    }
+    __typename
+  }
+  formattedCompletion
+  highlights
+  status
+  verificationUrl
+  credential {
+    credentialInfo {
+      name
+      values
+      __typename
+    }
+    manageVerificationUrl
+    deleteVerificationUrl
+    __typename
+  }
+  __typename
+}

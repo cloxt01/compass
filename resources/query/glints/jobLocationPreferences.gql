@@ -1,0 +1,55 @@
+query jobLocationPreferences {
+  jobLocationPreferences {
+    ...JobLocationPreferenceFields
+    __typename
+  }
+}
+
+fragment JobLocationPreferenceFields on JobLocationPreferenceType {
+  id
+  needsVisa
+  CountryCode
+  CityId
+  UserId
+  createdAt
+  updatedAt
+  LocationId
+  City {
+    id
+    name
+    CountryCode
+    __typename
+  }
+  Country {
+    code
+    name
+    demonym
+    currency
+    languages {
+      key
+      value
+      __typename
+    }
+    callingCode
+    __typename
+  }
+  HierarchicalLocation {
+    id
+    latitude
+    longitude
+    CountryCode: countryCode
+    name
+    administrativeLevelName
+    formattedName
+    parents {
+      id
+      name
+      level
+      administrativeLevelName
+      formattedName
+      __typename
+    }
+    __typename
+  }
+  __typename
+}

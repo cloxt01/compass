@@ -1,0 +1,30 @@
+query getReferenceChecks($locale: Locale!) {
+  viewer {
+    _id
+    referenceChecks {
+      id
+      references {
+        relationshipText(locale: $locale)
+        organisationName
+        refereeFullName
+        refereeRoleTitle
+        candidateRoleTitle
+        fromDate {
+          shortAbsoluteLabel(locale: $locale)
+          __typename
+        }
+        toDate {
+          shortAbsoluteLabel(locale: $locale)
+          __typename
+        }
+        referenceDate {
+          shortAbsoluteLabel(locale: $locale)
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

@@ -1,0 +1,15 @@
+query GetPreferredLocations2($zone: Zone!, $languageCode: LanguageCodeIso!) {
+  viewer {
+    _id
+    preferredLocations2(zone: $zone, languageCode: $languageCode) {
+      id
+      shortDescription
+      description
+      countryCode
+      kind
+      isDeprecated
+      __typename
+    }
+    __typename
+  }
+}

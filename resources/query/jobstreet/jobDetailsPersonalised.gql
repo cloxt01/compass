@@ -1,0 +1,90 @@
+query jobDetailsPersonalised(
+  $id: ID!,
+  $tracking: JobDetailsTrackingInput,
+  $locale: Locale!,
+  $zone: Zone!,
+  $languageCode: LanguageCodeIso!,
+  $timezone: Timezone!,
+  $platform: Platform!,
+  $visitorId: UUID!,
+  $enableGetCandidateJobMatch: Boolean!
+) {
+  jobDetails(id: $id, tracking: $tracking) {
+    ...jobPersonalised
+    __typename
+  }
+}
+
+fragment jobPersonalised on JobDetails {
+  personalised {
+    isSaved
+    appliedDateTime {
+      shortAbsoluteLabel(locale: $locale, timezone: $timezone)
+      __typename
+    }
+    
+    topApplicantBadge2(
+      visitorId: $visitorId,
+      platform: $platform,
+      languageCode: $languageCode
+    ) {
+      label(locale: $locale)
+      description(locale: $locale, zone: $zone)
+      __typename
+    }
+    salaryMatch {
+      ... on JobProfileMissingSalaryPreference {
+        label(locale: $locale)
+        __typename
+      }
+      ... on JobProfileSalaryMatch {
+        label(locale: $locale)
+        salaryPreference(locale: $locale, languageCode: $languageCode) {
+          id
+          description
+          country {
+            countryCode
+            name
+            __typename
+          }
+          currencyCode
+          amount
+          salaryType
+          __typename
+        }
+        __typename
+      }
+      ... on JobProfileSalaryNoMatch {
+        label(locale: $locale)
+        __typename
+      }
+      __typename
+    }
+    candidateJobMatch @include(if: $enableGetCandidateJobMatch) {
+      __typename
+      ... on CandidateJobMatchExists {
+        createdAt
+        shouldApply
+        shouldApplyMessage
+        summary
+        recommendations
+        trackingId
+        __typename
+      }
+      ... on CandidateJobMatchInProgress {
+        waitForMs
+        trackingId
+        __typename
+      }
+      ... on CandidateJobMatchResultInvalid {
+        message
+        __typename
+      }
+      ... on CandidateJobMatchNotExists {
+        __typename
+      }
+    }
+    __typename
+  }
+  __typename
+}

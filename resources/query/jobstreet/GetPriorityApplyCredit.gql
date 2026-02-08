@@ -1,0 +1,24 @@
+query GetPriorityApplyCredit($locale: Locale!, $timezone: Timezone!) {
+  priorityApplyCredit {
+    credit {
+      remainingCount
+      totalCredit
+      nextRenewalDate {
+        dateTimeUtc
+        shortAbsoluteLabel(timezone: $timezone, locale: $locale)
+        __typename
+      }
+      __typename
+    }
+    creditConfig {
+      creditValue
+      renewFrequency {
+        value
+        unit
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

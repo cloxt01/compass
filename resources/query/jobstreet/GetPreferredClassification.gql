@@ -1,0 +1,14 @@
+query GetPreferredClassification {
+  viewer {
+    _id
+    preferredClassification {
+      id
+      subClassification {
+        id
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

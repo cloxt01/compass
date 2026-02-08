@@ -1,0 +1,44 @@
+query GetUnconfirmedRoles {
+  viewer {
+    _id
+    unconfirmedRoles: roles(status: unconfirmed) {
+      id
+      title {
+        text
+        ontologyId
+        __typename
+      }
+      company {
+        text
+        ontologyId
+        __typename
+      }
+      seniority {
+        text
+        ontologyId
+        __typename
+      }
+      from {
+        year
+        month
+        __typename
+      }
+      to {
+        year
+        month
+        __typename
+      }
+      achievements
+      tracking {
+        events {
+          key
+          value
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

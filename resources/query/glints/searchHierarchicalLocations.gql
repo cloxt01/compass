@@ -1,0 +1,28 @@
+query searchHierarchicalLocations($searchTerm: String!, $levels: [PositiveInt!], $limit: PositiveInt, $withActiveJobsOnly: Boolean, $countryCode: String) {
+  searchHierarchicalLocations(
+    searchTerm: $searchTerm
+    levels: $levels
+    limit: $limit
+    withActiveJobsOnly: $withActiveJobsOnly
+    countryCode: $countryCode
+  ) {
+    id
+    CountryCode: countryCode
+    name
+    formattedName
+    level
+    parents {
+      id
+      name
+      formattedName
+      level
+      CountryCode: countryCode
+      parents {
+        level
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

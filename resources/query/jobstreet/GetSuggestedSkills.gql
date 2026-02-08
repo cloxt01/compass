@@ -1,0 +1,14 @@
+query GetSuggestedSkills($languageCode: LanguageCodeIso!, $zone: Zone!) {
+  viewer {
+    _id
+    suggestedSkills(languageCode: $languageCode, zone: $zone) {
+      keyword {
+        text
+        ontologyId
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

@@ -1,0 +1,23 @@
+query GetScore($zone: Zone, $languageCode: LanguageCodeIso, $isUnifiedSite: Boolean) {
+  viewer {
+    _id
+    score(zone: $zone, languageCode: $languageCode, isUnifiedSite: $isUnifiedSite) {
+      progress
+      tips {
+        action {
+          card
+          field
+          mode
+          item
+          __typename
+        }
+        label
+        description
+        score
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

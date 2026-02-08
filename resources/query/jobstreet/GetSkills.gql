@@ -1,0 +1,14 @@
+query GetSkills {
+  viewer {
+    _id
+    skills {
+      keyword {
+        text
+        ontologyId
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

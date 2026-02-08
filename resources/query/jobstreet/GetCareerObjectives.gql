@@ -1,0 +1,10 @@
+query GetCareerObjectives {
+  viewer {
+    _id
+    careerObjectives {
+      personalStatement
+      __typename
+    }
+    __typename
+  }
+}

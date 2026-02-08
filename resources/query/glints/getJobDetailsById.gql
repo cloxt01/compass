@@ -1,0 +1,214 @@
+query getJobDetailsById($opportunityId: String!, $traceInfo: String, $source: String) {
+  getJobById(id: $opportunityId, traceInfo: $traceInfo, source: $source) {
+    company {
+      ...CompanyFields
+      IndustryId
+      descriptionJsonString
+      isApprovedToTalentHunt
+      website
+      socialMediaSitesJsonString
+      photosJsonString
+      size
+      address
+      verificationTier {
+        type
+        __typename
+      }
+      __typename
+    }
+    hierarchicalJobCategory {
+      HierarchicalJobCategoryId: id
+      name
+      level
+      parents {
+        HierarchicalJobCategoryId: id
+        name
+        level
+        __typename
+      }
+      __typename
+    }
+    benefits {
+      benefit
+      title
+      __typename
+    }
+    fraudReportFlag
+    shouldShowSalary
+    educationLevel
+    resumeRequiredStatus
+    salaryEstimate {
+      minAmount
+      maxAmount
+      CurrencyCode
+      __typename
+    }
+    citySubDivision {
+      ...CitySubDivisionFields
+      __typename
+    }
+    city {
+      ...CityFields
+      __typename
+    }
+    country {
+      ...CountryFields
+      __typename
+    }
+    skills {
+      skill {
+        id
+        name
+        __typename
+      }
+      mustHave
+      __typename
+    }
+    salaries {
+      ...SalaryFields
+      __typename
+    }
+    location {
+      ...LocationFields
+      __typename
+    }
+    expInfo
+    creatorResponseTime
+    ...JobFields
+    creator {
+      ...CreatorFields
+      __typename
+    }
+    isEducationRequiredForCandidate
+    isLocationRequiredForCandidate
+    traceInfo
+    oneTapApply {
+      isEligible
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment JobFields on Job {
+  id
+  type
+  title
+  workArrangementOption
+  minYearsOfExperience
+  maxYearsOfExperience
+  createdAt
+  updatedAt
+  descriptionJsonString
+  interviewProcessJsonString
+  canUserApplyWithReason {
+    canApply
+    reason
+    __typename
+  }
+  isCoverLetterMandatory
+  externalApplyURL
+  acceptsForeignApplications
+  CountryCode
+  expiryDate
+  CityId
+  status
+  shouldShowBenefits
+  benefits {
+    benefit
+    title
+    __typename
+  }
+  isActivelyHiring
+  isHot
+  gender
+  minAge
+  maxAge
+  __typename
+}
+
+fragment CompanyFields on Company {
+  id
+  name
+  logo
+  status
+  isVIP
+  IndustryId
+  industry {
+    id
+    name
+    __typename
+  }
+  verificationTier {
+    type
+    userName
+    __typename
+  }
+  __typename
+}
+
+fragment CityFields on City {
+  id
+  name
+  __typename
+}
+
+fragment CountryFields on Country {
+  code
+  name
+  __typename
+}
+
+fragment SalaryFields on JobSalary {
+  id
+  salaryType
+  salaryMode
+  maxAmount
+  minAmount
+  CurrencyCode
+  __typename
+}
+
+fragment CitySubDivisionFields on CitySubDivision {
+  id
+  name
+  __typename
+}
+
+fragment LocationFields on HierarchicalLocation {
+  id
+  name
+  administrativeLevelName
+  formattedName
+  level
+  slug
+  latitude
+  longitude
+  parents {
+    id
+    name
+    administrativeLevelName
+    formattedName
+    level
+    slug
+    CountryCode: countryCode
+    parents {
+      level
+      formattedName
+      slug
+      __typename
+    }
+    __typename
+  }
+  __typename
+}
+
+fragment CreatorFields on Creator {
+  id
+  lastSeen
+  name
+  image
+  online
+  isHighResponseRate
+  __typename
+}

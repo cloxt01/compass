@@ -1,0 +1,30 @@
+query GetPersonalDetails($languageCode: LanguageCodeIso!, $countryCode: CountryCodeIso2!, $zone: Zone!) {
+  viewer {
+    _id
+    emailAddress
+    personalDetails(countryCode: $countryCode, languageCode: $languageCode) {
+      firstName
+      lastName
+      phoneNumber
+      countryCallingCode {
+        id
+        __typename
+      }
+      defaultCountryCallingCode {
+        id
+        __typename
+      }
+      __typename
+    }
+    currentLocation2(zone: $zone, languageCode: $languageCode) {
+      id
+      description
+      shortDescription
+      kind
+      countryCode
+      isDeprecated
+      __typename
+    }
+    __typename
+  }
+}

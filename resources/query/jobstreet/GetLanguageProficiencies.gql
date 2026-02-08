@@ -1,0 +1,15 @@
+query GetLanguageProficiencies {
+  viewer {
+    _id
+    languageProficiencies {
+      id
+      name {
+        text
+        ontologyId
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
