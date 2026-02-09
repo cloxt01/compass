@@ -31,7 +31,7 @@ $search = $adapter->job()->search([
 ]);
 
 $profile = $adapter->loadProfile();
-// print_r($profile);  
+print_r($profile);  
 // $job = $adapter->job()->details('89707772');
 // $job = $adapter->loadJob('89707772');
 // $payload = $adapter->buildPayload($job, $profile);

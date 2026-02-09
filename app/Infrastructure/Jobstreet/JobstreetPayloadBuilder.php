@@ -18,7 +18,9 @@ class JobstreetPayloadBuilder {
 
 
     public function build(array $details, array $profile): array
+    
     {
+        print_r($profile);
         if(empty($details)){
             throw new \JobNotFound("Detail pekerjaan tidak ditemukan.");
         }
@@ -29,6 +31,7 @@ class JobstreetPayloadBuilder {
         $resume = $profile['latest_resume'];
         $roles = $profile['latest_roles'] ?? [];
         $profile_visibility2 = $profile['profile_visibility']['2'] ?? [];
+
 
         // Tambahkan informasi pekerjaan
         $payload = [

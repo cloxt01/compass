@@ -19,18 +19,12 @@ class JobstreetProfile extends JobstreetAdapter
     public function load(): array
     {
         if ($this->data === null) {
-            $review = $this->client->graphql('ReviewPage')['data'] ?? [];
-            $document = $this->client->graphql('DocumentsQuery')['data'] ?? [];
+            $review = $this->client->graphql('ReviewPage')['data']['data']['viewer'] ?? [];
+            $document = $this->client->graphql('DocumentsQuery')['data']['data']['viewer'] ?? [];
 
-            print_r("----- REVIEW -----");
-            print_r($review);
-            print_r("----- DOCUMENT -----");
-            print_r($document);
-
-            if (!isset($review['data']['viewer']) && !isset($document['data']['viewer'])) {
-                return [];
-            }
-            $this->data = array_merge($review, $document);
+            
+            
+            $this->data = array_merge(["review" => $review], ["document" => $document]);
         }
         return $this->data ?? [];
     }
