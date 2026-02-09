@@ -17,10 +17,7 @@ class ApplyUseCase {
     public function apply(string $jobId): bool {
         $job = $this->adapter->loadJob($jobId);
         $profile = $this->adapter->loadProfile();
-        if(empty($job)){
-            Log::error("Gagal memuat detail pekerjaan untuk ID: " . $jobId);
-            return false;
-        }
+        
         if(!$this->adapter->canApply($job)['canApply']){
             Log::warning("Tidak dapat melamar pekerjaan ID: " . $jobId . " karena tidak memenuhi syarat.");
             Log::warning(json_encode($this->adapter->canApply($job)['issues']));

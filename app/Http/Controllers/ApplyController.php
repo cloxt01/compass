@@ -10,9 +10,9 @@ use App\Models\JobstreetAccount;
 
 use App\Clients\JobstreetAPI;
 use App\Clients\GlintsAPI;
+use App\Services\Adapters\JobstreetAdapter;
 
 use App\Jobs\ProcessApplications;
-use App\Services\JobstreetService;
 
 use App\Exceptions\UnknownProvider;
 use App\Exception\AccountNotFound;
@@ -43,37 +43,40 @@ class ApplyController extends Controller {
             $this->user = auth()->user();
             
             foreach($request->input('providers') as $provider){
+                // Cek dan inisialisasi akun serta klien untuk setiap provider
                 $this->provider_account[$provider] = match($provider){
                     'jobstreet' => $this->user->jobstreetAccount,
                     default => throw new UnknownProvider($provider)
                 };
+                // Validasi keberadaan akun untuk provider
                 if(!$this->provider_account[$provider]){
                     throw new AccountNotFound("$provider account not found");
                 }
+
+                // Inisialisasi klien 
                 $this->client[$provider] = match($provider){
                     'jobstreet' => new JobstreetAPI($this->user->jobstreetAccount?->access_token),
                 };
                 
-                $this->service[$provider] = match($provider){
-                    'jobstreet' => new JobstreetService($this->client[$provider]),
+                // Inisialisasi adapter 
+                $this->adapter[$provider] = match($provider){
+                    'jobstreet' => new JobstreetAdapter($this->client[$provider]),
                 };
-
-                if(!$this->provider_account[$provider]){
-                    throw new AccountNotFound("$provider account not found");
-                }
+                
+                // Cek status koneksi akun
                 if($this->provider_account[$provider]->status == 'reauth_required'){
                     return redirect()
                         ->route("api.external.disconnect", ['provider' => $provider]) 
                         ->withErrors(['msg' => "Koneksi ke $provider terputus, silakan hubungkan ulang."]);
                 }
-                $jobs = $this->service[$provider]->job()->search([
+                $jobs = $this->adapter[$provider]->job()->search([
                     'keyword' => $request->input('keyword'),
                     'location' => $request->input('location'),
                     'pageSize' => $request->input('pageSize')
                 ]);
                 Log::info("Found " . count($jobs['data']['data']) . " jobs on $provider for user " . $this->user->id);
                 foreach($jobs['data']['data'] as $job){
-                    ProcessApplications::dispatch($this->client[$provider], $job['id']);
+                    ProcessApplications::dispatch($this->adapter[$provider], $job['id']);
                 }
             }
             

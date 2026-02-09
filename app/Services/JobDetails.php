@@ -7,6 +7,7 @@ class JobDetails
     
 
     public static function fromJobstreet($raw){
+        
         return [
             'metadata' => [
                 'id' => $raw['details']['job']['id'] ?? 'Unknown',
