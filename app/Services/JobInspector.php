@@ -26,7 +26,7 @@ class JobInspector
             $issues[] = [
                 'type' => 'applied',
                 'level' => 'hard',
-                'message' => "Anda sudah melamar pekerjaan ini pada tanggal ".$details['eligibility']['applied']['shortAbsoluteLabel']
+                'message' => "Anda sudah melamar pekerjaan ini"
             ];
         }
 

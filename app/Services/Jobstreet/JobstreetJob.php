@@ -40,24 +40,40 @@ class JobstreetJob extends JobstreetAdapter
     public function search(array $params = []): array
     {
         $path = '/api/jobsearch/v5/me/search';
+        
         $params = [
             'siteKey' => 'ID-Main',
             'page' => 1,
             'keywords' => $params['keyword'],
             'where' => $params['location'],
             'pageSize' => (int)($params['pageSize']),
-            'locale' => 'id-ID'];
+            'locale' => 'id-ID'
+        ];
+        // $searchParams = [
+        //     'eventcapturesessionid' => null,              // kosong = null, bukan string kosong
+        //     'include'               => 'seogptTargeting,relatedsearches',
+        //     'keywords'              => 'Developer',
+        //     'locale'                => 'id-ID',
+        //     'page'                  => 1,                 // integer
+        //     'pagesize'              => 10,                // jangan bunuh hasil sendiri
+        //     'sitekey'               => 'ID-Main',
+        //     'source'                => 'FE_SERP',
+        //     'sourcesystem'          => 'houston',
+        //     'userid'                => null,              // anonymous, tapi eksplisit
+        //     'usersessionid'         => null,              // sama
+        //     'where'                 => 'Banten',
+        // ];
         return $this->client->get($path, $params) ?? [];
     }
 
     public function details(string $jobId): array
     {
-        $details = $this->client->graphql('jobDetailsWithPersonalised', ['jobId' => $jobId])['data']['data']['jobDetails'];
-        $process = $this->client->graphql('GetJobApplicationProcess', ['jobId' => $jobId])['data']['data']['jobApplicationProcess'];
+        $details = $this->client->graphql('jobDetailsWithPersonalised', ['jobId' => $jobId])['data']['data']['jobDetails'] ?? [];
+        $process = $this->client->graphql('GetJobApplicationProcess', ['jobId' => $jobId])['data']['data']['jobApplicationProcess'] ?? [];
 
-        $resp = array_merge($details['job'], $process);
+        $resp = array_merge(["details" => $details], ["process" => $process]);
         
-        return ["job" => $resp] ?? [];
+        return $resp;
     }
     public function apply(array $payload): bool
     {
