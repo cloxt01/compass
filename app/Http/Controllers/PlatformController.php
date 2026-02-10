@@ -93,7 +93,7 @@ class PlatformController extends Controller {
             if ($user->jobstreetAccount) {
                 $user->jobstreetAccount()->delete();
                 $user->refresh();
-                return redirect()->route('external.index');
+                return redirect()->route('platform.index');
             }
             return response()->json(['success' => false, 'message' => 'Account not found'], 404);
 
@@ -122,7 +122,7 @@ class PlatformController extends Controller {
             );
 
             return response()->json([
-                'redirect' => route('external.index')
+                'redirect' => route('platform.index')
             ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);

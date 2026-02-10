@@ -10,14 +10,14 @@
 <div id="status"></div>
 
 
-<form method="POST" action="{{ route('api.external.passwordless-login', ['provider' => 'jobstreet']) }}" id="sendOtpForm">
+<form method="POST" action="{{ route('api.platform.passwordless-login', ['provider' => 'jobstreet']) }}" id="sendOtpForm">
     @csrf
     <input type="hidden" name="request_id" id="request_id_send">
     <input type="text" name="email" placeholder="Email" auto-complete="on">
     <button type="submit">Submit</button>
 </form> 
 
-<form method="POST" action="{{ route('api.external.verify-otp', ['provider' => 'jobstreet']) }}" id="verifyOtpForm">
+<form method="POST" action="{{ route('api.platform.verify-otp', ['provider' => 'jobstreet']) }}" id="verifyOtpForm">
     @csrf
     <input type="hidden" name="request_id" id="request_id_verify">
     <input id="verifyEmailInput" type="hidden" name="email">
@@ -105,7 +105,7 @@
                     console.log(req);
                     const {id, token:payload, provider} = req.data;
                     console.log(id, payload, provider);
-                    let url = `${window.location.origin}/api-v1/external/${provider}/save-token`;
+                    let url = `${window.location.origin}/api-v1/platform/${provider}/save-token`;
                     const saved = await request(url, 'POST', {token: payload});
                     displayResponse(saved);
                     if(saved.status === 200 && saved.data.redirect){
