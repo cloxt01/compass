@@ -1,5 +1,5 @@
 <div>
-    <h2>Applied Jobs</h2>
+    <h2>Applied Jobs ({{ count($jobs) }})</h2>
 
     @if(count($jobs))
         <table>
@@ -12,14 +12,14 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($jobs as $job)
+                @for($i=0; $i < 5 && $i < count($jobs); $i++)
                     <tr>
-                        <td>{{ $job['job_title'] }}</td>
-                        <td>{{ $job['company'] }}</td>
-                        <td>{{ $job['job_location'] }}</td>
-                        <td>{{ $job['status'] }}</td>
+                        <td>{{ $jobs[$i]['job_title'] }}</td>
+                        <td>{{ $jobs[$i]['company'] }}</td>
+                        <td>{{ $jobs[$i]['job_location'] }}</td>
+                        <td>{{ $jobs[$i]['status'] }}</td>
                     </tr>
-                @endforeach
+                @endfor
             </tbody>
         </table>
     @else

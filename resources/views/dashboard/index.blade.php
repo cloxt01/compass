@@ -7,6 +7,8 @@
 
 @section('content')
 @livewireScripts
+<livewire:dashboard-nav />
+
 
 <h1>Dashboard</h1>
 
@@ -24,8 +26,8 @@
 
 
 
-
-<a href="{{ route('apply.index') }}">Go to Panel</a>
+<br>
+<a href="{{ route('apply.index') }}">Go to Apply</a>
 <br>    
 <a href="{{ route('auth.logout') }}">Logout</a>
 

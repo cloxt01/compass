@@ -17,7 +17,7 @@ new class extends Component
 
         if ($user && $user->jobstreetAccount) {
             $adapter = new JobstreetAdapter(new JobstreetAPI($user->jobstreetAccount->access_token));
-            $this->jobs = $adapter->job()->applied(5);
+            $this->jobs = $adapter->job()->applied(9999);
         }
     }
 
