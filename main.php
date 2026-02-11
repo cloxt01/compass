@@ -10,7 +10,7 @@ use App\Models\JobstreetAccount;
 use App\Services\Adapters\JobstreetAdapter;
 use App\Clients\JobstreetAPI;
 
-$user = User::find(1);
+$user = User::find(4);
 $account = $user->jobstreetAccount;
 if(!$account){
     echo("Account not found");
@@ -24,11 +24,11 @@ $client = new JobstreetAPI($account->access_token);
 $adapter = new JobstreetAdapter($client);
 // print_r($adapter);
 
-$search = $adapter->job()->search([
-    'pageSize' => 3,
-    'location' => 'Banten',
-    'keyword' => 'IT'
-]);
+// $search = $adapter->job()->search([
+//     'pageSize' => 3,
+//     'location' => 'Banten',
+//     'keyword' => 'IT'
+// ]);
 // $applied = $adapter->job()->applied(5);
 // print_r($applied);
 
@@ -47,7 +47,7 @@ print_r($profile);
 // // var_dump($search);
 // // var_dump($job);
 
-print_r($adapter->job()->applied(10));
+// print_r($adapter->job()->applied(10));
 // foreach($search['data']['data'] as $jobData){
 //     $job = $adapter->loadJob($jobData['id']);
 //     $profile = $adapter->loadProfile();
