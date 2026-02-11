@@ -42,7 +42,19 @@ return [
             'synchronous' => null,
             'transaction_mode' => 'DEFERRED',
         ],
-
+        'mongodb' => [
+            'driver'   => 'mongodb',
+            'host'     => env('MONGO_DB_HOST', '127.0.0.1'),
+            'dsn'      => env('MONGO_DB_DSN', null),
+            'port'     => env('MONGO_DB_PORT', 27017),
+            'database' => env('MONGO_DB_DATABASE'),
+            'username' => env('MONGO_DB_USERNAME'),
+            'password' => env('MONGO_DB_PASSWORD'),
+            'options'  => [
+                'appName' => env('MONGO_DB_OPTIONS', 'compass'),
+                'ssl' => true,
+            ],
+        ],
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),

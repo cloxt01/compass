@@ -40,17 +40,19 @@ Route::middleware('guest')->group(function() {
     Route::get('/register', fn() => view('register'))->name('register');
 });
 
+Route::prefix('dashboard')->middleware('auth')->group(function() {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
+});
 // Authenticated routes
 Route::middleware('auth')->group(function() {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
     Route::get('/apply', [ApplyController::class, 'index'])->name('apply.index');
+});
 
-    Route::get('/platform', fn() => view('platform.index'))->name('platform.index');
-
-    Route::prefix('platform')->group(function() {
-        Route::get('/connect/jobstreet', fn() => view('platform.jobstreet'))->name('platform.connect.jobstreet');
-        Route::get('/connect/glints', fn() => view('platform.glints'))->name('platform.connect.glints');
-    });
+// Platform routes
+Route::prefix('platform')->middleware('auth')->group(function() {
+    Route::get('/', [PlatformController::class, 'index'])->name('platform.index');
+    Route::get('/connect/jobstreet', fn() => view('platform.jobstreet'))->name('platform.connect.jobstreet');
+    Route::get('/connect/glints', fn() => view('platform.glints'))->name('platform.connect.glints');
 });
 
 // Web-based auth actions

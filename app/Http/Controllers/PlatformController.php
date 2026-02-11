@@ -22,6 +22,11 @@ class PlatformController extends Controller {
         return response()->json(['status' => 'failed', 'errors' => ['redis' => ['Redis connection failed']]], 500);;
     }
 
+    public function index(){
+        $user = auth()->user();
+        return view('platform.index', compact('user'));
+    }
+
     public function passwordless_login(Request $request, $provider){
         $request->validate([
         'request_id' => 'required|string|max:255',
