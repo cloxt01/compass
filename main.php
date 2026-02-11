@@ -37,7 +37,8 @@ $search = $adapter->job()->search([
 // print_r($job);
 // print_r($client->graphql('jobDetailsWithPersonalised', ['jobId' => '90201451']));
 
-// $profile = $adapter->loadProfile();
+$profile = $adapter->loadProfile();
+print_r($profile);
 // print_r($job);  
 // $job = $adapter->job()->details('89707772');
 // $payload = $adapter->buildPayload($job, $profile);
@@ -45,17 +46,21 @@ $search = $adapter->job()->search([
 // // $review = $service->review();
 // // var_dump($search);
 // // var_dump($job);
-foreach($search['data']['data'] as $jobData){
-    $job = $adapter->loadJob($jobData['id']);
-    $profile = $adapter->loadProfile();
-    $canApply = $adapter->canApply($job);
-    if($canApply['canApply']){
-        $applied = $adapter->execute($adapter->buildPayload($job, $profile));
-        print_r("Applied to Job ID: " . $jobData['id'] . " - " . ($applied ? "Success" : "Failed") . "\n");
-    } else {
-        print_r("Cannot apply to Job ID: " . $jobData['id'] . " - Reason: " .  $canApply['issues'][0]['message'] . "\n");
-    }
-}
+
+print_r($adapter->job()->applied(10));
+// foreach($search['data']['data'] as $jobData){
+//     $job = $adapter->loadJob($jobData['id']);
+//     $profile = $adapter->loadProfile();
+//     $canApply = $adapter->canApply($job);
+//     if($canApply['canApply']){
+//         $applied = $adapter->execute($adapter->buildPayload($job, $profile));
+//         print_r("Applied to Job ID: " . $jobData['id'] . " - " . ($applied ? "Success" : "Failed") . "\n");
+//     } else {
+//         print_r("Cannot apply to Job ID: " . $jobData['id'] . " - Reason: " .  $canApply['issues'][0]['message'] . "\n");
+//     }
+// }
+
+
 // print_r($search);
 // print_r($job);
 // var_dump($adapter->canApply($job));

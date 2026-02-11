@@ -11,7 +11,7 @@ class ProfileDetails
             'resumes' => $raw['document']['resumes'] ?? [],
             'roles' => $raw['review']['roles'] ?? [],
             'skills' => $raw['review']['skills'] ?? [],
-            'latest_resume' => end($raw['document']['resumes']) ?? null,
+            'latest_resume' => ($raw['document']['resumes'] ?? []) ? end($raw['document']['resumes']) : null,
             'latest_roles' => $raw['review']['roles'][0] ?? null,
             'profile_visibility' => [
                 '1' => $raw['review']['profileVisibility']['level'] ?? null,

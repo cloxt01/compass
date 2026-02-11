@@ -29,6 +29,10 @@ class ApplyController extends Controller {
         $this->service = [];
         $this->provider_account = [];
     }
+    public function index (){
+        $user = auth()->user();
+        return view('apply', compact('user'));
+    }
     public function start(Request $request) {
         try {
             $request->validate([
@@ -66,7 +70,7 @@ class ApplyController extends Controller {
                 // Cek status koneksi akun
                 if($this->provider_account[$provider]->status == 'reauth_required'){
                     return redirect()
-                        ->route("api.external.disconnect", ['provider' => $provider]) 
+                        ->route("api.platform.disconnect", ['provider' => $provider]) 
                         ->withErrors(['msg' => "Koneksi ke $provider terputus, silakan hubungkan ulang."]);
                 }
                 $jobs = $this->adapter[$provider]->job()->search([
@@ -88,4 +92,5 @@ class ApplyController extends Controller {
             return response()->json(['status' => 'failed', 'errors' => ['provider' => [$e->getMessage()]]], 400);
         }
     }
+    
 }

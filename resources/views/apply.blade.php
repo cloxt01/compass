@@ -23,7 +23,7 @@
     <br>
 
     @php
-        $hasJobstreet = auth()->user()->jobstreetAccount && auth()->user()->jobstreetAccount->access_token;
+        $hasJobstreet = $user->jobstreetAccount && $user->jobstreetAccount->access_token;
     @endphp
 
     <label>
@@ -39,5 +39,7 @@
     <button type="submit">Mulai</button>
 </form>
 
-<a href="{{ route('platform') }}">Connect Accounts</a>
+<a href="{{ route('platform.index') }}">Connect Accounts</a>
+
+
 @endsection

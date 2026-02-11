@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PanelController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ApplyController;
+use App\Http\Controllers\PlatformController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redis;
 
@@ -39,14 +42,10 @@ Route::middleware('guest')->group(function() {
 
 // Authenticated routes
 Route::middleware('auth')->group(function() {
-    Route::get('/dashboard', fn() => view('dashboard'))->name('dashboard');
-    Route::get('/apply', function() {
-        $user = auth()->user();
-        dump($user);
-        return view('apply');
-    })->name('apply');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/apply', [ApplyController::class, 'index'])->name('apply.index');
 
-    Route::get('/platform', fn() => view('platform.index'))->name('platform');
+    Route::get('/platform', fn() => view('platform.index'))->name('platform.index');
 
     Route::prefix('platform')->group(function() {
         Route::get('/connect/jobstreet', fn() => view('platform.jobstreet'))->name('platform.connect.jobstreet');

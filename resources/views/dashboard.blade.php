@@ -16,4 +16,6 @@
 <a href="{{ route('apply') }}">Go to Panel</a>
 <br>    
 <a href="{{ route('auth.logout') }}">Logout</a>
+
+
 @endsection

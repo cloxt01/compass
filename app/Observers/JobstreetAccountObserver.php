@@ -16,7 +16,6 @@ class JobstreetAccountObserver
         if (app()->runningInConsole()) {
             return;
         }
-        Log::info("Jobtreet account retrieved");
         if ($account->isExpired() && $account->status === 'active') {
             $token = RefreshJobstreetToken::dispatch($account->id);
         }
