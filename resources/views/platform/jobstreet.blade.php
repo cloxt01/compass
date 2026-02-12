@@ -52,11 +52,11 @@
         return await request(form.action, 'POST', jsonData);
     }
     async function requestInfo(id) {
-        const url = `${window.location.origin}/api-v1/request/${encodeURIComponent(id)}`;
+        const url = `${window.location.origin}/api/request/${encodeURIComponent(id)}`;
         return await request(url, 'GET');
     }
     async function saveToken(token, provider) {
-        const url = `${window.location.origin}/api-v1/${provider}/save-token`;
+        const url = `${window.location.origin}/api/platform/${provider}/save-token`;
         return await request(url, 'GET');
     }
 
@@ -105,7 +105,7 @@
                     console.log(req);
                     const {id, token:payload, provider} = req.data;
                     console.log(id, payload, provider);
-                    let url = `${window.location.origin}/api-v1/platform/${provider}/save-token`;
+                    let url = `${window.location.origin}/api/platform/${provider}/save-token`;
                     const saved = await request(url, 'POST', {token: payload});
                     displayResponse(saved);
                     if(saved.status === 200 && saved.data.redirect){
