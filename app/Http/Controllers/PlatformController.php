@@ -22,11 +22,6 @@ class PlatformController extends Controller {
         return response()->json(['status' => 'failed', 'errors' => ['redis' => ['Redis connection failed']]], 500);;
     }
 
-    public function index(){
-        $user = auth()->user();
-        return view('platform.index', compact('user'));
-    }
-
     public function passwordless_login(Request $request, $provider){
         $request->validate([
         'request_id' => 'required|string|max:255',
@@ -98,7 +93,7 @@ class PlatformController extends Controller {
             if ($user->jobstreetAccount) {
                 $user->jobstreetAccount()->delete();
                 $user->refresh();
-                return redirect()->route('platform.index');
+                return redirect()->route('profile');
             }
             return response()->json(['success' => false, 'message' => 'Account not found'], 404);
 
@@ -127,7 +122,7 @@ class PlatformController extends Controller {
             );
 
             return response()->json([
-                'redirect' => route('platform.index')
+                'redirect' => route('profile')
             ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);

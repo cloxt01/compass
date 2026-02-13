@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>@yield('title', 'Compass')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     {{-- Font --}}
     <link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome-all.min.css') }}">
@@ -13,12 +12,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="h-full bg-[#0d1117] text-gray-200">
+<body class="h-full bg-gray-100">
 
 <div class="flex min-h-screen">
-
-    {{-- SIDEBAR --}}
-    @include('layouts.sidebar')
 
     {{-- MAIN CONTENT --}}
     <main class="flex-1 p-6 transition-all duration-300">
@@ -27,8 +23,11 @@
 
 </div>
 
-
-
+<footer class="bg-white border-t">
+    <div class="text-center py-4 text-sm text-gray-500">
+        © Compass 2026
+    </div>
+</footer>
 
 </body>
 </html>

@@ -20,7 +20,7 @@ class AuthController extends Controller {
             return back()->withErrors(['error' => 'Invalid credentials']);
         }
         $request->session()->regenerate();
-        return redirect()->intended(route('dashboard.index'));
+        return redirect()->intended(route('dashboard'));
     }
     public function register(Request $request) {
         $credentials = $request->validate([
@@ -37,7 +37,7 @@ class AuthController extends Controller {
 
         Auth::login($user);
         $request->session()->regenerate();
-        return redirect()->intended(route('dashboard.index'));
+        return redirect()->intended(route('dashboard'));
     }
     public function logout(Request $request) {
         Auth::logout();

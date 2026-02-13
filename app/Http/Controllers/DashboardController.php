@@ -20,7 +20,7 @@ class DashboardController extends Controller
             $appliedJobs = $adapter->job()->applied(5);
         }
 
-        return view('dashboard.index', compact('appliedJobs'));
+        return view('dashboard', compact('appliedJobs'));
     }
 
 

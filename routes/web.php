@@ -40,17 +40,15 @@ Route::middleware('guest')->group(function() {
     Route::get('/register', fn() => view('register'))->name('register');
 });
 
-Route::prefix('dashboard')->middleware('auth')->group(function() {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
-});
-// Authenticated routes
 Route::middleware('auth')->group(function() {
-    Route::get('/apply', [ApplyController::class, 'index'])->name('apply.index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/apply', [ApplyController::class, 'index'])->name('apply');
+    Route::get('/profile', function(){return view('profile');})->name('profile');
 });
+
 
 // Platform routes
 Route::prefix('platform')->middleware('auth')->group(function() {
-    Route::get('/', [PlatformController::class, 'index'])->name('platform.index');
     Route::get('/connect/jobstreet', fn() => view('platform.jobstreet'))->name('platform.connect.jobstreet');
     Route::get('/connect/glints', fn() => view('platform.glints'))->name('platform.connect.glints');
 });
