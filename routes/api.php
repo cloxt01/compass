@@ -29,6 +29,7 @@ Route::prefix('platform')->middleware(['web', 'auth'])->group(function() {
     Route::post('/{provider}/save-token', [PlatformController::class, 'save_token'])->name('api.platform.save-token');
     Route::post('/{provider}/passwordless-login', [PlatformController::class, 'passwordless_login'])->name('api.platform.passwordless-login');
     Route::post('/{provider}/verify-otp', [PlatformController::class, 'verify_otp'])->name('api.platform.verify-otp');
+    Route::post('/{provider}/save-config', [PlatformController::class, 'save_config'])->name('api.platform.save-config');
 
 });
 

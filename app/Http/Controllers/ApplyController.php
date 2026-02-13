@@ -31,7 +31,11 @@ class ApplyController extends Controller {
     }
     public function index (){
         $user = auth()->user();
-        return view('apply', compact('user'));
+        $adapter = null;
+        if ($user->jobstreetAccount) {
+            $adapter = new JobstreetAdapter(new JobstreetAPI($user->jobstreetAccount->access_token));
+        }
+        return view('apply', compact('user', 'adapter'));
     }
     public function start(Request $request) {
         try {

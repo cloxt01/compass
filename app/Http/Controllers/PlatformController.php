@@ -128,4 +128,31 @@ class PlatformController extends Controller {
             return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);
         }
     }
+
+    public function save_config(Request $request, $provider){
+        try {
+            $user = auth()->user();
+            $account = match($provider){
+                'jobstreet' => $user->jobstreetAccount,
+                default => throw new UnknownProvider($provider)
+            };
+
+            foreach ($request->except('_token') as $key => $value) {
+                if (is_numeric($value)) {
+                    $value = (int) $value;
+                }
+                
+                $account->saveConfig($key, $value);
+            }
+
+            if(!$account){
+                return response()->json(['status' => 'failed', 'errors' => ['account' => ['Account not found']]], 404);
+            }
+            return back()->with('success', 'Configuration updated!');
+        } catch (UnknownProvider $e){
+            return response()->json(['status' => 'failed', 'errors' => ['provider' => [$e->getMessage()]]], 400);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);
+        }
+    }
 }

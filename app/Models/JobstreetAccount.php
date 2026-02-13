@@ -11,7 +11,14 @@ class JobstreetAccount extends Model
         'refresh_token',
         'expires_at',
         'status',
+        'apply_configurations',
+
     ];
+    protected $casts = [
+        'expires_at' => 'datetime',
+        'apply_configurations' => 'array',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -33,5 +40,17 @@ class JobstreetAccount extends Model
         $this->refresh_token = $token['refresh_token'];
         $this->expires_at = now()->addSeconds($token['expires_in'] - 60);
         $this->save();
+    }
+    public function saveConfig(string $key, $value){
+        $configs = $this->apply_configurations;
+        $configs[$key] = $value;
+        $this->apply_configurations = $configs;
+        $this->save();
+    }
+    public function getConfig(?string $key = null, $default = []): mixed {
+        if($key === null){
+            return $this->apply_configurations ?? [];
+        }
+        return $this->apply_configurations[$key] ?? $default;
     }
 }
