@@ -1,7 +1,7 @@
 
 # Compass App Documentation
 
-Compass is a Laravel-based web application designed to provide navigation and management features for your project. This documentation covers installation, configuration, and usage instructions.
+`Compass` - aplikasi pendukung untuk melamar pekerjaan 
 
 ## Installation
 
