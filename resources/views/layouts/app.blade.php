@@ -6,29 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- Font --}}
     <link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome-all.min.css') }}">
-
-    {{-- VITE --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="h-full bg-[#0d1117] text-gray-200">
 
-<div class="flex min-h-screen">
+<div id="app" class="flex min-h-screen">
 
     {{-- SIDEBAR --}}
     @include('layouts.sidebar')
 
-    {{-- MAIN CONTENT --}}
-    <main class="flex-1 p-6 transition-all duration-300">
-        @yield('content')
-    </main>
+    {{-- CONTENT AREA --}}
+    <div class="flex flex-col flex-1">
 
+        {{-- NAVBAR --}}
+        @include('layouts.navbar')
+
+        {{-- MAIN --}}
+        <main class="flex-1 p-6">
+            @yield('content')
+        </main>
+
+    </div>
 </div>
-
-
-
 
 </body>
 </html>

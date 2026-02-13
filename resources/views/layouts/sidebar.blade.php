@@ -1,81 +1,74 @@
-{{-- OVERLAY (mobile) --}}
-<div id="sidebarOverlay"
-     class="fixed inset-0 bg-black/40 z-30 hidden md:hidden"></div>
+<!-- BACKDROP -->
+<div id="sidebar-backdrop"
+     class="fixed inset-0 bg-black/60 z-40 hidden"></div>
 
-{{-- SIDEBAR --}}
+<!-- SIDEBAR -->
 <aside id="sidebar"
-       class="fixed md:static inset-y-0 left-0 z-40
-              w-64 bg-[#1f2230] text-gray-300
-              flex flex-col
-              -translate-x-full md:translate-x-0
-              transition-transform duration-300 ease-in-out">
+  class="fixed inset-y-0 left-0 z-50
+         w-64 bg-[#0d1117] text-[#c9d1d9]
+         flex flex-col
+         border-r border-[#30363d]
+         -translate-x-full
+         transition-transform duration-300 ease-in-out">
 
-    {{-- BRAND --}}
-    <div id="brandToggle"
-         class="flex items-center gap-3 px-5 py-4
-                border-b border-white/10
-                cursor-pointer select-none">
-
-        <div id="compassIcon" class="transition-transform duration-300">
-            <i class="fas fa-compass text-xl text-white"></i>
-        </div>
-
-        <span class="sidebar-text text-white font-semibold tracking-wide">
-            COMPASS
+    <!-- BRAND -->
+    <div class="flex items-center gap-2 px-4 h-14
+                border-b border-[#30363d]">
+        <img
+            src="{{ asset('icon.png') }}"
+            alt="Compass Logo"
+            class="w-5 h-5 filter invert brightness-200"
+        >
+        <span class="text-sm font-semibold tracking-tight text-white">
+            OMPASS
         </span>
     </div>
 
-    {{-- MENU --}}
-    <nav class="flex-1 px-3 py-4">
-        <ul class="space-y-1">
+    <!-- MENU -->
+    <nav class="flex-1 px-2 py-3">
+        <ul class="space-y-1 text-sm">
 
-            {{-- Dashboard --}}
             <li>
                 <a href="{{ route('dashboard') }}"
-                   class="group flex items-center gap-3 px-3 py-2 rounded-lg
-                          text-sm font-medium
+                   class="flex items-center gap-3 px-3 py-2 rounded-md
                           transition
                           {{ request()->routeIs('dashboard')
-                                ? 'bg-white/10 text-white'
-                                : 'hover:bg-white/5 hover:text-white' }}">
-                    <i class="fas fa-tachometer-alt text-sm opacity-80 group-hover:opacity-100"></i>
-                    <span class="sidebar-text">Dashboard</span>
+                            ? 'bg-[#30363d] text-white'
+                            : 'hover:bg-[#21262d]' }}">
+                    <i class="fas fa-tachometer-alt opacity-80"></i>
+                    <span>Dashboard</span>
                 </a>
             </li>
 
-            {{-- Profile --}}
             <li>
                 <a href="{{ route('profile') }}"
-                   class="group flex items-center gap-3 px-3 py-2 rounded-lg
-                          text-sm font-medium
+                   class="flex items-center gap-3 px-3 py-2 rounded-md
                           transition
                           {{ request()->routeIs('profile')
-                                ? 'bg-white/10 text-white'
-                                : 'hover:bg-white/5 hover:text-white' }}">
-                    <i class="fas fa-user text-sm opacity-80 group-hover:opacity-100"></i>
-                    <span class="sidebar-text">Profile</span>
+                            ? 'bg-[#30363d] text-white'
+                            : 'hover:bg-[#21262d]' }}">
+                    <i class="fas fa-user opacity-80"></i>
+                    <span>Profile</span>
                 </a>
             </li>
 
-            {{-- Apply --}}
             <li>
                 <a href="{{ route('apply') }}"
-                   class="group flex items-center gap-3 px-3 py-2 rounded-lg
-                          text-sm font-medium
+                   class="flex items-center gap-3 px-3 py-2 rounded-md
                           transition
                           {{ request()->routeIs('apply')
-                                ? 'bg-white/10 text-white'
-                                : 'hover:bg-white/5 hover:text-white' }}">
-                    <i class="fas fa-table text-sm opacity-80 group-hover:opacity-100"></i>
-                    <span class="sidebar-text">Apply</span>
+                            ? 'bg-[#30363d] text-white'
+                            : 'hover:bg-[#21262d]' }}">
+                    <i class="fas fa-table opacity-80"></i>
+                    <span>Apply</span>
                 </a>
             </li>
 
         </ul>
     </nav>
 
-    {{-- FOOTER --}}
-    <div class="px-5 py-4 border-t border-white/10 text-xs text-gray-400">
+    <!-- FOOTER -->
+    <div class="px-4 py-3 text-xs text-[#8b949e] border-t border-[#30363d]">
         © Compass 2026
     </div>
 </aside>
