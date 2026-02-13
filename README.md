@@ -1,3 +1,46 @@
+
+# Compass App Documentation
+
+Compass is a Laravel-based web application designed to provide navigation and management features for your project. This documentation covers installation, configuration, and usage instructions.
+
+## Installation
+
+1. Clone the repository:
+	```bash
+	git clone <repository-url>
+	```
+2. Install dependencies:
+	```bash
+	composer install
+	npm install && npm run dev
+	```
+3. Copy the example environment file and set your configuration:
+	```bash
+	cp .env.example .env
+	php artisan key:generate
+	```
+4. Set up your database in the `.env` file and run migrations:
+	```bash
+	php artisan migrate
+	```
+5. Start the development server:
+	```bash
+	php artisan serve
+	```
+
+## Features
+
+- User authentication and management
+- Project navigation dashboard
+- Role-based access control
+- Responsive UI
+
+## Usage
+
+After installation, access the app at `http://localhost:8000` and register a new user or log in with existing credentials. Use the dashboard to navigate and manage your projects.
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
