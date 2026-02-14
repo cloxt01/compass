@@ -45,7 +45,7 @@
 
     {{-- CONTENT --}}
     <div class="bg-[#161b22] border border-[#30363d] rounded-md p-4">
-        <livewire:applied-jobs />
+        <livewire:user-stats />
     </div>
 
 </div>

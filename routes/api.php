@@ -24,7 +24,7 @@ Route::prefix('apply')->middleware(['web','auth', 'token'])->group(function() {
 // --------------------
 // External account connection API
 // --------------------
-Route::prefix('platform')->middleware(['auth'])->group(function() {
+Route::prefix('platform')->middleware(['web','auth'])->group(function() {
     Route::get('/{provider}/disconnect', [PlatformController::class, 'disconnect'])->name('api.platform.disconnect');
     Route::post('/{provider}/save-token', [PlatformController::class, 'save_token'])->name('api.platform.save-token');
     Route::post('/{provider}/passwordless-login', [PlatformController::class, 'passwordless_login'])->name('api.platform.passwordless-login');
