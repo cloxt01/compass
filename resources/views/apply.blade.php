@@ -216,6 +216,7 @@
                                     </div>
                                 </div>
 
+                                {{-- ROLES SELECTION --}}
                                 <div>
                                     <label class="block text-xs font-medium text-[#8b949e] mb-1">
                                         Resume
@@ -241,6 +242,37 @@
                                             @endforeach
                                         @else
                                             <option value="">No resumes found</option>
+                                        @endif
+                                        
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-medium text-[#8b949e] mb-1">
+                                        Roles
+                                    </label>
+                                    <select name="role" class="w-full rounded-md border border-[#30363d] bg-[#0d1117]
+                                        px-3 py-2 text-sm text-[#e6edf3]
+                                        focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
+                                        @if(isset($jobstreet_profile['roles']))
+
+                                            @php
+                                                $selected_role = $jobstreet_config['role'] ?? null;
+                                            @endphp
+                                            
+                                            <option value="">Select Role</option>
+                                            
+                                            @foreach ($jobstreet_profile['roles'] as $role)
+                                                <option value="{{ $role['id'] }}" {{ $selected_role == $role['id'] ? 'selected' : '' }}>{{ $role['title']['text']}} 
+
+                                                    @if($selected_role == $role['id']) (Selected) @endif
+                                                    @if($loop->first)
+                                                        (Terbaru)
+                                                    @endif
+                                                </option>
+                                            @endforeach
+                                        @else
+                                            <option value="">No roles found</option>
                                         @endif
                                         
                                     </select>
