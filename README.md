@@ -17,7 +17,8 @@
 <img width="1915" height="900" alt="Screenshot 2026-02-14 011638" src="https://github.com/user-attachments/assets/e8f1dde4-3f51-4658-866c-6d0b4b449507" />
 
 `/apply`
-<img width="1901" height="902" alt="Screenshot 2026-02-14 011727" src="https://github.com/user-attachments/assets/0596f4ce-f254-4942-b013-a0272c3f7866" />
+<img width="1919" height="905" alt="image" src="https://github.com/user-attachments/assets/24c994d7-bca8-438f-a8d3-e34be1c1acc5" />
+
 
 
 ### Production Env

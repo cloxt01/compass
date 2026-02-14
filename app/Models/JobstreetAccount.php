@@ -2,6 +2,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+<<<<<<< HEAD
+=======
+use App\Services\Token\JobstreetToken;
+>>>>>>> main
 use App\Infrastructure\Contracts\PlatformAccount;
 
 class JobstreetAccount extends Model implements PlatformAccount 
@@ -19,6 +23,7 @@ class JobstreetAccount extends Model implements PlatformAccount
         'expires_at' => 'datetime',
         'apply_configurations' => 'array',
     ];
+    
 
     public function user()
     {
@@ -41,6 +46,18 @@ class JobstreetAccount extends Model implements PlatformAccount
         $this->refresh_token = $token['refresh_token'];
         $this->expires_at = now()->addSeconds($token['expires_in'] - 60);
         $this->save();
+    }
+    public function refreshToken(): bool
+    {
+        
+        $token = (new JobstreetToken())->refreshToken($this->refresh_token);
+        if (!$token || !isset($token['access_token'])) {
+            $this->status = 'reauth_required';
+            $this->save();
+            return false;
+        }
+        $this->updateToken($token);
+        return true;
     }
     public function saveConfig(string $key, $value){
         $configs = $this->apply_configurations;

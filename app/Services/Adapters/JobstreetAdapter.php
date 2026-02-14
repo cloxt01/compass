@@ -40,13 +40,6 @@ class JobstreetAdapter implements PlatformAdapter {
         return ProfileDetails::fromJobstreet($raw);
     }
 
-    public function loadConfig(): array {
-        return [
-            "resume" => $this->profile()->get_resume_byId(),
-            "latest_role" => $this->profile()->get_latest_roles()
-        ];
-    }
-
 
     public function buildPayload(array $jobDetails, array $profileDetails, array $config=[]): array
     {

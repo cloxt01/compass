@@ -24,7 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        JobstreetAccount::observe(JobstreetAccountObserver::class);
 
          if (config('app.env') !== 'local') {
             URL::forceScheme('https');
