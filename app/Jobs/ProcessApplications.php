@@ -13,6 +13,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use App\Infrastructure\Contracts\PlatformAdapter;
+use App\Infrastructure\Contracts\PlatformAccount;
 use App\Clients\GlintsAPI;
 
 use App\Application\UseCase\ApplyUseCase;
@@ -26,9 +27,11 @@ class ProcessApplications implements ShouldQueue
 
     protected string $job_id;
     protected PlatformAdapter $adapter;
-    public function __construct(PlatformAdapter $adapter, string $job_id)
+    protected PlatformAccount $account;
+    public function __construct(PlatformAdapter $adapter, PlatformAccount $account, string $job_id)
     {
         $this->adapter = $adapter;
+        $this->account = $account;
         $this->job_id = $job_id;
     }
 
@@ -37,7 +40,7 @@ class ProcessApplications implements ShouldQueue
         Log::info("Memproses Lamaran ID: " . $this->job_id);
 
         try {
-            $result = (new ApplyUseCase($this->adapter))->apply($this->job_id);
+            $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result ? "Ya" : "Tidak"));
         } catch (CantApply $e){
             Log::info($e->getMessage());
