@@ -17,10 +17,10 @@
         <img
             src="{{ asset('icon.png') }}"
             alt="Compass Logo"
-            class="w-5 h-5 filter invert brightness-200"
+            class="w-8 h-8 filter brightness-200"
         >
         <span class="text-sm font-semibold tracking-tight text-white">
-            OMPASS
+            Compass
         </span>
     </div>
 

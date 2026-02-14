@@ -164,11 +164,11 @@
        {{-- PLATFORM CONFIGURATION --}} 
 
         {{-- JOBSTREET CONFIG --}}
-        <div class="w-full md:w-128 bg-[#161b22] border border-[#30363d] rounded-md">
+        <div class="w-full md:w-100 bg-[#161b22] border border-[#30363d] rounded-md">
             {{-- HEADER --}}
             <div class="px-6 py-4 border-b border-[#30363d]">
                 <h1 class="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
-                    <i class="fas fa-paper-plane text-[#8b949e]"></i>
+                    <img width=25 height=25 src="{{ asset('assets/img/platform/jobstreet.png') }}" alt="">
                     Jobstreet Configuration
                 </h1>
                 <p class="text-xs text-[#8b949e] mt-1">

@@ -12,12 +12,5 @@ class UserStat extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function record()
-    {
-        $this->stats()->firstOrCreate(
-            ['date' => now()->toDateString()],
-            ['total_applied' => 0]
-        );
-        return $this->stats()->increment('total_applied');
-    }
+    
 }

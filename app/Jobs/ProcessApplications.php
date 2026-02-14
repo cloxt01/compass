@@ -42,7 +42,13 @@ class ProcessApplications implements ShouldQueue
         try {
             $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
             if($result){
-                $this->account->user->stats()->record();
+                $user = $this->account->user;
+                $userStat = $user->stats()->firstOrCreate(
+                    ['date' => now()->toDateString()],
+                    ['total_applied' => 0]
+                );
+                $userStat->increment('total_applied');
+                Log::info("Mencatat statistik untuk pengguna ID: " . $this->account->user->id);
             }
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result ? "Ya" : "Tidak"));
         } catch (CantApply $e){

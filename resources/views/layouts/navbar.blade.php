@@ -12,7 +12,7 @@
         </button>
 
         {{-- GITHUB ICON --}}
-        <img class="w-5 h-5 invert" src="{{ asset('icon.png') }}" alt="Compass Icon">
+        <img class="w-8 h-8" src="{{ asset('icon.png') }}" alt="Compass Icon">
         
         {{-- TITLE --}}
         <span class="text-sm font-semibold text-white">
