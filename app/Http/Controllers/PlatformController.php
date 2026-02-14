@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Http;
 
 use App\Models\User;
-use App\Services\JobstreetToken;
+use App\Services\Token\JobstreetToken;
 use App\Exceptions\UnknownOperation;
 use App\Exceptions\UnknownProvider;
 

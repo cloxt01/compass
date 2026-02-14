@@ -44,14 +44,16 @@ Route::middleware('auth')->group(function() {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/apply', [ApplyController::class, 'index'])->name('apply');
     Route::get('/profile', function(){return view('profile');})->name('profile');
+
+    Route::prefix('platform')->group(function() {
+    Route::get('/connect/jobstreet', fn() => view('platform.jobstreet'))->name('platform.connect.jobstreet');
+    Route::get('/connect/glints', fn() => view('platform.glints'))->name('platform.connect.glints');
+});
+
 });
 
 
 // Platform routes
-Route::prefix('platform')->middleware('auth')->group(function() {
-    Route::get('/connect/jobstreet', fn() => view('platform.jobstreet'))->name('platform.connect.jobstreet');
-    Route::get('/connect/glints', fn() => view('platform.glints'))->name('platform.connect.glints');
-});
 
 // Web-based auth actions
 Route::prefix('auth')->group(function() {

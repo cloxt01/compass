@@ -41,6 +41,9 @@ class ProcessApplications implements ShouldQueue
 
         try {
             $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
+            if($result){
+                $this->account->user->stats()->record();
+            }
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result ? "Ya" : "Tidak"));
         } catch (CantApply $e){
             Log::info($e->getMessage());
