@@ -41,8 +41,6 @@ class ProcessApplications implements ShouldQueue
 
         try {
             $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
-<<<<<<< HEAD
-=======
             if($result){
                 $user = $this->account->user;
                 $userStat = $user->stats()->firstOrCreate(
@@ -52,7 +50,6 @@ class ProcessApplications implements ShouldQueue
                 $userStat->increment('total_applied');
                 Log::info("Mencatat statistik untuk pengguna ID: " . $this->account->user->id);
             }
->>>>>>> main
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result ? "Ya" : "Tidak"));
         } catch (CantApply $e){
             Log::info($e->getMessage());

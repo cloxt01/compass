@@ -2,10 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-<<<<<<< HEAD
-=======
 use App\Services\Token\JobstreetToken;
->>>>>>> main
 use App\Infrastructure\Contracts\PlatformAccount;
 
 class JobstreetAccount extends Model implements PlatformAccount 

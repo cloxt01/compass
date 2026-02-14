@@ -87,7 +87,6 @@ class ApplyController extends Controller {
                     ProcessApplications::dispatch($this->adapter[$provider], $this->account[$provider], $job['id']);
                 }
             }
-            
 
             return response()->json(['status' => 'success'], 200);
         } catch(AccountNotFound $e){

@@ -40,8 +40,8 @@ Route::middleware('guest')->group(function() {
     Route::get('/register', fn() => view('register'))->name('register');
 });
 
-Route::middleware('auth')->group(function() {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['web', 'auth'])->group(function() {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('token');
     Route::get('/apply', [ApplyController::class, 'index'])->name('apply');
     Route::get('/profile', function(){return view('profile');})->name('profile');
 
