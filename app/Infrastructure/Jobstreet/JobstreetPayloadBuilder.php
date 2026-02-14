@@ -33,10 +33,15 @@ class JobstreetPayloadBuilder {
                 break;
             }
         }
+        foreach ($profile['roles'] as $role) {
+            if ($role['id'] === ($config['role'] ?? '')) {
+                $selectedRole = $role;
+                break;
+            }
+        }
         
         $resume = $selectedResume ?? $profile['latest_resume'];
-        Log::info("Resume yang digunakan untuk melamar: " . ($resume['id'] ?? 'Tidak ada resume yang ditemukan'));
-        $roles = $profile['latest_roles'] ?? [];
+        $roles = $selectedRole ?? $profile['latest_roles'] ?? [];
         $profile_visibility2 = $profile['profile_visibility']['2'] ?? [];
 
 
