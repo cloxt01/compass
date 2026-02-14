@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Jobstreet;
 
 
-
+use Illuminate\Support\Facades\Log;
 use App\Support\QuestionnaireParser;
 
 use App\Exceptions\JobNotFound;
@@ -17,7 +17,7 @@ class JobstreetPayloadBuilder {
     }
 
 
-    public function build(array $details, array $profile): array
+    public function build(array $details, array $profile, array $config = []): array
     
     {
         if(empty($details)){
@@ -27,7 +27,15 @@ class JobstreetPayloadBuilder {
             throw new \ResumeNotFound("Tidak ada resume yang ditemukan.");
         }
 
-        $resume = $profile['latest_resume'];
+        foreach ($profile['resumes'] as $resume) {
+            if ($resume['id'] === ($config['resume'] ?? '')) {
+                $selectedResume = $resume;
+                break;
+            }
+        }
+        
+        $resume = $selectedResume ?? $profile['latest_resume'];
+        Log::info("Resume yang digunakan untuk melamar: " . ($resume['id'] ?? 'Tidak ada resume yang ditemukan'));
         $roles = $profile['latest_roles'] ?? [];
         $profile_visibility2 = $profile['profile_visibility']['2'] ?? [];
 

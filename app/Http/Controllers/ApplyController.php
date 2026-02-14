@@ -22,18 +22,18 @@ class ApplyController extends Controller {
     protected User $user;
     protected array $client;
     protected array $service;
-    protected array $provider_account;
+    protected array $account;
     
     public function __construct() {
         $this->client = [];
         $this->service = [];
-        $this->provider_account = [];
+        $this->account = [];
     }
     public function index (){
         $user = auth()->user();
         $adapter = null;
         if ($user->jobstreetAccount) {
-            $adapter = new JobstreetAdapter(new JobstreetAPI($user->jobstreetAccount->access_token));
+            $adapter = new JobstreetAdapter(new JobstreetAPI($user->jobstreetAccount->access_token), $user->jobstreetAccount);
         }
         return view('apply', compact('user', 'adapter'));
     }
@@ -52,12 +52,12 @@ class ApplyController extends Controller {
             
             foreach($request->input('providers') as $provider){
                 // Cek dan inisialisasi akun serta klien untuk setiap provider
-                $this->provider_account[$provider] = match($provider){
+                $this->account[$provider] = match($provider){
                     'jobstreet' => $this->user->jobstreetAccount,
                     default => throw new UnknownProvider($provider)
                 };
                 // Validasi keberadaan akun untuk provider
-                if(!$this->provider_account[$provider]){
+                if(!$this->account[$provider]){
                     throw new AccountNotFound("$provider account not found");
                 }
 
@@ -68,11 +68,11 @@ class ApplyController extends Controller {
                 
                 // Inisialisasi adapter 
                 $this->adapter[$provider] = match($provider){
-                    'jobstreet' => new JobstreetAdapter($this->client[$provider]),
+                    'jobstreet' => new JobstreetAdapter($this->client[$provider], $this->account[$provider]),
                 };
                 
                 // Cek status koneksi akun
-                if($this->provider_account[$provider]->status == 'reauth_required'){
+                if($this->account[$provider]->status == 'reauth_required'){
                     return redirect()
                         ->route("api.platform.disconnect", ['provider' => $provider]) 
                         ->withErrors(['msg' => "Koneksi ke $provider terputus, silakan hubungkan ulang."]);
@@ -84,7 +84,7 @@ class ApplyController extends Controller {
                 ]);
                 Log::info("Found " . count($jobs['data']['data']) . " jobs on $provider for user " . $this->user->id);
                 foreach($jobs['data']['data'] as $job){
-                    ProcessApplications::dispatch($this->adapter[$provider], $job['id']);
+                    ProcessApplications::dispatch($this->adapter[$provider], $this->account[$provider], $job['id']);
                 }
             }
             

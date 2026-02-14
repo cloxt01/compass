@@ -2,8 +2,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Infrastructure\Contracts\PlatformAccount;
 
-class JobstreetAccount extends Model
+class JobstreetAccount extends Model implements PlatformAccount 
 {
      protected $fillable = [
         'user_id',

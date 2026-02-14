@@ -34,6 +34,17 @@ class JobstreetProfile extends JobstreetAdapter
         return $this->load()['data']['viewer']['resumes'] ?? [];
     }
 
+    public function get_resume_byId(string $id): array
+    {
+        $resumes = $this->get_resumes();
+        foreach($resumes as $resume){
+            if(isset($resume['id']) && $resume['id'] === $id){
+                return $resume;
+            }
+        }
+        return [];
+    }
+
     public function get_roles(): array
     {
         return $this->load()['data']['viewer']['roles'] ?? [];
