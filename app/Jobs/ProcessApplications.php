@@ -14,7 +14,9 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Infrastructure\Contracts\PlatformAdapter;
 use App\Infrastructure\Contracts\PlatformAccount;
-use App\Clients\GlintsAPI;
+use App\Clients\JobstreetAPI;
+use App\Services\Adapters\JobstreetAdapter;
+use App\Models\JobstreetAccount;
 
 use App\Application\UseCase\ApplyUseCase;
 
@@ -25,38 +27,66 @@ class ProcessApplications implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $timeout = 120;
+    public $tries = 3;
+    public $backoff = [30, 60, 120];
+
     protected string $job_id;
-    protected PlatformAdapter $adapter;
-    protected PlatformAccount $account;
+    protected int $account_id;
+
     public function __construct(PlatformAdapter $adapter, PlatformAccount $account, string $job_id)
     {
-        $this->adapter = $adapter;
-        $this->account = $account;
+        // Simpan hanya ID, bukan object
         $this->job_id = $job_id;
+        $this->account_id = $account->id;
+        error_log("[ProcessApplications] Job created: job_id={$job_id}, account_id={$account->id}");
     }
 
     public function handle()
     {
+        error_log("[ProcessApplications] Handle called: job_id={$this->job_id}, account_id={$this->account_id}");
         Log::info("Memproses Lamaran ID: " . $this->job_id);
 
         try {
-            $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
+            // Ambil account dari database
+            $account = JobstreetAccount::find($this->account_id);
+            if (!$account) {
+                Log::error("Account ID {$this->account_id} tidak ditemukan");
+                return;
+            }
+
+            // Buat adapter baru dari account yang terbaru
+            $adapter = new JobstreetAdapter(
+                new JobstreetAPI($account->access_token),
+                $account
+            );
+
+            $result = (new ApplyUseCase($adapter, $account))->apply($this->job_id);
             if($result){
                 Log::info("Lamaran ID: " . $this->job_id . " berhasil dilamar. Mencatat statistik...");
-                $user = $this->account->user;
+                $user = $account->user;
                 $userStat = $user->stats()->firstOrCreate(
                     ['date' => now()->toDateString()],
                     ['total_applied' => 0]
                 );
                 $userStat->increment('total_applied');
-                Log::info("Mencatat statistik untuk pengguna ID: " . $this->account->user->id);
+                Log::info("Statistik berhasil dicatat untuk user ID: " . $user->id);
             }
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result ? "Ya" : "Tidak"));
         } catch (CantApply $e){
-            Log::info($e->getMessage());
+            Log::warning("Tidak dapat melamar job {$this->job_id}: " . $e->getMessage());
         } catch (\Exception $e) {
-            Log::error("Error: " . $e->getMessage());
+            Log::error("Error: " . $e->getMessage(), ['exception' => $e]);
             throw $e; 
         }
+    }
+
+    public function failed(\Throwable $exception)
+    {
+        Log::error("ProcessApplications job FAILED setelah retry habis", [
+            'job_id' => $this->job_id,
+            'account_id' => $this->account_id,
+            'error' => $exception->getMessage()
+        ]);
     }
 }
