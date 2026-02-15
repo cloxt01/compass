@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full">
+<html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Compass')</title>
@@ -12,22 +12,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="h-full bg-gray-100">
+<body class="bg-[#0d1117]">
 
-<div class="flex min-h-screen">
-
+<div class="flex flex-col min-h-screen">
+    {{-- NAVBAR --}}
+    @include('layouts.navbar-guest')
+    
     {{-- MAIN CONTENT --}}
-    <main class="flex-1 p-6 transition-all duration-300">
+    <main class="flex-1 w-full">
         @yield('content')
     </main>
-
 </div>
-
-<footer class="bg-white border-t">
-    <div class="text-center py-4 text-sm text-gray-500">
-        © Compass 2026
-    </div>
-</footer>
 
 </body>
 </html>

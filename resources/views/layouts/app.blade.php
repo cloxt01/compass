@@ -23,7 +23,7 @@
     <div class="flex flex-col flex-1">
 
         {{-- NAVBAR --}}
-        @include('layouts.navbar')
+        @include('layouts.navbar-auth')
 
         {{-- MAIN --}}
         <main class="flex-1 p-6">

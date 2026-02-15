@@ -39,6 +39,7 @@ Route::middleware('guest')->group(function() {
     Route::get('/login', fn() => view('login'))->name('login');
     Route::get('/register', fn() => view('register'))->name('register');
 });
+Route::get('/', fn() => view('index'));
 
 Route::middleware(['web', 'auth'])->group(function() {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('token');
