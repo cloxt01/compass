@@ -11,7 +11,7 @@
             </svg>
         </button>
 
-        {{-- GITHUB ICON --}}
+        {{-- APP ICON --}}
         <img class="w-8 h-8" src="{{ asset('icon.png') }}" alt="Compass Icon">
         
         {{-- TITLE --}}
