@@ -17,7 +17,7 @@
             <div class="bg-[#161b22] border border-[#30363d] rounded-md p-6 text-center">
 
                 <img
-                    src="{{ asset('assets/img/avatars/messi.jpeg') }}"
+                    src="{{ asset('assets/img/avatars/messi.png') }}"
                     alt="Avatar"
                     class="w-36 h-36 rounded-full mx-auto mb-4 object-cover
                            border border-[#30363d]"
