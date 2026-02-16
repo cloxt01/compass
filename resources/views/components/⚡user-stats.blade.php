@@ -18,7 +18,10 @@ new class extends Component
         $this->user = Auth::user();
         $client = new JobstreetAPI($this->user->jobstreetAccount->access_token ?? null);
         $adapter = new JobstreetAdapter($client);
-        $this->userStat = UserStat::where('user_id', $this->user->id)->first();
+        $this->userStat = UserStat::firstOrCreate(
+            ['user_id' => $this->user->id, 'date' => today()],
+            ['total_applied' => 0] 
+        );
         $this->jobs = $adapter->job()->applied(9999);
     }
 
