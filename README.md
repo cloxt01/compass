@@ -14,10 +14,12 @@
 * **Worker:** Node Worker + Laravel Worker 
 
 `/dashboard`
-<img width="1915" height="900" alt="Screenshot 2026-02-14 011638" src="https://github.com/user-attachments/assets/e8f1dde4-3f51-4658-866c-6d0b4b449507" />
+<img width="1919" height="898" alt="image" src="https://github.com/user-attachments/assets/84b83d17-ef80-4c38-bcba-279977942726" />
+
 
 `/apply`
-<img width="1919" height="905" alt="image" src="https://github.com/user-attachments/assets/24c994d7-bca8-438f-a8d3-e34be1c1acc5" />
+<img width="1919" height="901" alt="image" src="https://github.com/user-attachments/assets/eeb9458e-61fc-45ab-8c26-1d2ebdd603ad" />
+
 
 
 
