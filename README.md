@@ -19,9 +19,3 @@
 
 `/apply`
 <img width="1919" height="901" alt="image" src="https://github.com/user-attachments/assets/eeb9458e-61fc-45ab-8c26-1d2ebdd603ad" />
-
-
-
-
-### Production Env
-<img width="1917" height="911" alt="Screenshot 2026-02-14 005907" src="https://github.com/user-attachments/assets/3a08425d-2c75-41ee-bae8-498d5d0e900c" />
