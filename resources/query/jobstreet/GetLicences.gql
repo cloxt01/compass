@@ -1,0 +1,58 @@
+query GetLicences($languageCode: LanguageCodeIso!, $zone: Zone!) {
+  viewer {
+    _id
+    licences(
+      languageCode: $languageCode
+      zone: $zone
+      platform: WEB
+      source: PROFILE
+    ) {
+      ...licence
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment licence on Licence {
+  id
+  name {
+    text
+    ontologyId
+    __typename
+  }
+  issuingOrganisation
+  issueDate {
+    month
+    year
+    __typename
+  }
+  expiryDate {
+    month
+    year
+    __typename
+  }
+  noExpiryDate
+  description
+  status
+  formattedDate
+  verificationUrl
+  verificationMessage
+  credentialType
+  credential {
+    verification {
+      result
+      __typename
+    }
+    credentialInfo {
+      name
+      values
+      __typename
+    }
+    manageVerificationUrl
+    deleteVerificationUrl
+    expiryStatus
+    __typename
+  }
+  __typename
+}

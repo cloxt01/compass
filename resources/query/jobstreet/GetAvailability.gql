@@ -1,0 +1,11 @@
+query GetAvailability($languageCode: LanguageCodeIso!) {
+  viewer {
+    _id
+    availability(languageCode: $languageCode) {
+      id
+      description
+      __typename
+    }
+    __typename
+  }
+}

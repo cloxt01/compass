@@ -1,0 +1,19 @@
+query GetSalaryPreferences($countryCode: CountryCodeIso2!, $languageCode: LanguageCodeIso = "en") {
+  viewer {
+    _id
+    salaryPreferences2(countryCode: $countryCode, languageCode: $languageCode) {
+      id
+      country {
+        countryCode
+        name
+        __typename
+      }
+      currencyCode
+      description
+      amount
+      salaryType
+      __typename
+    }
+    __typename
+  }
+}

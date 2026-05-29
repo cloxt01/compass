@@ -1,0 +1,20 @@
+query getHierarchicalLocationById($id: String!) {
+  location(id: $id) {
+    id
+    latitude
+    longitude
+    CountryCode: countryCode
+    name
+    administrativeLevelName
+    formattedName
+    parents {
+      id
+      name
+      level
+      administrativeLevelName
+      formattedName
+      __typename
+    }
+    __typename
+  }
+}

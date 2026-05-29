@@ -1,0 +1,21 @@
+query GetVerifications($jobId: ID!, $selectedAnswerUris: [String!]!, $zone: Zone) {
+  viewer {
+    _id
+    verificationNudges(
+      jobId: $jobId
+      selectedAnswerUris: $selectedAnswerUris
+      platform: WEB
+      source: JAS
+      zone: $zone
+    ) {
+      uri
+      ctaLabel
+      ctaUrl
+      description
+      rank
+      verificationType
+      __typename
+    }
+    __typename
+  }
+}

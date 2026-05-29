@@ -1,0 +1,97 @@
+query getApplications($data: GetApplicationsInput!) {
+  getApplications(data: $data) {
+    data {
+      id
+      createdAt
+      status
+      streamChannelId
+      job {
+        bookmarkId
+        id
+        creatorId
+        title
+        minYearsOfExperience
+        maxYearsOfExperience
+        updatedAt
+        isRemote
+        workArrangementOption
+        salaries {
+          ...SalaryFields
+          __typename
+        }
+        type
+        status
+        city {
+          name
+          country {
+            ...CountryFields
+            __typename
+          }
+          __typename
+        }
+        country {
+          ...CountryFields
+          __typename
+        }
+        location {
+          HierarchicalJobCategoryId: id
+          name
+          level
+          parents {
+            HierarchicalJobCategoryId: id
+            name
+            level
+            __typename
+          }
+          __typename
+        }
+        company {
+          ...CompanyFields
+          __typename
+        }
+        fraudReportFlag
+        __typename
+      }
+      source
+      __typename
+    }
+    totalCount
+    __typename
+  }
+}
+
+fragment SalaryFields on JobSalary {
+  id
+  salaryType
+  salaryMode
+  maxAmount
+  minAmount
+  CurrencyCode
+  __typename
+}
+
+fragment CompanyFields on Company {
+  id
+  name
+  logo
+  status
+  isVIP
+  IndustryId
+  industry {
+    id
+    name
+    __typename
+  }
+  verificationTier {
+    type
+    userName
+    __typename
+  }
+  __typename
+}
+
+fragment CountryFields on Country {
+  code
+  name
+  __typename
+}

@@ -1,0 +1,18 @@
+mutation sendLoginCallbackEvent {
+  sendLoginCallbackEvent {
+    ... on SendLoginCallbackEventSuccess {
+      loginType
+      __typename
+    }
+    ... on SendLoginCallbackEventFailure {
+      error {
+        message
+        code
+        reason
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

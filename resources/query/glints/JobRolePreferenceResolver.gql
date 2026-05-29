@@ -1,0 +1,21 @@
+query JobRolePreferenceResolver {
+  jobRolePreferences {
+    id
+    HierarchicalJobCategoryId
+    HierarchicalJobCategory {
+      HierarchicalJobCategoryId: id
+      name
+      level
+      defaultName
+      parents {
+        HierarchicalJobCategoryId: id
+        level
+        name
+        defaultName
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

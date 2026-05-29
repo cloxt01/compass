@@ -1,0 +1,44 @@
+query DocumentsQuery($jobId: ID!) {
+  viewer {
+    _id
+    resumes {
+      ...resume
+      __typename
+    }
+    __typename
+  }
+  jobApplicationProcess(jobId: $jobId) {
+    documents {
+      lastAppliedResumeIdPrefill
+      selectionCriteriaRequired
+      lastWrittenCoverLetter {
+        content
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
+fragment resume on Resume {
+  id
+  createdDateUtc
+  isDefault
+  fileMetadata {
+    name
+    size
+    virusScanStatus
+    sensitiveDataInfo {
+      isDetected
+      __typename
+    }
+    uri
+    __typename
+  }
+  origin {
+    type
+    __typename
+  }
+  __typename
+}

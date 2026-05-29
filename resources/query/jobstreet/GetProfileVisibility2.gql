@@ -1,0 +1,11 @@
+query GetProfileVisibility2($locale: Locale!) {
+  viewer {
+    _id
+    profileVisibility2 {
+      __typename
+      id
+      name(locale: $locale)
+    }
+    __typename
+  }
+}
