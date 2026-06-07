@@ -17,9 +17,9 @@ use App\Exceptions\UnknownProvider;
 
 class PlatformController extends Controller {
     function __construct(){
-        $this->redis = Redis::connection();
-        if(!$this->redis->ping())
-        return response()->json(['status' => 'failed', 'errors' => ['redis' => ['Redis connection failed']]], 500);;
+        // $this->redis = Redis::connection();
+        // if(!$this->redis->ping())
+        // return response()->json(['status' => 'failed', 'errors' => ['redis' => ['Redis connection failed']]], 500);;
     }
 
     public function passwordless_login(Request $request, $provider){
