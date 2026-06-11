@@ -6,6 +6,7 @@
 @php
     $user = auth()->user();
     $hasJobstreet = $user->jobstreetAccount && $user->jobstreetAccount->access_token;
+    $hasGlints = $user->glintsAccount && $user->glintsAccount->access_token;
 @endphp
 
 <div class="max-w-6xl mx-auto px-4 py-10 text-gray-200">
@@ -104,27 +105,41 @@
                                 </td>
                             </tr>
 
-                            {{-- GLINTS --}}
+                            {{-- JOBSTREET --}}
                             <tr>
                                 <td class="px-6 py-4 font-medium text-gray-100">
                                     Glints
                                 </td>
 
                                 <td class="px-6 py-4">
-                                    <span class="inline-flex items-center rounded-full
-                                                 bg-[#30363d] text-gray-400
-                                                 text-xs px-2 py-0.5 border border-[#30363d]">
-                                        Not Available
-                                    </span>
+                                    @if($hasGlints)
+                                        <span class="inline-flex items-center rounded-full
+                                                     bg-[#238636]/20 text-[#3fb950]
+                                                     text-xs px-2 py-0.5 border border-[#238636]/40">
+                                            Connected
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center rounded-full
+                                                     bg-[#30363d] text-gray-400
+                                                     text-xs px-2 py-0.5 border border-[#30363d]">
+                                            Disconnected
+                                        </span>
+                                    @endif
                                 </td>
 
                                 <td class="px-6 py-4">
-                                    <button
-                                        disabled
+                                    <a
+                                        href="{{ $hasGlints
+                                            ? route('platform.disconnect', ['provider' => 'glints'])
+                                            : route('platform.connect.glints') }}"
                                         class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium
-                                               bg-[#21262d] text-gray-500 cursor-not-allowed border border-[#30363d]">
-                                        Disabled
-                                    </button>
+                                               {{ $hasGlints
+                                                   ? 'bg-[#da3633] text-white hover:bg-[#f85149]'
+                                                   : 'bg-[#238636] text-white hover:bg-[#2ea043]' }}
+                                               transition"
+                                    >
+                                        {{ $hasGlints ? 'Disconnect' : 'Connect' }}
+                                    </a>
                                 </td>
                             </tr>
 

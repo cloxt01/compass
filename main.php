@@ -5,25 +5,47 @@ $app = require_once __DIR__ . '/bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
+use App\Clients\GlintsAPI;
 use App\Models\User;
 use App\Models\JobstreetAccount;
+use App\Services\Adapters\GlintsAdapter;
 use App\Services\Adapters\JobstreetAdapter;
 use App\Clients\JobstreetAPI;
 
 $user = User::find(1);
-$account = $user->jobstreetAccount;
-if(!$account){
-    echo("Account not found");
-    exit();
+$jobstreetaccount = $user->jobstreetAccount;
+$glintsaccount = $user->glintsAccount;
+
+if(!$jobstreetaccount){
+    echo("jobstreetAccount not found");
+}
+if(!$glintsaccount){
+    echo("glintsAccount not found");
 }
 
-$cookie = config('compass.platforms.jobstreet.cookie');
-$client = new JobstreetAPI($account->access_token, $cookie);
-// print_r($account->access_token);
-print_r($client);
+//$cookie = config('compass.platforms.jobstreet.cookie');
+//$client = new JobstreetAPI($account->access_token, $cookie);
+//// print_r($account->access_token);
+//print_r($client);
+
+$cookie = $glintsaccount->cookie;
+$token = $glintsaccount->access_token;
+
+if(!$cookie){
+    echo("cookie not found\n");
+}
+if(!$token){
+    echo("token not found\n");
+}
+
+$client = new GlintsAPI($token, $cookie);
+$adapter = new GlintsAdapter($client);
+
+print_r($adapter->loadProfile());
+
+//$adapter = new JobstreetAdapter($client);
 
 
-$adapter = new JobstreetAdapter($client);
 // print_r($adapter);
 
 // $search = $adapter->job()->search([
@@ -39,17 +61,17 @@ $adapter = new JobstreetAdapter($client);
 // print_r($job);
 // print_r($client->graphql('jobDetailsWithPersonalised', ['jobId' => '90201451']));
 
-$profile = $adapter->loadProfile();
-print_r($profile);
-// print_r($job);  
+//$profile = $adapter->loadProfile();
+//print_r($profile);
+// print_r($job);
 // $job = $adapter->job()->details('89707772');
 // $payload = $adapter->buildPayload($job, $profile);
 // // $document = $service->documents();
 // // $review = $service->review();
 // // var_dump($search);
 // // var_dump($job);
-
-print_r($adapter->job()->applied(10));
+//
+//print_r($adapter->job()->applied(10));
 // foreach($search['data']['data'] as $jobData){
 //     $job = $adapter->loadJob($jobData['id']);
 //     $profile = $adapter->loadProfile();

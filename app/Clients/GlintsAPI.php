@@ -5,6 +5,7 @@ namespace App\Clients;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\RequestException;
 use App\Support\QueryHelper;
+use Illuminate\Support\Facades\Log;
 
 class GlintsAPI extends api
 {
@@ -18,19 +19,19 @@ class GlintsAPI extends api
         ?string $token = null,
         ?string $cookie = null,
     ) {
-        $this->token = $token;
-        $this->cookie = $cookie;
+        $this->token = $token ?: '';
+        $this->cookie = $cookie ?: '';
         $this->sessionId = '';
         $this->headers = [
             'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36',
             'Accept' => '*/*',
             'Content-Type' => 'application/json',
-            'Cookie' => $cookie,
+            'Cookie' => $this->cookie,
             'DNT' => '1',
             'Traceparent' => '00-2334d811047b919f3a4ac1f3fb1accf4-904abac004e541f1-01',
             'Origin' => 'https://glints.com',
             'Referer' => 'https://glints.com/',
-            'Authorization' => 'Bearer ' . 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRHZjM0TU1GNUpmdUFaX1R4RjhBbiJ9.eyJodHRwOi8vc2Vlay9jbGFpbXMvaWRlbnRpdHlfaWQiOiJhdXRoMHw2OTBlZDRiN2FkNTkxNzEyNjBmMGFiMDAiLCJodHRwOi8vc2Vlay9jbGFpbXMvY291bnRyeSI6IklEIiwiaHR0cDovL3NlZWsvY2xhaW1zL2JyYW5kIjoiam9ic3RyZWV0IiwiaHR0cDovL3NlZWsvY2xhaW1zL2V4cGVyaWVuY2UiOiJjYW5kaWRhdGUiLCJodHRwOi8vc2Vlay9jbGFpbXMvdXNlcl9pZCI6IjU5MDE0NTk4MCIsImlzcyI6Imh0dHBzOi8vbG9naW4uc2Vlay5jb20vIiwic3ViIjoiYXV0aDB8NjkwZWQ0YjdhZDU5MTcxMjYwZjBhYjAwIiwiYXVkIjpbImh0dHBzOi8vc2Vlay9hcGkvY2FuZGlkYXRlIiwiaHR0cHM6Ly9zZWVrYW56Lm9ubGluZWF1dGgucHJvZC5vdXRmcmEueHl6L3VzZXJpbmZvIl0sImlhdCI6MTc2MjU4NTAxMywiZXhwIjoxNzYyNTg4NjEzLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIG9mZmxpbmVfYWNjZXNzIiwiYXpwIjoiOE9WaHB2dGFJOW41UVZFUUszWDV5ZnNtQ2JyckxYZkUifQ.jp1teJLaBx95AhYdZHI44vmEXOC8uOGSlC5tnoHLWJeSEhhc9pNQfBEPZBb8n26dhgSvL-b8Kvgca-uO-XgbYdbsdWVyoKwJgT3-xKnkWjl6mNhhX53_TZGt27yZkJqv5WWvHQiBRolkzYrYcj37_eETlMQ-zz31ftisiQBFrfF-FmcLziZZPM2ch7uGsGYPfmZvivIRKet4l6bxRs7pe8qy4wE7HxZScYEgE_kpdbSyChC83g5_gdssbI1GGo2RVdfghYAaB2Wv8s5M8QvpgpvS8lqRDE1Xx61CTsnv6UxAAVx6xwQOSk8o-fhOpR2kGJ-TH16ccxKP2iCx1Ow6Tw',
+            'Authorization' => 'Bearer ' . $this->token,
             'Sec-CH-UA' => '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
             'Sec-CH-UA-Mobile' => '?0',
             'Sec-CH-UA-Platform' => '"Windows"',
@@ -39,7 +40,7 @@ class GlintsAPI extends api
             'Sec-Fetch-Site' => 'same-origin',
         ];
     }
-    
+
     public function graphql(
         string $operation,
         array $variables = [],
@@ -61,6 +62,7 @@ class GlintsAPI extends api
 
         try {
             $response = $this->api()->post($this->host . '/graphql?op='. $operation , $payload);
+            Log::info(json_encode($response));
         } catch (RequestException $e) {
             return [
                 'ok' => false,
@@ -94,7 +96,7 @@ class GlintsAPI extends api
         if ($options['headers']) {
             $out['headers'] = $response->headers();
         }
-        
+
         if ($options['debug']) {
             $out['debug'] = [
                 'request' => [
@@ -116,6 +118,6 @@ class GlintsAPI extends api
 
         return $out;
     }
-    
+
 
 }

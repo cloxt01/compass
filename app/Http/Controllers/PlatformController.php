@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Http;
 
 use App\Models\User;
 use App\Services\Token\JobstreetToken;
+use App\Services\Token\GlintsToken;
+
 use App\Exceptions\UnknownOperation;
 use App\Exceptions\UnknownProvider;
 
@@ -60,7 +62,7 @@ class PlatformController extends Controller {
                 // Provider lainn
                 default => throw new UnknownProvider($provider)
             };
-            
+
             $is_verified = $client->verify_otp($request->input('email'), $request->input('verification_code'));
 
             switch($is_verified){
@@ -75,7 +77,7 @@ class PlatformController extends Controller {
             }
             $this->redis->hset(("otp:". $request->input('request_id')), "otp", $request->input('verification_code'));
             $this->redis->expire("otp:". $request->input('request_id'), 3600);
-            
+
 
             return response()->json(['status' => 'success', 'data' => 'OK'], 200);
         } catch(\UnknownProvider $e){
@@ -83,30 +85,38 @@ class PlatformController extends Controller {
         } catch(\Exception $e){
             return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);
         }
-        
+
     }
 
     public function disconnect(Request $request, $provider){
         Log::info("Disconnecting from external platform: " . $provider);
 
         try {
+
             $user = auth()->user();
-            if ($user->jobstreetAccount) {
-                $user->jobstreetAccount()->delete();
-                $user->refresh();
-                return redirect()->route('profile');
-            }
+            $account = match($provider) {
+                'jobstreet' => $user->jobstreetAccount(),
+                'glints' => $user->glintsAccount(),
+                // Provider lainn
+                default => throw new UnknownProvider($provider)
+            };
+
+            $account->delete();
+            $user->refresh();
+            return redirect()->route('profile');
             return response()->json(['success' => false, 'message' => 'Account not found'], 404);
 
+        } catch(\UnknownProvider $e){
+            return response()->json(['status' => 'failed', 'errors' => ['provider' =>[$e->getMessage()]]], 400);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to disconnect account', 'errors' => $e->getMessage()], 500);
-        } 
+        }
     }
 
     public function save_token(Request $request)
     {
         try {
-            
+
             $request->validate([
                 'token' => 'required|json'
             ]);
@@ -142,7 +152,7 @@ class PlatformController extends Controller {
                 if (is_numeric($value)) {
                     $value = (int) $value;
                 }
-                
+
                 $account->saveConfig($key, $value);
             }
 
@@ -155,5 +165,48 @@ class PlatformController extends Controller {
         } catch (\Exception $e) {
             return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);
         }
+    }
+
+    public function login(Request $request, $provider){
+
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+            'email' => 'required|email',
+            'password' => 'required|string'
+        ]);
+        Log::info("Logining from external platform: " . $provider);
+
+        $user = User::find($request->input('user_id'));
+        if(!$user) {
+            return response()->json(['status' => 'failed', 'errors' => ['user' => ['User not found']]], 404);
+        }
+
+        $client = match($provider) {
+//            'jobstreet' => new JobstreetToken,
+            'glints' => new GlintsToken,
+            default => throw new UnknownProvider($provider)
+        };
+
+        $data = $client->getToken($request->input('email'), $request->input('password'));
+        if(!$data) {
+            return response()->json(['status' => 'failed', 'errors' => ['token' => ['Email atau password salah']]], 400);
+        }
+        Log::info("Token generated : " . $data['access_token']);
+        Log::info("Cookie generated : " . $data['cookie']);
+        $saved = $user->glintsAccount()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'access_token' => $data['access_token'],
+                'cookie' => $data['cookie'],
+                'status' => 'active',
+                'updated_at' => now(),
+            ]
+        );
+
+
+        if($saved){
+            return redirect()->route('profile')->with('success', 'Login berhasil');
+        }
+        return back()->with('error', 'Failed to save token');
     }
 }

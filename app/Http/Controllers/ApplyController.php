@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Adapters\GlintsAdapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -23,7 +24,7 @@ class ApplyController extends Controller {
     protected array $client;
     protected array $service;
     protected array $account;
-    
+
     public function __construct() {
         $this->client = [];
         $this->service = [];
@@ -49,11 +50,12 @@ class ApplyController extends Controller {
                 'max_applications' => 'required|integer|min:1|max:1000',
             ]);
             $this->user = auth()->user();
-            
+
             foreach($request->input('providers') as $provider){
                 // Cek dan inisialisasi akun serta klien untuk setiap provider
                 $this->account[$provider] = match($provider){
                     'jobstreet' => $this->user->jobstreetAccount,
+                    'glints' => $this->user->glintsAccount,
                     default => throw new UnknownProvider($provider)
                 };
                 // Validasi keberadaan akun untuk provider
@@ -61,20 +63,22 @@ class ApplyController extends Controller {
                     throw new AccountNotFound("$provider account not found");
                 }
 
-                // Inisialisasi klien 
+                // Inisialisasi klien
                 $this->client[$provider] = match($provider){
                     'jobstreet' => new JobstreetAPI($this->user->jobstreetAccount?->access_token),
+                    'glints' => new GlintsAPI($this->user->glintsAccount->access_token, $this->user->glintsAccount->cookie),
                 };
-                
-                // Inisialisasi adapter 
+
+                // Inisialisasi adapter
                 $this->adapter[$provider] = match($provider){
-                    'jobstreet' => new JobstreetAdapter($this->client[$provider], $this->account[$provider]),
+                    'jobstreet' => new JobstreetAdapter($this->client[$provider]),
+                    'glints' => new GlintsAdapter($this->client[$provider]),
                 };
-                
+
                 // Cek status koneksi akun
                 if($this->account[$provider]->status == 'reauth_required'){
                     return redirect()
-                        ->route("platform.disconnect", ['provider' => $provider]) 
+                        ->route("platform.disconnect", ['provider' => $provider])
                         ->withErrors(['msg' => "Koneksi ke $provider terputus, silakan hubungkan ulang."]);
                 }
                 $jobs = $this->adapter[$provider]->job()->search([
@@ -87,7 +91,7 @@ class ApplyController extends Controller {
                     ProcessApplications::dispatch($this->adapter[$provider], $this->account[$provider], $job['id']);
                 }
             }
-            
+
 
             return response()->json(['status' => 'success'], 200);
         } catch(AccountNotFound $e){
@@ -96,5 +100,5 @@ class ApplyController extends Controller {
             return response()->json(['status' => 'failed', 'errors' => ['provider' => [$e->getMessage()]]], 400);
         }
     }
-    
+
 }

@@ -12,13 +12,15 @@
 
 @php
     $jobstreet_profile = null;
-    $jobsteer_account = $user->jobstreetAccount;
+    $jobstreet_account = $user->jobstreetAccount;
+    $glints_account = $user->glintsAccount;
+    $hasGlints = $user->glintsAccount && $user->glintsAccount->access_token;
     $hasJobstreet = $user->jobstreetAccount && $user->jobstreetAccount->access_token;
-    
+
     if ($hasJobstreet) {
-        
+
         $jobstreet_profile = $adapter->loadProfile();
-        $jobstreet_config = $jobsteer_account->getConfig() ?? [];
+        $jobstreet_config = $jobstreet_account->getConfig() ?? [];
     }
 @endphp
 
@@ -143,6 +145,31 @@
                                     Ready
                                 </span>
                             @endif
+                            <div class="flex items-center gap-3">
+                                <input
+                                    type="checkbox"
+                                    name="providers[]"
+                                    value="glints"
+                                    class="h-4 w-4 rounded border-[#30363d] bg-[#0d1117] text-[#238636]
+                                        focus:ring-[#238636]"
+                                    {{ $hasGlints ? '' : 'disabled' }}
+                                >
+                                <span class="text-sm font-medium text-[#e6edf3]">
+                                    Glints
+                                </span>
+                            </div>
+
+                            @if(!$hasGlints)
+                                <span class="text-xs px-2 py-0.5 rounded border border-yellow-700
+                                            text-yellow-400 bg-[#2d1b00]">
+                                    Not connected
+                                </span>
+                            @else
+                                <span class="text-xs px-2 py-0.5 rounded border border-green-700
+                                            text-green-400 bg-[#0f2a1c]">
+                                    Ready
+                                </span>
+                            @endif
                         </label>
                     </div>
 
@@ -161,7 +188,7 @@
             </div>
         </div>
 
-       {{-- PLATFORM CONFIGURATION --}} 
+       {{-- PLATFORM CONFIGURATION --}}
 
         {{-- JOBSTREET CONFIG --}}
         <div class="w-full md:w-128 bg-[#161b22] border border-[#30363d] rounded-md">
@@ -192,22 +219,22 @@
                                     </label>
                                     <div class="flex items-center">
                                         <label for="auto_answer" class="relative inline-flex cursor-pointer items-center">
-                                            <input type="checkbox" 
-                                                name="auto_answer" 
-                                                id="auto_answer" 
+                                            <input type="checkbox"
+                                                name="auto_answer"
+                                                id="auto_answer"
                                                 value="1"
                                                 class="peer sr-only"
                                                 {{ ($jobstreet_config['auto_answer'] ?? false) ? 'checked' : '' }}>
-                                            
+
                                             {{-- Toggle Switch --}}
-                                            <div class="h-6 w-11 rounded-full bg-[#30363d] transition-colors 
-                                                        after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 
-                                                        after:rounded-full after:border after:border-gray-300 after:bg-white 
-                                                        after:transition-all after:content-[''] 
-                                                        peer-checked:bg-[#238636] peer-checked:after:translate-x-full 
+                                            <div class="h-6 w-11 rounded-full bg-[#30363d] transition-colors
+                                                        after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5
+                                                        after:rounded-full after:border after:border-gray-300 after:bg-white
+                                                        after:transition-all after:content-['']
+                                                        peer-checked:bg-[#238636] peer-checked:after:translate-x-full
                                                         peer-checked:after:border-white focus:outline-none">
                                             </div>
-                                            
+
                                             {{-- Teks yang akan berubah --}}
                                             <span id="status-text" class="ml-3 text-sm font-medium transition-colors {{ ($jobstreet_config['auto_answer'] ?? false) ? 'text-[#238636]' : 'text-[#8b949e]' }}">
                                                 {{ ($jobstreet_config['auto_answer'] ?? false) ? 'Enabled' : 'Disabled' }}
@@ -228,11 +255,11 @@
                                             @php
                                                 $selected_resume = $jobstreet_config['resume'] ?? null;
                                             @endphp
-                                            
+
                                             <option value="">Select Resume</option>
-                                            
+
                                             @foreach ($jobstreet_profile['resumes'] as $resume)
-                                                <option value="{{ $resume['id'] }}" {{ $selected_resume == $resume['id'] ? 'selected' : '' }}>{{ $resume['fileMetadata']['name']}} 
+                                                <option value="{{ $resume['id'] }}" {{ $selected_resume == $resume['id'] ? 'selected' : '' }}>{{ $resume['fileMetadata']['name']}}
 
                                                     @if($selected_resume == $resume['id']) (Selected) @endif
                                                     @if($loop->first)
@@ -243,7 +270,7 @@
                                         @else
                                             <option value="">No resumes found</option>
                                         @endif
-                                        
+
                                     </select>
                                 </div>
 
@@ -259,11 +286,11 @@
                                             @php
                                                 $selected_role = $jobstreet_config['role'] ?? null;
                                             @endphp
-                                            
+
                                             <option value="">Select Role</option>
-                                            
+
                                             @foreach ($jobstreet_profile['roles'] as $role)
-                                                <option value="{{ $role['id'] }}" {{ $selected_role == $role['id'] ? 'selected' : '' }}>{{ $role['title']['text']}} 
+                                                <option value="{{ $role['id'] }}" {{ $selected_role == $role['id'] ? 'selected' : '' }}>{{ $role['title']['text']}}
 
                                                     @if($selected_role == $role['id']) (Selected) @endif
                                                     @if($loop->first)
@@ -274,7 +301,7 @@
                                         @else
                                             <option value="">No roles found</option>
                                         @endif
-                                        
+
                                     </select>
                                 </div>
                             </div>
@@ -286,9 +313,9 @@
                 @endif
             </div>
         </div>
-        
+
     </div>
-    
+
 
     <p class="mt-4 text-xs text-[#8b949e] text-center">
         Keep your connection stable while automation is running.

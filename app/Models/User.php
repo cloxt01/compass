@@ -50,7 +50,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(JobstreetAccount::class);
     }
-
+    public function glintsAccount()
+    {
+        return $this->hasOne(GlintsAccount::class);
+    }
     public function stats()
     {
         return $this->hasMany(UserStat::class);

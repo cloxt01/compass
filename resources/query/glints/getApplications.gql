@@ -73,6 +73,7 @@ fragment SalaryFields on JobSalary {
 fragment CompanyFields on Company {
   id
   name
+  brandName
   logo
   status
   isVIP

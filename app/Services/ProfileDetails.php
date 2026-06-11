@@ -22,6 +22,6 @@ class ProfileDetails
         ];
     }
     public static function fromGlints($raw){
-        return [];
+        return $raw;
     }
 }

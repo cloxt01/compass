@@ -25,6 +25,7 @@ Route::prefix('apply')->middleware(['web','auth', 'token'])->group(function() {
 // External account connection API
 // --------------------
 Route::prefix('platform')->group(function() {
+    Route::post('/{provider}/login}', [PlatformController::class, 'login'])->name('api.platform.login');
     Route::post('/{provider}/passwordless-login', [PlatformController::class, 'passwordless_login'])->name('api.platform.passwordless-login');
     Route::post('/{provider}/verify-otp', [PlatformController::class, 'verify_otp'])->name('api.platform.verify-otp');
 });

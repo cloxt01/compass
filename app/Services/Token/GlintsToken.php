@@ -3,8 +3,10 @@
 namespace App\Services\Token;
 
 use App\Clients\api;
+use App\Clients\GlintsAPI;
 use App\Support\DataHelper;
 use App\Support\QueryHelper;
+use App\Support\RequestHelper;
 use App\Exceptions\UnknownOperation;
 use App\Models\JobstreetAccount;
 
@@ -13,20 +15,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Infrastructure\Contracts\PlatformAccount;
 
-class JobstreetToken extends api implements PlatformToken
+class GlintsToken extends GlintsAPI implements PlatformToken
 {
-
-    protected string $host = 'https://login.seek.com';
-
     public function __construct()
     {
         parent::__construct();
         $this->headers = [
-            'accept' => '*/*',
-            'auth0-client' => config('compass.auth0_client'),
-            'content-type' => 'application/json',
+            'accept' => 'application/json, text/plain, */*',
+            'content-type' => 'application/json;charset=UTF-8',
             'dnt' => '1',
             'priority' => 'u=1, i',
+            'origin' => 'https://glints.com',
             'sec-ch-ua' => '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
             'sec-ch-ua-mobile' => '?0',
             'sec-ch-ua-platform' => '"Windows"',
@@ -34,36 +33,34 @@ class JobstreetToken extends api implements PlatformToken
             'sec-fetch-mode' => 'cors',
             'sec-fetch-site' => 'same-origin',
             'user-agent' => config('compass.user_agent'),
+            'x-glints-country-code' => 'ID',
         ];
     }
 
-    public  function verify_otp($email, $code)
+    public  function getToken($email, $password): ?array
     {
         $payload = [
-            "client_id" => config('compass.platforms.jobstreet.client_id'),
-            "connection" => "email",
-            "email" => $email,
-            "verification_code" => $code,
+            'grant_type' => 'password',
+            "client_id" => config('compass.platforms.glints.client_id'),
+            "username" => $email,
+            "password" => $password
         ];
 
-        $response = $this->post('/passwordless/verify', $payload);
-
-        switch($response['http_code']){
-            case 200:
-                return 'verified';
-            case 400:
-                return 'unverified';
-            case 429:
-                return 'blocked';
-            default:
-                return 'failed';
+        $response = $this->post('/oauth2/token', $payload);
+        if(isset($response['data']['access_token'])){
+            return [
+                'access_token' => $response['data']['access_token'],
+                'cookie' => isset($response['headers']['set-cookie'][0])
+                    ? RequestHelper::parseSetCookieToCookieString($response['headers']['set-cookie'][0])
+                    : null
+            ];
         }
-
+        return null;
     }
     public function refreshToken(string $refreshToken): ?array
     {
         $payload = [
-            "client_id"             => config('compass.platforms.jobstreet.client_id'),
+            "client_id"             => config('compass.client_id'),
             "redirect_uri"          => "https://id.jobstreet.com/oauth/callback/",
             "initial_scope"         => "openid profile email offline_access",
             "JobseekerSessionId"    => QueryHelper::generateUUID(),
