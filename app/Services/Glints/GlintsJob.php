@@ -2,6 +2,8 @@
 
 namespace App\Services\Glints;
 
+use App\Services\JobQuestion;
+use App\Support\DataHelper;
 use Illuminate\Support\Facades\Log;
 use App\Clients\GlintsAPI;
 use App\Services\Adapters\GlintsAdapter;
@@ -38,33 +40,58 @@ class GlintsJob extends GlintsAdapter
         Log::info("Fetched applied jobs for user: " . count($data) . " jobs found.");
         return $data;
     }
+    public function hiring_question(array $params = []): array
+    {
+        if(!isset($params['jobId'])){
+            return [];
+        }
+        $result = $this->client->graphql('jobHiringQuestion', $params);
+        return JobQuestion::fromGlints($result) ?: [];
+    }
     public function search(array $params = []): array
     {
-        $path = '/api/jobsearch/v5/me/search';
+        $list = ['CountryCode' => ['ID'],
+            'lastUpdatedAtRange' => ['ANY_TIME', 'PAST_MONTH', 'PAST_24_HOURS', 'PAST_WEEK'],
+            'type' => [
+                'FULL_TIME',
+                'CONTRACT',
+                'INTERNSHIP',
+                'PROJECT_BASED',
+                'PART_TIME'
+            ],
+            'workArrangementOptions' => [
+                'ONSITE',
+                'HYBRID',
+                'REMOTE'
+            ],
+            'educationLevels' => [
+                "PRIMARY_SCHOOL",
+                "SECONDARY_SCHOOL",
+                "HIGH_SCHOOL",
+                "DIPLOMA",
+                "BACHELOR_DEGREE",
+                "PROFESSIONAL_EDUCATION",
+                "MASTER_DEGREE",
+                "DOCTORATE"
+            ],
+            'yearsOfExperienceFilter' => [
+                ['range' => [
+                    "NO_EXPERIENCE",
+                    "FRESH_GRAD",
+                    "LESS_THAN_A_YEAR",
+                    "ONE_TO_THREE_YEARS",
+                    "THREE_TO_FIVE_YEARS",
+                    "FIVE_TO_TEN_YEARS",
+                    "MORE_THAN_TEN_YEARS"
+                ]]
+            ]
+            ];
 
-        $params = [
-            'siteKey' => 'ID-Main',
-            'page' => 1,
-            'keywords' => $params['keyword'] ?? '',
-            'where' => $params['location'] ?? '',
-            'pageSize' => (int)($params['pageSize'] ?? 32),
-            'locale' => 'id-ID'
-        ];
-        // $searchParams = [
-        //     'eventcapturesessionid' => null,              // kosong = null, bukan string kosong
-        //     'include'               => 'seogptTargeting,relatedsearches',
-        //     'keywords'              => 'Developer',
-        //     'locale'                => 'id-ID',
-        //     'page'                  => 1,                 // integer
-        //     'pagesize'              => 10,                // jangan bunuh hasil sendiri
-        //     'sitekey'               => 'ID-Main',
-        //     'source'                => 'FE_SERP',
-        //     'sourcesystem'          => 'houston',
-        //     'userid'                => null,              // anonymous, tapi eksplisit
-        //     'usersessionid'         => null,              // sama
-        //     'where'                 => 'Banten',
-        // ];
-        return $this->client->get($path, $params) ?? [];
+        if(!DataHelper::validateJobSearchParams($params, $list)){
+            return [];
+        }
+
+        return $this->client->graphql('searchJobsV3', $params, ['isv2' => true]) ?? [];
     }
 
     public function details(string $jobId): array

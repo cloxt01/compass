@@ -23,7 +23,7 @@ class QueryHelper {
     public static function loadGraphQLQuery(JobstreetAPI | GlintsAPI $client, $operationName) {
         $path = resource_path("query/".$client::provider."/$operationName.gql");
 
-        
+
         if (!file_exists($path)) {
             throw new UnknownOperation($operationName);
             // throw new UnknownOperation("File query tidak ditemukan di: " . $path);
@@ -72,7 +72,7 @@ class QueryHelper {
                 "jobId" => $variables['jobId'] ?? '',
                 "locale" => "id-ID"
             ],
-            
+
             'ApplySubmitApplication' => [
                 "input" => [
                     "jobId" => $variables['jobId'],
@@ -186,12 +186,12 @@ class QueryHelper {
             $vars = match($operationName) {
                 'searchHierarchicalLocations' => [
                     // dua versi, pilih default yang paling lengkap
-                    'searchTerm' => $variables['searchTerm'] ?? 'Bandung',
-                    'limit' => $variables['limit'] ?? 9,
+                    'searchTerm' => $variables['searchTerm'] ?? '',
+                    'limit' => $variables['limit'] ?? 10,
                     'levels' => $variables['levels'] ?? [1,2,3,4],
                     'countryCode' => $variables['countryCode'] ?? 'ID',
-                    'withActiveJobsOnly' => $variables['withActiveJobsOnly'] ?? null,
-                    'searchType' => $variables['searchType'] ?? 'SUGGESTION',
+//                    'withActiveJobsOnly' => $variables['withActiveJobsOnly'] ?? null,
+//                    'searchType' => $variables['searchType'] ?? 'SUGGESTION',
                 ],
                 'getJobDetailsById' => [
                     'opportunityId' => $variables['opportunityId'] ?? '',
@@ -223,7 +223,14 @@ class QueryHelper {
                         'limit' => 5,
                         'offset' => 0,
                         'orderType' => 'DESC',
-                        // 'statuses' => [], // bisa diisi jika ada
+                    ],
+                ],
+                 'searchJobsV3' => [
+                    'data' => $variables['data'] ?? [
+                        'CountryCode' => 'ID',
+                        'includeExternalJobs' => false,
+                        'pageSize' => 30,
+                        'page' => 1
                     ],
                 ],
                 default => new \stdClass()

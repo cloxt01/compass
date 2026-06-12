@@ -32,11 +32,19 @@ class ApplyController extends Controller {
     }
     public function index (){
         $user = auth()->user();
-        $adapter = null;
-        if ($user->jobstreetAccount) {
-            $adapter = new JobstreetAdapter(new JobstreetAPI($user->jobstreetAccount->access_token), $user->jobstreetAccount);
+        $adapters = [];
+        $accounts = [];
+
+        if ($user->jobstreetAccount && $user->jobstreetAccount->access_token) {
+            $accounts['jobstreet'] = $user->jobstreetAccount;
+            $adapters['jobstreet'] = new JobstreetAdapter(new JobstreetAPI($user->jobstreetAccount->access_token));
         }
-        return view('apply', compact('user', 'adapter'));
+        if ($user->glintsAccount && $user->glintsAccount->access_token) {
+            $accounts['glints'] = $user->glintsAccount;
+            $adapters['glints'] = new GlintsAdapter(new GlintsAPI($user->glintsAccount->access_token, $user->glintsAccount->cookie));
+        }
+
+        return view('apply', compact('user', 'adapters', 'accounts'));
     }
     public function start(Request $request) {
         try {
@@ -81,11 +89,18 @@ class ApplyController extends Controller {
                         ->route("platform.disconnect", ['provider' => $provider])
                         ->withErrors(['msg' => "Koneksi ke $provider terputus, silakan hubungkan ulang."]);
                 }
-                $jobs = $this->adapter[$provider]->job()->search([
-                    'keyword' => $request->input('keyword'),
-                    'location' => $request->input('location'),
-                    'pageSize' => $request->input('pageSize')
-                ]);
+                $params = match($provider){
+                    'jobstreet' => [
+                        'keyword' => $request->input('keyword'),
+                        'location' => $request->input('location'),
+                        'pageSize' => $request->input('pageSize')
+                    ],
+                    'glints' => [
+                        'searchTerm' => $request->input('keyword'),
+                        ''
+                    ]
+                }
+                $jobs = $this->adapter[$provider]->job()->search();
                 Log::info("Found " . count($jobs['data']['data']) . " jobs on $provider for user " . $this->user->id);
                 foreach($jobs['data']['data'] as $job){
                     ProcessApplications::dispatch($this->adapter[$provider], $this->account[$provider], $job['id']);

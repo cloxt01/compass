@@ -12,15 +12,18 @@
 
 @php
     $jobstreet_profile = null;
-    $jobstreet_account = $user->jobstreetAccount;
-    $glints_account = $user->glintsAccount;
-    $hasGlints = $user->glintsAccount && $user->glintsAccount->access_token;
-    $hasJobstreet = $user->jobstreetAccount && $user->jobstreetAccount->access_token;
+    $glints_profile = null;
+
+    $hasGlints = isset($accounts['glints']) && isset($adapters['glints']);
+    $hasJobstreet = isset($accounts['jobstreet']) && isset($adapters['jobstreet']);
 
     if ($hasJobstreet) {
-
-        $jobstreet_profile = $adapter->loadProfile();
-        $jobstreet_config = $jobstreet_account->getConfig() ?? [];
+        $jobstreet_profile = $adapters['jobstreet']->loadProfile();
+        $jobstreet_config = $accounts['jobstreet']->getConfig() ?? [];
+    }
+    if ($hasGlints) {
+        $glints_profile = $adapters['glints']->loadProfile();
+        $glints_config = $accounts['glints']->getConfig() ?? [];
     }
 @endphp
 
@@ -218,10 +221,10 @@
                                         Auto-answer
                                     </label>
                                     <div class="flex items-center">
-                                        <label for="auto_answer" class="relative inline-flex cursor-pointer items-center">
+                                        <label for="auto_answer_jobstreet" class="relative inline-flex cursor-pointer items-center">
                                             <input type="checkbox"
                                                 name="auto_answer"
-                                                id="auto_answer"
+                                                id="auto_answer_jobstreet"
                                                 value="1"
                                                 class="peer sr-only"
                                                 {{ ($jobstreet_config['auto_answer'] ?? false) ? 'checked' : '' }}>
@@ -236,7 +239,7 @@
                                             </div>
 
                                             {{-- Teks yang akan berubah --}}
-                                            <span id="status-text" class="ml-3 text-sm font-medium transition-colors {{ ($jobstreet_config['auto_answer'] ?? false) ? 'text-[#238636]' : 'text-[#8b949e]' }}">
+                                            <span id="status-text_jobstreet" class="ml-3 text-sm font-medium transition-colors {{ ($jobstreet_config['auto_answer'] ?? false) ? 'text-[#238636]' : 'text-[#8b949e]' }}">
                                                 {{ ($jobstreet_config['auto_answer'] ?? false) ? 'Enabled' : 'Disabled' }}
                                             </span>
                                         </label>
@@ -314,6 +317,74 @@
             </div>
         </div>
 
+        {{-- GLINTS CONFIG --}}
+        <form method="POST" hidden action="{{ route('api.getLocation') }}">
+            @csrf
+            <input type="text" name="keyword" placeholder="Masukan minimal 2 karakter">
+            <button type="submit">Submit</button>
+        </form>
+        <div class="w-full md:w-128 bg-[#161b22] border border-[#30363d] rounded-md">
+            {{-- HEADER --}}
+            <div class="px-6 py-4 border-b border-[#30363d]">
+                <h1 class="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
+                    <i class="fas fa-paper-plane text-[#8b949e]"></i>
+                    Glints Configuration
+                </h1>
+                <p class="text-xs text-[#8b949e] mt-1">
+                    Konfigurasi platform untuk auto apply. Pastikan platform sudah terhubung di halaman profile.
+                </p>
+            </div>
+            {{-- BODY --}}
+            <div class="p-6">
+                @if (!$hasGlints)
+                    <p class="text-sm text-yellow-400">
+                        Glints is not connected. Please connect your JobStreet account in the profile page.
+                    </p>
+                @else
+                    <form action="{{ route('platform.save-config', ['provider' => 'glints']) }}" method="POST">
+                        @csrf
+                        <div class="mb-4">
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-[#8b949e] mb-2">
+                                        Auto-answer
+                                    </label>
+                                    <div class="flex items-center">
+                                        <label for="auto_answer_glints" class="relative inline-flex cursor-pointer items-center">
+                                            <input type="checkbox"
+                                                   name="auto_answer"
+                                                   id="auto_answer_glints"
+                                                   value="1"
+                                                   class="peer sr-only"
+                                                {{ ($glints_config['auto_answer'] ?? false) ? 'checked' : '' }}>
+
+                                            {{-- Toggle Switch --}}
+                                            <div class="h-6 w-11 rounded-full bg-[#30363d] transition-colors
+                                                        after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5
+                                                        after:rounded-full after:border after:border-gray-300 after:bg-white
+                                                        after:transition-all after:content-['']
+                                                        peer-checked:bg-[#238636] peer-checked:after:translate-x-full
+                                                        peer-checked:after:border-white focus:outline-none">
+                                            </div>
+
+                                            {{-- Teks yang akan berubah --}}
+                                            <span id="status-text_glints" class="ml-3 text-sm font-medium transition-colors {{ ($glints_config['auto_answer'] ?? false) ? 'text-[#238636]' : 'text-[#8b949e]' }}">
+                                                {{ ($glints_config['auto_answer'] ?? false) ? 'Enabled' : 'Disabled' }}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <button type="submit" class="inline-flex items-center justify-center rounded-md bg-[#238636] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#2ea043] transition">
+                            Save Configuration
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </div>
+
     </div>
 
 
@@ -326,20 +397,25 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const checkbox = document.getElementById('auto_answer');
-        const statusText = document.getElementById('status-text');
+        // Jobstreet toggle
+        const checkboxJS = document.getElementById('auto_answer_jobstreet');
+        const statusTextJS = document.getElementById('status-text_jobstreet');
+        if (checkboxJS && statusTextJS) {
+            checkboxJS.addEventListener('change', function() {
+                statusTextJS.textContent = this.checked ? 'Enabled' : 'Disabled';
+                statusTextJS.classList.toggle('text-[#238636]', this.checked);
+                statusTextJS.classList.toggle('text-[#8b949e]', !this.checked);
+            });
+        }
 
-        if (checkbox && statusText) {
-            checkbox.addEventListener('change', function() {
-                if (this.checked) {
-                    statusText.textContent = 'Enabled';
-                    statusText.classList.remove('text-[#8b949e]');
-                    statusText.classList.add('text-[#238636]');
-                } else {
-                    statusText.textContent = 'Disabled';
-                    statusText.classList.remove('text-[#238636]');
-                    statusText.classList.add('text-[#8b949e]');
-                }
+        // Glints toggle
+        const checkboxGlints = document.getElementById('auto_answer_glints');
+        const statusTextGlints = document.getElementById('status-text_glints');
+        if (checkboxGlints && statusTextGlints) {
+            checkboxGlints.addEventListener('change', function() {
+                statusTextGlints.textContent = this.checked ? 'Enabled' : 'Disabled';
+                statusTextGlints.classList.toggle('text-[#238636]', this.checked);
+                statusTextGlints.classList.toggle('text-[#8b949e]', !this.checked);
             });
         }
     });

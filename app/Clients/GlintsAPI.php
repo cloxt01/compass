@@ -61,7 +61,12 @@ class GlintsAPI extends api
         print_r($payload);
 
         try {
-            $response = $this->api()->post($this->host . '/graphql?op='. $operation , $payload);
+            if(isset($options['isv2']) && $options['isv2']  == true) {
+                $url = $this->host . '/v2-alc/graphql?op='. $operation;
+            } else {
+                $url = $this->host . '/graphql?op='. $operation;
+            }
+            $response = $this->api()->post($url, $payload);
             Log::info(json_encode($response));
         } catch (RequestException $e) {
             return [

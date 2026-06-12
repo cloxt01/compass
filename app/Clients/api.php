@@ -16,7 +16,6 @@ class api {
 
     public function api()
     {
-        print_r($this->headers);
         return Http::withHeaders($this->headers)
             ->baseUrl($this->host)
             ->acceptJson()

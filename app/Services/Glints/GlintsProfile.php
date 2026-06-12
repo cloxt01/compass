@@ -19,7 +19,6 @@ class GlintsProfile extends GlintsAdapter
     {
         if ($this->data === null) {
             $this->data = $this->client->get('/v2/me');
-
         }
         return $this->data ?? [];
     }
