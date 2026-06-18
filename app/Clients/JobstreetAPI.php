@@ -27,6 +27,8 @@ class JobstreetAPI extends api
         $this->sessionId = '';
         $this->userAgent = config('compass.user_agent');
         $this->headers = [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $this->token,
             'X-Seek-Site' => 'Chalice',
             'X-Seek-Ec-Visitorid' => $this->sessionId,
@@ -63,7 +65,7 @@ class JobstreetAPI extends api
                     $out['ok'] = true;
                     $out['http_code'] = $response['http_code'];
                     $out['data'] = $response['data'];
-                    break; 
+                    break;
 
                 case 'system_error':
                 case 'connection_error':
