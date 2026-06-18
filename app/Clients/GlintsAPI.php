@@ -56,7 +56,6 @@ class GlintsAPI extends api
             "variables" => QueryHelper::buildGraphQLVariables($this, $operation, $variables) ?? new \stdClass(),
             "query" => QueryHelper::loadGraphQLQuery($this, $operation)
         ];
-        print_r($this->host . '/graphql?op='. $operation );
 
         try {
             if(isset($options['isv2']) && $options['isv2']  == true) {
