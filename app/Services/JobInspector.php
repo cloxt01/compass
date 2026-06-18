@@ -4,7 +4,7 @@ namespace App\Services;
 
 class JobInspector
 {
-    
+
 
     public static function fromJobstreet($details){
         $issues = [];
@@ -37,20 +37,20 @@ class JobInspector
                 'message' => 'Anda harus menjawab pertanyaan untuk melamar pekerjaan ini'
             ];
         }
-        
+
         usort($issues, function ($a, $b) {
             if ($a['level'] === $b['level']) {
                 return 0;
             }
             return $a['level'] === 'hard' ? -1 : 1;
         });
-        
+
         return [
             'canApply' => empty(array_filter($issues, fn($x) => $x['level'] === 'hard')),
             'issues' => $issues
         ];
     }
     public static function fromGlints($details){
-        return [];
+
     }
 }

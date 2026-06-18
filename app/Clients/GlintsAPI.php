@@ -57,8 +57,6 @@ class GlintsAPI extends api
             "query" => QueryHelper::loadGraphQLQuery($this, $operation)
         ];
         print_r($this->host . '/graphql?op='. $operation );
-        print_r($this->headers);
-        print_r($payload);
 
         try {
             if(isset($options['isv2']) && $options['isv2']  == true) {
