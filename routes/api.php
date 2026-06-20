@@ -27,7 +27,7 @@ Route::prefix('apply')->middleware(['web','auth', 'token'])->group(function() {
 Route::post('/{provider}/search-location', [\App\Http\Controllers\Api\Glints\api::class, 'searchLocation'])->name('api.search.location');
 Route::prefix('platform')->group(function() {
     Route::post('/{provider}/search-location', [PlatformController::class, 'locationInfo'])->name('api.platform.locationInfo');
-    Route::post('/{provider}/login}', [PlatformController::class, 'login'])->name('api.platform.login');
+    Route::post('/{provider}/login', [PlatformController::class, 'login'])->name('api.platform.login');
     Route::post('/{provider}/passwordless-login', [PlatformController::class, 'passwordless_login'])->name('api.platform.passwordless-login');
     Route::post('/{provider}/verify-otp', [PlatformController::class, 'verify_otp'])->name('api.platform.verify-otp');
 });
