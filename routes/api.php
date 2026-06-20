@@ -24,7 +24,7 @@ Route::prefix('apply')->middleware(['web','auth', 'token'])->group(function() {
 // --------------------
 // External account connection API
 // --------------------
-Route::post('/{provider}/search-location', []);
+Route::post('/{provider}/search-location', [\App\Http\Controllers\Api\Glints\api::class, 'searchLocation'])->name('api.search.location');
 Route::prefix('platform')->group(function() {
     Route::post('/{provider}/search-location', [PlatformController::class, 'locationInfo'])->name('api.platform.locationInfo');
     Route::post('/{provider}/login}', [PlatformController::class, 'login'])->name('api.platform.login');

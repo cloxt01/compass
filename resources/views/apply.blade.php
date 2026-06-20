@@ -318,7 +318,7 @@
         </div>
 
         {{-- GLINTS CONFIG --}}
-        <form method="POST" hidden action="{{ route('api.getLocation') }}">
+        <form method="POST" hidden action="{{ route('api.search.location', ['provider' => 'glints']) }}">
             @csrf
             <input type="text" name="keyword" placeholder="Masukan minimal 2 karakter">
             <button type="submit">Submit</button>

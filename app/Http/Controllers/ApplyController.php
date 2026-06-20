@@ -99,7 +99,7 @@ class ApplyController extends Controller {
                         'searchTerm' => $request->input('keyword'),
                         ''
                     ]
-                }
+                };
                 $jobs = $this->adapter[$provider]->job()->search();
                 Log::info("Found " . count($jobs['data']['data']) . " jobs on $provider for user " . $this->user->id);
                 foreach($jobs['data']['data'] as $job){
