@@ -188,6 +188,8 @@ class PlatformController extends Controller {
         };
 
         $data = $client->getToken($request->input('email'), $request->input('password'));
+        Log::info("Logining from external platform: " . $provider);
+        Log::info("Output from getToken : ".$data);
         if(!$data) {
             return response()->json(['status' => 'failed', 'errors' => ['token' => ['Email atau password salah']]], 400);
         }
