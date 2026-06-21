@@ -50,6 +50,7 @@ class GlintsJob extends GlintsAdapter
             Log::info("Job Hiring Question returned an error : ". json_encode($result));
             return [];
         }
+        Log::info("Job Hiring Question result: " . json_encode($result));
         return JobQuestion::fromGlints($result) ?: [];
     }
     public function search(array $params = []): array
