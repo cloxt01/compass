@@ -47,6 +47,7 @@ class GlintsToken extends GlintsAPI implements PlatformToken
         ];
 
         $response = $this->post('/oauth2/token', $payload);
+        Log::info('Response to Glints token : '. json_encode($response));
         if(isset($response['data']['access_token'])){
             return [
                 'access_token' => $response['data']['access_token'],
