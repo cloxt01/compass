@@ -11,7 +11,7 @@ class JobQuestion
         return [
         ];
     }
-    public static function fromGlints($raw): array {
+    public static function fromGlints(array $raw): array {
         $result = [];
 
         foreach ($raw['data']['getJobHiringQuestions']['predefinedQuestions'] as $question) {

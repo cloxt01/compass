@@ -46,6 +46,10 @@ class GlintsJob extends GlintsAdapter
             return [];
         }
         $result = $this->client->graphql('jobHiringQuestion', $params);
+        if (!isset($result) && !is_array($result)) {
+            Log::info("Job Hiring Question returned an error : ". json_encode($result));
+            return [];
+        }
         return JobQuestion::fromGlints($result) ?: [];
     }
     public function search(array $params = []): array
