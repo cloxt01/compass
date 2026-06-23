@@ -16,10 +16,10 @@ use App\Services\ProfileDetails;
 use App\Services\JobDetails;
 
 class JobstreetAdapter implements PlatformAdapter {
-    
+
     public function __construct(protected JobstreetAPI $client){
         $this->client = $client;
-        $this->builder = new JobstreetPayloadBuilder(); 
+        $this->builder = new JobstreetPayloadBuilder();
     }
 
     protected function profile():JobstreetProfile {
@@ -43,7 +43,7 @@ class JobstreetAdapter implements PlatformAdapter {
 
     public function buildPayload(array $jobDetails, array $profileDetails, array $config=[]): array
     {
-        
+
         return $this->builder->build($jobDetails, $profileDetails, $config);
     }
 
@@ -52,9 +52,9 @@ class JobstreetAdapter implements PlatformAdapter {
         return JobInspector::fromJobstreet($details);
     }
 
-    public function execute(array $payload): bool
+    public function execute(string $jobId, array $payload): bool
     {
-        return $this->job()->apply($payload);
+        return $this->job()->apply($jobId, $payload);
     }
 
 }

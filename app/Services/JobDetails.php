@@ -4,10 +4,10 @@ namespace App\Services;
 
 class JobDetails
 {
-    
+
 
     public static function fromJobstreet($raw){
-        
+
         return [
             'metadata' => [
                 'id' => $raw['details']['job']['id'] ?? 'Unknown',
@@ -29,7 +29,36 @@ class JobDetails
             ] ?? []
         ];
     }
-    public static function fromGlints($raw){
-        return [];
+    public static function fromGlints($raw)
+    {
+        if(empty($raw))
+            return [];
+        return [
+            'metadata' => [
+                'id' => $raw['details']['id'] ?? '',
+                'title' => $raw['details']['title'] ?? 'Unknown',
+                'company' => $raw['details']['company']['displayName'] ?? 'Unknown',
+                'location' => $raw['details']['companyAddress']['poi']['addressLabel'] ?? 'Unknown',
+            ],
+            'eligibility' => [
+                'linkout' => $raw['details']['job']['externalApplyURL'] ?? false,
+                'expired' => (strtotime($raw['details']['expiryDate']) < time() || !empty($raw['details']['closedAt'])) ? true : false,
+                'closed' => $raw['details']['status'] === 'CLOSED' ? true : false,
+                'applied' => $raw['details']['isApplied'] ?? false,
+            ],
+            'insights' => [
+                'isActivelyHiring' => $raw['details']['isActivelyHiring'] ?? false,
+                'isHot' => $raw['details']['isHot'] ?? false,
+                'creatorResponseRate' => $raw['details']['creatorResponseRate'] ?? null,
+                'creatorResponseTime' => $raw['details']['creatorResponseTime'] ?? null,
+                'isHighResponseRate' => $raw['details']['isHighResponseRate'] ?? false,
+            ],
+            'products' => [
+                'questionnaire' => $raw['hiring_question']['employerScreeningQuestions'] ?? []
+            ]
+        ];
+//       return $raw;
+
+//        return $raw['screeningQuestionsEnabled'] ? [true] : [false];
     }
 }

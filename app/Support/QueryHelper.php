@@ -20,6 +20,7 @@ class QueryHelper {
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );
     }
+
     public static function loadGraphQLQuery(JobstreetAPI | GlintsAPI $client, $operationName) {
         $path = resource_path("query/".$client::provider."/$operationName.gql");
 

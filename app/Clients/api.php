@@ -37,7 +37,6 @@ class api {
     public function get(string $path, array $params = []): array
     {
         try {
-
             $res = $this->api()->get($path, $params)->throw();
             return [
                 'status' => 'success',

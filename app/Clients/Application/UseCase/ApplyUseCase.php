@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Application\UseCase;
+namespace App\Clients\Application\UseCase;
 
-use Illuminate\Support\Facades\Log;
-
-use App\Infrastructure\Contracts\PlatformAdapter;
 use App\Infrastructure\Contracts\PlatformAccount;
+use App\Infrastructure\Contracts\PlatformAdapter;
+use Illuminate\Support\Facades\Log;
 
 class ApplyUseCase {
 
@@ -19,13 +18,12 @@ class ApplyUseCase {
         $profile = $this->adapter->loadProfile();
         $config = $this->account->getConfig();
 
-
         if(!$this->adapter->canApply($job)['canApply']){
             Log::warning("Tidak dapat melamar pekerjaan ID: " . $jobId . " karena tidak memenuhi syarat.");
             Log::warning(json_encode($this->adapter->canApply($job)['issues']));
             return false;
         }
         $payload = $this->adapter->buildPayload($job, $profile, $config);
-        return $this->adapter->execute($payload);
+        return $this->adapter->execute($jobId, $payload);
     }
 }

@@ -53,7 +53,13 @@ class GlintsJob extends GlintsAdapter
         Log::info("Job Hiring Question result: " . json_encode($result));
         return JobQuestion::fromGlints($result) ?: [];
     }
-    public function search(array $params = []): array
+    public function search(array $params = [
+        'CountryCode' => 'ID',
+//        'searchTerm' => '',
+        'includeExternalJobs' => false,
+        'pageSize' => 30,
+        'page' => 1
+    ]): array
     {
         $list = ['CountryCode' => ['ID'],
             'lastUpdatedAtRange' => ['ANY_TIME', 'PAST_MONTH', 'PAST_24_HOURS', 'PAST_WEEK'],
@@ -101,22 +107,36 @@ class GlintsJob extends GlintsAdapter
 
     public function details(string $jobId): array
     {
-        $details = $this->client->graphql('jobDetailsWithPersonalised', ['jobId' => $jobId])['data']['data']['jobDetails'] ?? [];
-        $process = $this->client->graphql('GetJobApplicationProcess', ['jobId' => $jobId])['data']['data']['jobApplicationProcess'] ?? [];
+        $details = $this->client->get('/v2/job/'. $jobId);
+        if(!isset($details['data']['data'])){
+            Log::info("Job Details tidak menampilkan data: ". json_encode($details));
+            return [];
+        }
 
-        $resp = array_merge(["details" => $details], ["process" => $process]);
+        $hiring_question = $this->hiring_question(['jobId' => $jobId]);
 
+
+        $resp = array_merge(["details" => $details['data']['data']], ["hiring_question" => $hiring_question]);
+        print_r($resp);
         return $resp;
     }
-    public function apply(array $payload): bool
+    public function apply(string $jobId, array $payload): bool
     {
-        $resp = $this->client->graphql('ApplySubmitApplication', $payload);
-        if($resp['ok'] && $resp['data']['data']['submitApplication']['__typename'] === 'SubmitApplicationSuccess'){
+        if(!isset($jobId)){
+            return false;
+        }
+        $resp = $this->client->post('/v2/v2/jobs/' . $jobId, $payload);
+        print_r($this->client->host.'/v2/v2/jobs/'.$jobId.'/applications');
+        print_r($payload);
+        print_r($resp);
+        if($resp['status'] === 'success' && $resp['data']['data']['status'] === 'NEW'){
             return true;
         } else {
             Log::error("Gagal melamar pekerjaan: " . json_encode($resp));
             return false;
         }
-    }
-}
 
+    }
+
+
+}

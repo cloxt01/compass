@@ -54,9 +54,9 @@ class GlintsAdapter implements PlatformAdapter {
         return JobInspector::fromGlints($details);
     }
 
-    public function execute(array $payload): bool
+    public function execute(string $jobId, array $payload): bool
     {
-        return $this->job()->apply($payload);
+        return $this->job()->apply($jobId, $payload);
     }
 
 }

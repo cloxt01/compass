@@ -4,7 +4,7 @@ $app = require_once __DIR__ . '/bootstrap/app.php';
 
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
-
+use App\Clients\Application\UseCase\ApplyUseCase;
 use App\Clients\GlintsAPI;
 use App\Models\User;
 use App\Models\JobstreetAccount;
@@ -43,8 +43,9 @@ $client = new GlintsAPI($token, $cookie);
 $adapter = new GlintsAdapter($client);
 $job = $adapter->job();
 
-print_r($job->hiring_question(['jobId' => '403c0949-fc7e-44ba-acfb-c78dac3f5a9b']));
-
+//print_r($job->hiring_question(['jobId' => '403c0949-fc7e-44ba-acfb-c78dac3f5a9b']));
+$useCase = new ApplyUseCase($adapter, $glintsaccount);
+var_dump($useCase->apply('e5e1691b-1d66-4a29-9521-7c62483548ff'));
 //print_r($adapter->job()->search([
 //    'CountryCode' => 'ID',
 //    'searchTerm' => 'IT',
@@ -52,7 +53,10 @@ print_r($job->hiring_question(['jobId' => '403c0949-fc7e-44ba-acfb-c78dac3f5a9b'
 //    'includeExternalJobs' => false,
 //    'pageSize' => 30,
 //    'page' => 1
+
 //]));
+
+//print_r($job->loadJob('403c0949-fc7e-44ba-acfb-c78dac3f5a9b'));
 //
 //$list = ['CountryCode' => ['ID'],
 //    'lastUpdatedAtRange' => ['ANY_TIME', 'PAST_MONTH', 'PAST_24_HOURS', 'PAST_WEEK'],

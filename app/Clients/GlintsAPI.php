@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 class GlintsAPI extends api
 {
     public const provider = 'glints';
-    protected string $host = 'https://glints.com/api';
+    public string $host = 'https://glints.com/api';
     protected ?string $token;
     protected ?string $cookie;
     protected array $headers;
@@ -31,7 +31,7 @@ class GlintsAPI extends api
             'Traceparent' => '00-2334d811047b919f3a4ac1f3fb1accf4-904abac004e541f1-01',
             'Origin' => 'https://glints.com',
             'Referer' => 'https://glints.com/',
-            'Authorization' => 'Bearer ' . $this->token,
+//            'Authorization' => 'Bearer ' . $this->token,
             'Sec-CH-UA' => '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
             'Sec-CH-UA-Mobile' => '?0',
             'Sec-CH-UA-Platform' => '"Windows"',

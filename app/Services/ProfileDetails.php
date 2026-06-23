@@ -22,6 +22,23 @@ class ProfileDetails
         ];
     }
     public static function fromGlints($raw){
-        return [];
+        return [
+            'id' => $raw['id'] ?? null,
+            'email' => $raw['email'] ?? null,
+            'first_name' => $raw['firstName'] ?? null,
+            'last_name' => $raw['lastName'] ?? null,
+            'full_name' => ($raw['firstName'] ?? '') . " " . ($raw['lastName'] ?? '') ?? null,
+            'resume' => $raw['resume'] ?? null,
+            'gender' => $raw['gender'] ?? null,
+            'phone' => $raw['phone'] ?? null,
+            'whatsappNumber' => $raw['whatsappNumber'] ?? null,
+            'isPhoneNumberVerified' => $raw['isPhoneNumberVerified'] ?? null,
+            'isWhatsappVerified' => $raw['isWhatsappVerified'] ?? null,
+            'isVerified' => $raw['isVerified'] ?? false,
+            'careerStartDate' => $raw['careerStartDate'] ?? null,
+            'highestEducation' => $raw['highestEducationLevel'] ?? null,
+            'preferredLocations' => $raw['preferredLocations'] ?? [],
+            'applicationsCount' => $raw['applicationsCount'] ?? null,
+        ];
     }
 }

@@ -41,7 +41,7 @@ class JobstreetJob extends JobstreetAdapter
     public function search(array $params = []): array
     {
         $path = '/api/jobsearch/v5/me/search';
-        
+
         $params = [
             'siteKey' => 'ID-Main',
             'page' => 1,
@@ -73,13 +73,15 @@ class JobstreetJob extends JobstreetAdapter
         $process = $this->client->graphql('GetJobApplicationProcess', ['jobId' => $jobId])['data']['data']['jobApplicationProcess'] ?? [];
 
         $resp = array_merge(["details" => $details], ["process" => $process]);
-        
+
         return $resp;
     }
-    public function apply(array $payload): bool
+    public function apply(string $jobId ,array $payload): bool
     {
         $resp = $this->client->graphql('ApplySubmitApplication', $payload);
-        if($resp['ok'] && $resp['data']['data']['submitApplication']['__typename'] === 'SubmitApplicationSuccess'){
+        Log::info("Apply job id: " . $jobId . " submitted.");
+        Log::info(json_encode($resp));
+        if($resp[''] && $resp['data']['data']['submitApplication']['__typename'] === 'SubmitApplicationSuccess'){
             return true;
         } else {
             Log::error("Gagal melamar pekerjaan: " . json_encode($resp));

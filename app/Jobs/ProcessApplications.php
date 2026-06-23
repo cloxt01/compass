@@ -3,22 +3,17 @@
 
 namespace App\Jobs;
 
+use App\Clients\Application\UseCase\ApplyUseCase;
+use App\Exceptions\CantApply;
 use App\Http\Controllers\JobController;
-use App\Events\JobProcessed;
-use Illuminate\Support\Facades\Log;
+use App\Infrastructure\Contracts\PlatformAccount;
+use App\Infrastructure\Contracts\PlatformAdapter;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-
-use App\Infrastructure\Contracts\PlatformAdapter;
-use App\Infrastructure\Contracts\PlatformAccount;
-use App\Clients\GlintsAPI;
-
-use App\Application\UseCase\ApplyUseCase;
-
-use App\Exceptions\CantApply;
+use Illuminate\Support\Facades\Log;
 
 
 class ProcessApplications implements ShouldQueue
@@ -52,7 +47,7 @@ class ProcessApplications implements ShouldQueue
             Log::info($e->getMessage());
         } catch (\Exception $e) {
             Log::error("Error: " . $e->getMessage());
-            throw $e; 
+            throw $e;
         }
     }
 }

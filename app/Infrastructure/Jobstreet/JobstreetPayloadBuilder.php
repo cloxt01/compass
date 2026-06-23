@@ -16,10 +16,11 @@ class JobstreetPayloadBuilder {
     public function __construct(){
     }
 
-
     public function build(array $details, array $profile, array $config = []): array
-    
+
     {
+
+        exit;
         if(empty($details)){
             throw new \JobNotFound("Detail pekerjaan tidak ditemukan.");
         }
@@ -39,7 +40,7 @@ class JobstreetPayloadBuilder {
                 break;
             }
         }
-        
+
         $resume = $selectedResume ?? $profile['latest_resume'];
         $roles = $selectedRole ?? $profile['latest_roles'] ?? [];
         $profile_visibility2 = $profile['profile_visibility']['2'] ?? [];
@@ -68,7 +69,7 @@ class JobstreetPayloadBuilder {
                     "title" => $roles['title']['text'] ?? 'Unknown'
                 ]
             ];
-            
+
             if (isset($roles['from']['year']) && isset($roles['from']['month'])) {
                 $payload['roles']['started'] = [
                     "year" => (int)($roles['from']['year']),
@@ -82,7 +83,7 @@ class JobstreetPayloadBuilder {
                 ];
             }
         }
-        
+
         // Tambahkan visibilitas profil dan jawaban kuesioner
         $payload += [
             "profileVisibility2" => $profile_visibility2,
