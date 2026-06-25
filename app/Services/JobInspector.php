@@ -84,7 +84,7 @@ class JobInspector
         if($job['eligibility']['applied']){
             $issues[] = [
                 'type' => 'applied',
-                'level' => 'hard',
+                'level' => 'soft',
                 'message' => "Anda sudah melamar pekerjaan ini"
             ];
         }

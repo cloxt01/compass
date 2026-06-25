@@ -107,7 +107,7 @@ class GlintsJob extends GlintsAdapter
 
     public function details(string $jobId): array
     {
-        $details = $this->client->get('/v2/job/'. $jobId);
+        $details = $this->client->getRaw($this->client->host.'/v2/job/'. $jobId);
         if(!isset($details['data']['data'])){
             Log::info("Job Details tidak menampilkan data: ". json_encode($details));
             return [];
@@ -117,7 +117,6 @@ class GlintsJob extends GlintsAdapter
 
 
         $resp = array_merge(["details" => $details['data']['data']], ["hiring_question" => $hiring_question]);
-        print_r($resp);
         return $resp;
     }
     public function apply(string $jobId, array $payload): bool
@@ -125,10 +124,12 @@ class GlintsJob extends GlintsAdapter
         if(!isset($jobId)){
             return false;
         }
-        $resp = $this->client->post('/v2/v2/jobs/' . $jobId, $payload);
-        print_r($this->client->host.'/v2/v2/jobs/'.$jobId.'/applications');
-        print_r($payload);
-        print_r($resp);
+        $path = '/v2/jobs/' . $jobId. '/applications';
+        $resp = $this->client->postRaw('https://glints.com/api/v2/v2/jobs/db5cc606-3458-4591-9369-bde9b020f0ae/applications', json_encode($payload));
+        print_r("Host : ".$this->client->host.$path);
+        print_r("\nHeaders :". json_encode($this->client->headers));
+        print_r("\nPayload : ".json_encode($payload));
+        print_r("\nResponse : ".json_encode($resp));
         if($resp['status'] === 'success' && $resp['data']['data']['status'] === 'NEW'){
             return true;
         } else {

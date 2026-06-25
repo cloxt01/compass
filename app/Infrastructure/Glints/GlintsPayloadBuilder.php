@@ -21,7 +21,7 @@ class GlintsPayloadBuilder
                 'attachments' => []
             ],
             'source' => 'For You',
-            'traceInfo' => bin2hex(random_bytes(16))
+            'traceInfo' => 'd06f88314420a59edd2d7d9a0e6501c2'
         ];
     }
 }

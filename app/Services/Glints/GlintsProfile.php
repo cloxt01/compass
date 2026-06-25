@@ -18,7 +18,7 @@ class GlintsProfile extends GlintsAdapter
     public function load(): array
     {
         if ($this->data === null) {
-            $this->data = $this->client->get('/v2/me');
+            $this->data = $this->client->getRaw($this->client->host.'/v2/me');
         }
         return ($this->data && isset($this->data['data']['data']))  ? $this->data['data']['data'] : [];
     }

@@ -45,7 +45,8 @@ $job = $adapter->job();
 
 //print_r($job->hiring_question(['jobId' => '403c0949-fc7e-44ba-acfb-c78dac3f5a9b']));
 $useCase = new ApplyUseCase($adapter, $glintsaccount);
-var_dump($useCase->apply('e5e1691b-1d66-4a29-9521-7c62483548ff'));
+$jobId = 'db5cc606-3458-4591-9369-bde9b020f0ae';
+var_dump($useCase->apply($jobId));
 //print_r($adapter->job()->search([
 //    'CountryCode' => 'ID',
 //    'searchTerm' => 'IT',
