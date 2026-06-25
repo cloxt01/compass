@@ -50,7 +50,7 @@ class ApplyController extends Controller {
         try {
             $request->validate([
                 'providers' => 'required|array|min:1',
-                'providers.*' => 'in:jobstreet',
+                'providers.*' => 'in:jobstreet,glints',
                 'keyword' => 'required',
                 'location' => 'required|min:3',
                 'pageSize' => 'required|integer|min:1|max:50',
@@ -97,12 +97,17 @@ class ApplyController extends Controller {
                     ],
                     'glints' => [
                         'searchTerm' => $request->input('keyword'),
-                        ''
+                        'pageSize' => $request->input('pageSize')
                     ]
                 };
-                $jobs = $this->adapter[$provider]->job()->search();
-                Log::info("Found " . count($jobs['data']['data']) . " jobs on $provider for user " . $this->user->id);
-                foreach($jobs['data']['data'] as $job){
+                $jobs = $this->adapter[$provider]->job()->search($params);
+                $data = match($provider){
+                    'jobstreet' => $jobs['data']['data'] ?? [],
+                    'glints' => $jobs['data']['searchJobsV3']['jobsInPage'] ?? []
+                };
+
+                Log::info("Found " . count($data) . " jobs on $provider for user " . $this->user->id);
+                foreach($data as $job){
                     ProcessApplications::dispatch($this->adapter[$provider], $this->account[$provider], $job['id']);
                 }
             }

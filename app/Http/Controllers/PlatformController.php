@@ -145,6 +145,7 @@ class PlatformController extends Controller {
             $user = auth()->user();
             $account = match($provider){
                 'jobstreet' => $user->jobstreetAccount,
+                'glints' => $user->glintsAccount,
                 default => throw new UnknownProvider($provider)
             };
 
