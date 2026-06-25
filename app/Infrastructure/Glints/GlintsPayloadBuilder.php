@@ -13,6 +13,8 @@ class GlintsPayloadBuilder
 //        print_r($profile);
 //        print_r($config);
 
+        print_r($config);
+
         return [
             'data' => [
                 'resume' => $profile['resume'],
@@ -21,7 +23,7 @@ class GlintsPayloadBuilder
                 'attachments' => []
             ],
             'source' => 'For You',
-            'traceInfo' => 'd06f88314420a59edd2d7d9a0e6501c2'
+            'traceInfo' => $config['traceInfo'] ?? bin2hex(random_bytes(16)),
         ];
     }
 }

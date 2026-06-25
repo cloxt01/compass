@@ -51,8 +51,11 @@ class JobstreetAdapter implements PlatformAdapter {
     {
         return JobInspector::fromJobstreet($details);
     }
+    public function generateTraceInfo(): string {
+        return '';
+    }
 
-    public function execute(string $jobId, array $payload): bool
+    public function execute(string $jobId, array $payload, array $config = []): bool
     {
         return $this->job()->apply($jobId, $payload);
     }

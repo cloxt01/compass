@@ -107,7 +107,7 @@ class GlintsJob extends GlintsAdapter
 
     public function details(string $jobId): array
     {
-        $details = $this->client->getRaw($this->client->host.'/v2/job/'. $jobId);
+        $details = $this->client->get('/v2/job/'. $jobId);
         if(!isset($details['data']['data'])){
             Log::info("Job Details tidak menampilkan data: ". json_encode($details));
             return [];
@@ -119,17 +119,20 @@ class GlintsJob extends GlintsAdapter
         $resp = array_merge(["details" => $details['data']['data']], ["hiring_question" => $hiring_question]);
         return $resp;
     }
-    public function apply(string $jobId, array $payload): bool
+    public function apply(string $jobId, array $payload, $config): bool
     {
         if(!isset($jobId)){
             return false;
         }
-        $path = '/v2/jobs/' . $jobId. '/applications';
-        $resp = $this->client->postRaw('https://glints.com/api/v2/v2/jobs/db5cc606-3458-4591-9369-bde9b020f0ae/applications', json_encode($payload));
+        $path = '/v2/v2/jobs/' . $jobId. '/applications';
+        $this->client->headers['Referer'] = 'https://glints.com/id/opportunities/jobs/engineering/'.$jobId.'/apply?utm_referrer=fyp&traceInfo='.$config['traceInfo'];
+        $resp = $this->client->post($path, $payload);
+
         print_r("Host : ".$this->client->host.$path);
         print_r("\nHeaders :". json_encode($this->client->headers));
         print_r("\nPayload : ".json_encode($payload));
         print_r("\nResponse : ".json_encode($resp));
+
         if($resp['status'] === 'success' && $resp['data']['data']['status'] === 'NEW'){
             return true;
         } else {

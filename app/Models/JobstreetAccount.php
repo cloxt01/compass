@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Services\Token\JobstreetToken;
 use App\Infrastructure\Contracts\PlatformAccount;
 
-class JobstreetAccount extends Model implements PlatformAccount 
+class JobstreetAccount extends Model implements PlatformAccount
 {
      protected $fillable = [
         'user_id',
@@ -20,7 +20,7 @@ class JobstreetAccount extends Model implements PlatformAccount
         'expires_at' => 'datetime',
         'apply_configuration' => 'array',
     ];
-    
+
 
     public function user()
     {
@@ -46,7 +46,7 @@ class JobstreetAccount extends Model implements PlatformAccount
     }
     public function refreshToken(): bool
     {
-        
+
         $token = (new JobstreetToken())->refreshToken($this->refresh_token);
         if (!$token || !isset($token['access_token'])) {
             $this->status = 'reauth_required';
@@ -56,11 +56,11 @@ class JobstreetAccount extends Model implements PlatformAccount
         $this->updateToken($token);
         return true;
     }
-    public function saveConfig(string $key, $value){
+    public function saveConfig(string $key, $value): bool {
         $configs = $this->apply_configuration ?? [];
         $configs[$key] = $value;
         $this->apply_configuration = $configs;
-        $this->save();
+        return $this->save();
     }
     public function getConfig(?string $key = null, $default = []): mixed {
         if($key === null){

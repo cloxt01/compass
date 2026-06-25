@@ -23,11 +23,11 @@ class GlintsAccount extends Model implements PlatformAccount
     {
         return $this->belongsTo(User::class);
     }
-    public function saveConfig(string $key, $value){
+    public function saveConfig(string $key, $value): bool{
         $configs = $this->apply_configuration ?? [];
         $configs[$key] = $value;
         $this->apply_configuration = $configs;
-        $this->save();
+        return $this->save();
     }
     public function getConfig(?string $key = null, $default = []): mixed {
         if($key === null){

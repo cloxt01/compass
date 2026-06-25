@@ -16,7 +16,13 @@ class ApplyUseCase {
     public function apply(string $jobId): bool {
         $job = $this->adapter->loadJob($jobId);
         $profile = $this->adapter->loadProfile();
-        $config = $this->account->getConfig();
+
+        $traceInfo = $this->adapter->generateTraceInfo();
+        if(!empty($traceInfo)) {
+            $this->account->saveConfig('traceInfo' , $traceInfo);
+            $config = $this->account->getConfig();
+        }
+
 
         if(!$this->adapter->canApply($job)['canApply']){
             Log::warning("Tidak dapat melamar pekerjaan ID: " . $jobId . " karena tidak memenuhi syarat.");
@@ -24,6 +30,6 @@ class ApplyUseCase {
             return false;
         }
         $payload = $this->adapter->buildPayload($job, $profile, $config);
-        return $this->adapter->execute($jobId, $payload);
+        return $this->adapter->execute($jobId, $payload, $config);
     }
 }
