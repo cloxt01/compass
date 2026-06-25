@@ -21,7 +21,7 @@ class GlintsAccount extends Model implements PlatformAccount
     ];
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
     public function saveConfig(string $key, $value): bool{
         $configs = $this->apply_configuration ?? [];

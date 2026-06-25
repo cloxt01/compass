@@ -41,6 +41,69 @@ Route::middleware('guest')->group(function() {
 });
 
 Route::middleware('auth')->group(function() {
+    Route::get('/user/queue/status', function () {
+        $userId = auth()->id();
+
+        $pending = DB::table('jobs')
+            ->where('user_id', $userId)
+            ->whereNull('reserved_at')
+            ->count();
+
+        $processing = DB::table('jobs')
+            ->where('user_id', $userId)
+            ->whereNotNull('reserved_at')
+            ->count();
+
+        $failed = DB::table('failed_jobs')
+            ->where('user_id', $userId)
+            ->count();
+
+        $recentJobs = DB::table('jobs')
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get(['id', 'attempts', 'reserved_at', 'created_at']);
+
+        return response()->json([
+            'pending' => $pending,
+            'processing' => $processing,
+            'failed' => $failed,
+            'recent' => $recentJobs,
+            'updated_at' => now()->toDateTimeString()
+        ]);
+    })->name('user.queue.status');
+    Route::get('/user/jobs/status', function () {
+        $userId = auth()->id();
+
+        $stats = DB::table('glints_applications')
+            ->where('user_id', $userId)
+            ->selectRaw("
+            COUNT(*) as total,
+            SUM(status = 'success') as success,
+            SUM(status = 'applied') as applied,
+            SUM(status = 'linkout') as linkout,
+            SUM(status = 'questionnaire') as questionnaire
+        ")
+            ->first();
+
+        $recent = DB::table('glints_applications')
+            ->where('user_id', $userId)
+            ->latest()
+            ->limit(10)
+            ->get([
+                'job_id',
+                'status',
+                'created_at'
+            ]);
+
+        return response()->json([
+            'stats' => $stats,
+            'recent' => $recent,
+            'updated_at' => now()->toDateTimeString(),
+        ]);
+    })->name('user.jobs.status');
+    //   Tambahkan disini Route::get('/user/jobs/status', function () {})
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/apply', [ApplyController::class, 'index'])->name('apply');
     Route::get('/profile', function(){return view('profile');})->name('profile');

@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Models\JobstreetAccount;
-use App\Observers\JobstreetAccountObserver;
 
+use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
@@ -28,6 +28,5 @@ class AppServiceProvider extends ServiceProvider
          if (config('app.env') !== 'local') {
             URL::forceScheme('https');
         }
-       
     }
 }

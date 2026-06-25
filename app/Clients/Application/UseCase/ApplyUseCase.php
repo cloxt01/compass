@@ -23,10 +23,11 @@ class ApplyUseCase {
             $config = $this->account->getConfig();
         }
 
-
-        if(!$this->adapter->canApply($job)['canApply']){
+        $inspector = $this->adapter->canApply($job);
+        if(!$inspector['canApply']){
             Log::warning("Tidak dapat melamar pekerjaan ID: " . $jobId . " karena tidak memenuhi syarat.");
-            Log::warning(json_encode($this->adapter->canApply($job)['issues']));
+            Log::warning(json_encode($inspector['issues']));
+            $this->adapter->db()->upsert_job($this->account->user->id, $jobId, $inspector['issues'][0]['type']);
             return false;
         }
         $payload = $this->adapter->buildPayload($job, $profile, $config);

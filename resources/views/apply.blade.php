@@ -392,7 +392,91 @@
         Keep your connection stable while automation is running.
     </p>
 </div>
+{{-- QUEUE STATUS --}}
+<div class="mt-8 bg-[#161b22] border border-[#30363d] rounded-md">
+    <div class="px-6 py-4 border-b border-[#30363d] flex justify-between items-center">
+        <div>
+            <h2 class="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
+                <i class="fas fa-tasks text-[#8b949e]"></i>
+                Status Antrian
+            </h2>
+            <p class="text-xs text-[#8b949e] mt-1">
+                Real-time status lamaran Anda.
+            </p>
+        </div>
+        <span id="last-updated" class="text-xs text-[#8b949e]"></span>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-4 text-center">
+                <div class="text-xs text-[#8b949e] uppercase tracking-wide">Pending</div>
+                <div id="pending-count" class="text-2xl font-bold text-[#e6edf3]">0</div>
+            </div>
+            <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-4 text-center">
+                <div class="text-xs text-[#8b949e] uppercase tracking-wide">Processing</div>
+                <div id="processing-count" class="text-2xl font-bold text-yellow-400">0</div>
+            </div>
+            <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-4 text-center">
+                <div class="text-xs text-[#8b949e] uppercase tracking-wide">Failed</div>
+                <div id="failed-count" class="text-2xl font-bold text-red-400">0</div>
+            </div>
+        </div>
 
+        <div>
+            <h4 class="text-xs font-medium text-[#8b949e] uppercase tracking-wide mb-2">Recent Jobs (Last 5)</h4>
+            <ul id="recent-jobs" class="space-y-1 text-sm text-[#e6edf3]">
+                <li class="text-[#8b949e]">Belum ada data...</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{{-- APPLICATION STATUS --}}
+<div class="mt-8 bg-[#161b22] border border-[#30363d] rounded-md">
+    <div class="px-6 py-4 border-b border-[#30363d] flex justify-between items-center">
+        <div>
+            <h2 class="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
+                <i class="fas fa-file-alt text-[#8b949e]"></i>
+                Status Lamaran (Glints)
+            </h2>
+            <p class="text-xs text-[#8b949e] mt-1">
+                Ringkasan hasil lamaran otomatis Anda.
+            </p>
+        </div>
+        <span id="app-last-updated" class="text-xs text-[#8b949e]"></span>
+    </div>
+
+    <div class="p-6">
+        {{-- STATISTIK --}}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-center">
+                <div class="text-xs text-[#8b949e] uppercase tracking-wide">✅ Success</div>
+                <div id="stat-success" class="text-xl font-bold text-green-400">0</div>
+            </div>
+            <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-center">
+                <div class="text-xs text-[#8b949e] uppercase tracking-wide">📩 Applied</div>
+                <div id="stat-applied" class="text-xl font-bold text-blue-400">0</div>
+            </div>
+            <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-center">
+                <div class="text-xs text-[#8b949e] uppercase tracking-wide">🔗 Link Out</div>
+                <div id="stat-linkout" class="text-xl font-bold text-yellow-400">0</div>
+            </div>
+            <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-center">
+                <div class="text-xs text-[#8b949e] uppercase tracking-wide">📝 Questionnaire</div>
+                <div id="stat-questionnaire" class="text-xl font-bold text-purple-400">0</div>
+            </div>
+        </div>
+
+        {{-- DAFTAR TERBARU --}}
+        <div>
+            <h4 class="text-xs font-medium text-[#8b949e] uppercase tracking-wide mb-2">
+                Aplikasi Terbaru (Last 5)
+            </h4>
+            <ul id="recent-apps" class="space-y-1 text-sm text-[#e6edf3]">
+                <li class="text-[#8b949e]">Belum ada aplikasi.</li>
+            </ul>
+        </div>
+    </div>
+</div>
 @endsection
 
 <script>
@@ -418,5 +502,92 @@
                 statusTextGlints.classList.toggle('text-[#8b949e]', !this.checked);
             });
         }
+
+        // Queue Jobs User
+        function fetchQueueStatus() {
+            fetch('{{ route("user.queue.status") }}', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                credentials: 'same-origin'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('pending-count').textContent = data.pending;
+                    document.getElementById('processing-count').textContent = data.processing;
+                    document.getElementById('failed-count').textContent = data.failed;
+
+                    const list = document.getElementById('recent-jobs');
+                    list.innerHTML = '';
+                    if (data.recent && data.recent.length > 0) {
+                        data.recent.forEach(job => {
+                            const status = job.reserved_at ? '🟡 Processing' : '🟢 Pending';
+                            const li = document.createElement('li');
+                            li.textContent = `#${job.id} - ${status} (Attempts: ${job.attempts})`;
+                            list.appendChild(li);
+                        });
+                    } else {
+                        list.innerHTML = '<li class="text-[#8b949e]">Belum ada job.</li>';
+                    }
+
+                    document.getElementById('last-updated').textContent = `🔄 Updated: ${data.updated_at}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching queue status:', error);
+                });
+        }
+        function fetchApplicationStatus() {
+            fetch('{{ route("user.jobs.status") }}', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    // Update statistik
+                    document.getElementById('stat-success').textContent       = data.stats.success || 0;
+                    document.getElementById('stat-applied').textContent       = data.stats.applied || 0;
+                    document.getElementById('stat-linkout').textContent       = data.stats.linkout || 0;
+                    document.getElementById('stat-questionnaire').textContent = data.stats.questionnaire || 0;
+
+                    // Update daftar terbaru
+                    const list = document.getElementById('recent-apps');
+                    list.innerHTML = '';
+                    if (data.recent && data.recent.length > 0) {
+                        data.recent.forEach(app => {
+                            const statusMap = {
+                                'success': '✅ Success',
+                                'applied': '📩 Applied',
+                                'linkout': '🔗 Link Out',
+                                'questionnaire': '📝 Questionnaire'
+                            };
+                            const statusLabel = statusMap[app.status] || app.status;
+                            const li = document.createElement('li');
+                            li.textContent = `Job: ${app.job_id} - ${statusLabel} (${new Date(app.created_at).toLocaleString()})`;
+                            list.appendChild(li);
+                        });
+                    } else {
+                        list.innerHTML = '<li class="text-[#8b949e]">Belum ada aplikasi.</li>';
+                    }
+
+                    document.getElementById('app-last-updated').textContent = `🔄 Updated: ${data.updated_at}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching application status:', error);
+                    document.getElementById('recent-apps').innerHTML = '<li class="text-red-400">Gagal memuat data.</li>';
+                });
+        }
+        fetchApplicationStatus();
+        setInterval(fetchApplicationStatus, 5000);
+
+        fetchQueueStatus();
+        setInterval(fetchQueueStatus, 5000);
     });
 </script>

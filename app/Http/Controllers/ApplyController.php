@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\Adapters\GlintsAdapter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
@@ -17,6 +18,7 @@ use App\Jobs\ProcessApplications;
 
 use App\Exceptions\UnknownProvider;
 use App\Exception\AccountNotFound;
+use Illuminate\Support\Facades\Queue;
 
 
 class ApplyController extends Controller {
@@ -108,7 +110,30 @@ class ApplyController extends Controller {
 
                 Log::info("Found " . count($data) . " jobs on $provider for user " . $this->user->id);
                 foreach($data as $job){
-                    ProcessApplications::dispatch($this->adapter[$provider], $this->account[$provider], $job['id']);
+                    $queue = new ProcessApplications(
+                        $this->adapter[$provider],
+                        $this->account[$provider],
+                        $job['id']
+                    );
+                    $queueId = Queue::connection('database')->push($queue);
+                    DB::table('jobs')
+                        ->where('id', $queueId)
+                        ->update([
+                            'user_id' => $queue->user_id
+                        ]);
+//                    $queue = new ProcessApplications(
+//                        $this->adapter[$provider],
+//                        $this->account[$provider],
+//                        $job['id']
+//                    );
+//
+//                    $queueId = dispatch($queue);
+//
+//                    DB::table('jobs')
+//                        ->where('id', $queueId)
+//                        ->update([
+//                            'user_id' => $queue->user_id,
+//                        ]);
                 }
             }
 
