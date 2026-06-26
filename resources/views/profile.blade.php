@@ -43,8 +43,11 @@
             </div>
         </div>
 
+
         {{-- RIGHT: CONNECTIONS --}}
         <div class="lg:col-span-2">
+            <p class="text-sm text-yellow-400">Untuk dapat menghubungkan akun jobstreet, hubungi admin</p>
+
             <div class="bg-[#161b22] border border-[#30363d] rounded-md">
 
                 {{-- HEADER --}}
@@ -54,9 +57,11 @@
                     </h2>
                 </div>
 
+
                 {{-- TABLE --}}
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
+
                         <thead class="bg-[#0d1117] text-gray-400">
                             <tr>
                                 <th class="px-6 py-3 text-left font-medium">Platform</th>
@@ -64,7 +69,6 @@
                                 <th class="px-6 py-3 text-left font-medium">Action</th>
                             </tr>
                         </thead>
-
                         <tbody class="divide-y divide-[#30363d]">
 
                             {{-- JOBSTREET --}}
@@ -88,12 +92,11 @@
                                         </span>
                                     @endif
                                 </td>
-
                                 <td class="px-6 py-4">
                                     <a
                                         href="{{ $hasJobstreet
                                             ? route('platform.disconnect', ['provider' => 'jobstreet'])
-                                            : route('platform.connect.jobstreet') }}"
+                                            : '#' }}"
                                         class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium
                                                {{ $hasJobstreet
                                                    ? 'bg-[#da3633] text-white hover:bg-[#f85149]'
@@ -105,7 +108,7 @@
                                 </td>
                             </tr>
 
-                            {{-- JOBSTREET --}}
+                            {{-- GLINTS --}}
                             <tr>
                                 <td class="px-6 py-4 font-medium text-gray-100">
                                     Glints

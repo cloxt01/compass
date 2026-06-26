@@ -20,8 +20,8 @@ class ApplyUseCase {
         $traceInfo = $this->adapter->generateTraceInfo();
         if(!empty($traceInfo)) {
             $this->account->saveConfig('traceInfo' , $traceInfo);
-            $config = $this->account->getConfig();
         }
+        $config = $this->account->getConfig();
 
         $inspector = $this->adapter->canApply($job);
         if(!$inspector['canApply']){

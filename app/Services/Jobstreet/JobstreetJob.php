@@ -81,7 +81,7 @@ class JobstreetJob extends JobstreetAdapter
         $resp = $this->client->graphql('ApplySubmitApplication', $payload);
         Log::info("Apply job id: " . $jobId . " submitted.");
         Log::info(json_encode($resp));
-        if($resp[''] && $resp['data']['data']['submitApplication']['__typename'] === 'SubmitApplicationSuccess'){
+        if($resp['ok'] && $resp['data']['data']['submitApplication']['__typename'] === 'SubmitApplicationSuccess'){
             return true;
         } else {
             Log::error("Gagal melamar pekerjaan: " . json_encode($resp));

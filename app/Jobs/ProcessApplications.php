@@ -14,6 +14,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 
 
 class ProcessApplications implements ShouldQueue
@@ -32,8 +33,18 @@ class ProcessApplications implements ShouldQueue
         $this->user_id = $this->account->user->id;
     }
 
+
+
     public function handle()
     {
+        if (RateLimiter::tooManyAttempts('glints-apply', 20)) {
+            Log::warning("Job {$this->job_id} kena rate limit, di-release...");
+            $this->release(RateLimiter::availableIn('glints-apply'));
+            return;
+        }
+
+        RateLimiter::hit('glints-apply', 600);
+
         Log::info("Memproses Lamaran ID: " . $this->job_id . " - User ID : " . $this->account->user->id . " - Platform : " . get_class($this->adapter));
 
         try {

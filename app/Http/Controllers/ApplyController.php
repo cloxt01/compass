@@ -55,10 +55,9 @@ class ApplyController extends Controller {
                 'providers' => 'required|array|min:1',
                 'providers.*' => 'in:jobstreet,glints',
                 'keyword' => 'required',
-                'location' => 'required|min:3',
-                'pageSize' => 'required|integer|min:1|max:50',
-                'interval' => 'required|integer|min:1|max:60',
-                'max_applications' => 'required|integer|min:1|max:1000',
+                'pageSize' => 'required|integer|min:1|max:40',
+//                'interval' => 'required|integer|min:1|max:60',
+//                'max_applications' => 'required|integer|min:1|max:1000',
             ]);
             $this->user = auth()->user();
 
@@ -95,7 +94,7 @@ class ApplyController extends Controller {
                 $params = match($provider){
                     'jobstreet' => [
                         'keyword' => $request->input('keyword'),
-                        'location' => $request->input('location'),
+                        'location' => (string) ($this->account[$provider]->getConfig('location', '')),
                         'pageSize' => (int) ($request->input('pageSize'))
                     ],
                     'glints' => [

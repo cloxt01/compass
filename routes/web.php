@@ -89,11 +89,11 @@ Route::middleware('auth')->group(function() {
         $recent = DB::table('glints_applications')
             ->where('user_id', $userId)
             ->latest()
-            ->limit(10)
+            ->limit(10) // Tambah limit sedikit agar lebih jelas
             ->get([
                 'job_id',
                 'status',
-                'created_at'
+                'updated_at' // Pastikan nama kolom ini benar di database!
             ]);
 
         return response()->json([

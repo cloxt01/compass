@@ -20,7 +20,6 @@ class JobstreetPayloadBuilder {
 
     {
 
-        exit;
         if(empty($details)){
             throw new \JobNotFound("Detail pekerjaan tidak ditemukan.");
         }
