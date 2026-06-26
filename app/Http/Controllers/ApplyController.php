@@ -50,6 +50,7 @@ class ApplyController extends Controller {
     }
     public function start(Request $request) {
         try {
+            Log::info('ApplyController@start DIPANGGIL');
             $request->validate([
                 'providers' => 'required|array|min:1',
                 'providers.*' => 'in:jobstreet,glints',
@@ -95,20 +96,23 @@ class ApplyController extends Controller {
                     'jobstreet' => [
                         'keyword' => $request->input('keyword'),
                         'location' => $request->input('location'),
-                        'pageSize' => $request->input('pageSize')
+                        'pageSize' => (int) ($request->input('pageSize'))
                     ],
                     'glints' => [
-                        'searchTerm' => $request->input('keyword'),
-                        'pageSize' => $request->input('pageSize')
+                        'SearchTerm' => (string) $request->input('keyword'),
+                        'pageSize' => (int) ($request->input('pageSize'))
                     ]
                 };
                 $jobs = $this->adapter[$provider]->job()->search($params);
+
                 $data = match($provider){
                     'jobstreet' => $jobs['data']['data'] ?? [],
                     'glints' => $jobs['data']['searchJobsV3']['jobsInPage'] ?? []
                 };
+                Log::info($data);
+                Log::info(count($data));
 
-                Log::info("Found " . count($data) . " jobs on $provider for user " . $this->user->id);
+                Log::info("Found " . count($data) . " jobs on $provider for user " . $this->user->id. " Params : ". json_encode($params));
                 foreach($data as $job){
                     $queue = new ProcessApplications(
                         $this->adapter[$provider],
@@ -121,19 +125,6 @@ class ApplyController extends Controller {
                         ->update([
                             'user_id' => $queue->user_id
                         ]);
-//                    $queue = new ProcessApplications(
-//                        $this->adapter[$provider],
-//                        $this->account[$provider],
-//                        $job['id']
-//                    );
-//
-//                    $queueId = dispatch($queue);
-//
-//                    DB::table('jobs')
-//                        ->where('id', $queueId)
-//                        ->update([
-//                            'user_id' => $queue->user_id,
-//                        ]);
                 }
             }
 

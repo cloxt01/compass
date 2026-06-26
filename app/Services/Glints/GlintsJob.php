@@ -53,13 +53,19 @@ class GlintsJob extends GlintsAdapter
         Log::info("Job Hiring Question result: " . json_encode($result));
         return JobQuestion::fromGlints($result) ?: [];
     }
-    public function search(array $params = [
-        'CountryCode' => 'ID',
-//        'searchTerm' => '',
-        'includeExternalJobs' => false,
-        'pageSize' => 30,
-        'page' => 1
-    ]): array
+
+    /*
+     * Params :
+     *  --- Required ---
+     *  - Key : type (default)
+     *  ----------------
+     *  - CountryCode : string (ID)
+     *  - SearchTerm : string ('')
+     *  - includeExternalJobs : bool (false)
+     *  - page : int (1)
+     *  - pageSize : int (30)
+     */
+    public function search(array $params = []): array
     {
         $list = ['CountryCode' => ['ID'],
             'lastUpdatedAtRange' => ['ANY_TIME', 'PAST_MONTH', 'PAST_24_HOURS', 'PAST_WEEK'],
@@ -97,8 +103,8 @@ class GlintsJob extends GlintsAdapter
                 ]]
             ]
             ];
-
         if(!DataHelper::validateJobSearchParams($params, $list)){
+            Log::info("Job search params tidak tervalidasi: ". json_encode($params));
             return [];
         }
 
@@ -133,6 +139,11 @@ class GlintsJob extends GlintsAdapter
         print_r("\nPayload : ".json_encode($payload));
         print_r("\nResponse : ".json_encode($resp));
 
+        Log::info('Job Apply: '.json_encode([
+            'jobId' => $jobId,
+            'payload' => $payload,
+            'response' => $resp
+        ]));
         if($resp['status'] === 'success' && $resp['data']['data']['status'] === 'NEW'){
             return true;
         } else {

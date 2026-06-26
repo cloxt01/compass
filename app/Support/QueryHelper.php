@@ -227,13 +227,16 @@ class QueryHelper {
                     ],
                 ],
                  'searchJobsV3' => [
-                    'data' => $variables['data'] ?? [
-                        'CountryCode' => 'ID',
-                        'includeExternalJobs' => false,
-                        'pageSize' => 30,
-                        'page' => 1
-                    ],
-                ],
+                     'data' => $variables['data'] ?? array_filter([
+                             'SearchTerm'         => $variables['SearchTerm'] ?? 'IT',
+                             'CountryCode'         => 'ID',
+                             'includeExternalJobs' => $variables['includeExternalJobs'] ?? false,
+                             'pageSize'            => $variables['pageSize'] ?? 10,
+                             'page'                => $variables['page'] ?? 1,
+                         ], function ($value) {
+                             return $value !== null;
+                         }),
+                 ],
                 default => new \stdClass()
             };
         } else {
