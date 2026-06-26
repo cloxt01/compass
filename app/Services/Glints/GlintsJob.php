@@ -2,6 +2,7 @@
 
 namespace App\Services\Glints;
 
+use App\Models\GlintsAccount;
 use App\Services\JobQuestion;
 use App\Support\DataHelper;
 use Illuminate\Support\Facades\Log;
@@ -67,6 +68,7 @@ class GlintsJob extends GlintsAdapter
      */
     public function search(array $params = []): array
     {
+
         $list = ['CountryCode' => ['ID'],
             'lastUpdatedAtRange' => ['ANY_TIME', 'PAST_MONTH', 'PAST_24_HOURS', 'PAST_WEEK'],
             'type' => [

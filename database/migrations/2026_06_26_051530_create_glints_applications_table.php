@@ -12,7 +12,7 @@ return new class extends Migration
             $table->increments('id');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('job_id');
-            $table->enum('status', ['success', 'applied', 'linkout', 'questionnaire']); // Tanggal lamaran
+            $table->enum('status', ['success', 'applied', 'linkout', 'questionnaire', 'expired']); // Tanggal lamaran
             $table->timestamps();
         });
     }

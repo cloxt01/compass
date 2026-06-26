@@ -14,11 +14,5 @@ class GlintsLocation extends GlintsAdapter
         parent::__construct($client);
     }
 
-    public function load(): array
-    {
-        if ($this->data === null) {
 
-        }
-        return $this->data ?? [];
-    }
 }

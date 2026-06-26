@@ -100,7 +100,9 @@ class ApplyController extends Controller {
                     ],
                     'glints' => [
                         'SearchTerm' => (string) $request->input('keyword'),
+                        'LocationIds' => (array) ($this->account[$provider]->getConfig('location_ids', [])),
                         'pageSize' => (int) ($request->input('pageSize'))
+
                     ]
                 };
                 $jobs = $this->adapter[$provider]->job()->search($params);

@@ -186,13 +186,10 @@ class QueryHelper {
         } else if ($client::provider == 'glints'){
             $vars = match($operationName) {
                 'searchHierarchicalLocations' => [
-                    // dua versi, pilih default yang paling lengkap
                     'searchTerm' => $variables['searchTerm'] ?? '',
                     'limit' => $variables['limit'] ?? 10,
                     'levels' => $variables['levels'] ?? [1,2,3,4],
                     'countryCode' => $variables['countryCode'] ?? 'ID',
-//                    'withActiveJobsOnly' => $variables['withActiveJobsOnly'] ?? null,
-//                    'searchType' => $variables['searchType'] ?? 'SUGGESTION',
                 ],
                 'getJobDetailsById' => [
                     'opportunityId' => $variables['opportunityId'] ?? '',
@@ -233,6 +230,7 @@ class QueryHelper {
                              'includeExternalJobs' => $variables['includeExternalJobs'] ?? false,
                              'pageSize'            => $variables['pageSize'] ?? 10,
                              'page'                => $variables['page'] ?? 1,
+                             'LocationIds' => $variables['LocationIds'] ?? [],
                          ], function ($value) {
                              return $value !== null;
                          }),
