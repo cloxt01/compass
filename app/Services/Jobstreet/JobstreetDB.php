@@ -14,6 +14,6 @@ class JobstreetDB
 
     public static function upsert_job(int $userId, string $jobId, string $type): bool
     {
-        return DB::table('glints_applications')->updateOrInsert((array)['job_id' => $jobId, 'user_id' => $userId, 'status' => $type, 'updated_at' => DB::raw('NOW()')]);
+        return DB::table('jobstreet_applications')->updateOrInsert((array)['job_id' => $jobId, 'user_id' => $userId, 'status' => $type, 'updated_at' => DB::raw('NOW()')]);
     }
 }

@@ -1,745 +1,884 @@
 @extends('layouts.app')
 
 @section('title', 'Apply · Compass')
+@section('titleNavbar', 'Apply')
+
+@php
+    $jobstreet_profile = null;
+    $glints_profile    = null;
+
+    $hasGlints     = isset($accounts['glints'])     && isset($adapters['glints']);
+    $hasJobstreet  = isset($accounts['jobstreet'])  && isset($adapters['jobstreet']);
+
+    // ✅ Flag paused sekarang di USER, bukan per account
+    $isPaused = $user->automation_paused ?? false;
+
+    if ($hasJobstreet) {
+        $jobstreet_profile = $adapters['jobstreet']->loadProfile();
+        $jobstreet_config  = $accounts['jobstreet']->getConfig() ?? [];
+    }
+    if ($hasGlints) {
+        $glints_profile = $adapters['glints']->loadProfile();
+        $glints_config  = $accounts['glints']->getConfig() ?? [];
+    }
+@endphp
 
 @section('content')
-    @if (session('success'))
-        <div class="mb-6 rounded-md border border-green-800 bg-[#0f2a1c] p-4 text-sm text-green-400 flex items-center gap-2">
-            <i class="fas fa-check-circle"></i>
-            {{ session('success') }}
+    <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+        {{-- ═══ HEADER ═══ --}}
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight">Auto Apply</h1>
+                <p class="text-sm text-white/40">Automation across JobStreet &amp; Glints</p>
+            </div>
+            <div class="flex items-center gap-3">
+                {{-- Status Badge --}}
+                <div id="main-status" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" id="status-dot-ping"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" id="status-dot"></span>
+                    </span>
+                    <span class="text-sm font-medium text-white/80" id="status-label">Running</span>
+                </div>
+                {{-- Settings link --}}
+                <a href="{{ route('profile') }}" class="p-2 rounded-lg hover:bg-white/5 transition">
+                    <i class="fas fa-sliders-h text-white/30 text-sm"></i>
+                </a>
+            </div>
         </div>
-    @endif
 
-    @php
-        $jobstreet_profile = null;
-        $glints_profile = null;
+        {{-- ═══ HERO CARD ═══ --}}
+        <div class="bg-[#111317] border border-white/5 rounded-2xl shadow-xl p-6 space-y-5">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+                <div class="flex-1 space-y-3">
+                    {{-- Keyword & Batch --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-medium text-white/30 uppercase tracking-wider mb-1.5">Keyword</label>
+                            <div class="relative">
+                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-white/20 text-sm"></i>
+                                <input type="text" name="keyword" id="keyword-input" required placeholder="Web Developer"
+                                       class="w-full h-10 rounded-xl border border-white/10 bg-[#0d0f16] pl-9 pr-3
+                                          text-sm text-white placeholder-white/20
+                                          focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 outline-none transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-white/30 uppercase tracking-wider mb-1.5">Batch</label>
+                            <input type="number" name="pageSize" value="5" min="1" max="40"
+                                   class="w-full h-10 rounded-xl border border-white/10 bg-[#0d0f16] px-3
+                                      text-sm text-white
+                                      focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 outline-none transition">
+                        </div>
+                    </div>
 
-        $hasGlints = isset($accounts['glints']) && isset($adapters['glints']);
-        $hasJobstreet = isset($accounts['jobstreet']) && isset($adapters['jobstreet']);
-
-        if ($hasJobstreet) {
-            $jobstreet_profile = $adapters['jobstreet']->loadProfile();
-            $jobstreet_config = $accounts['jobstreet']->getConfig() ?? [];
-        }
-        if ($hasGlints) {
-            $glints_profile = $adapters['glints']->loadProfile();
-            $glints_config = $accounts['glints']->getConfig() ?? [];
-        }
-    @endphp
-
-    <div class="max-w-8xl py-10 px-4">
-
-        {{-- ERROR --}}
-        @if ($errors->any())
-            <div class="mb-6 rounded-md border border-red-800 bg-[#2a1215] p-4 text-sm text-red-400">
-                <ul class="list-disc list-inside space-y-1">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        {{-- MAIN GRID --}}
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            {{-- AUTO APPLY --}}
-            <div class="lg:col-span-1 bg-[#161b22] border border-[#30363d] rounded-md flex flex-col">
-                <div class="px-6 py-4 border-b border-[#30363d]">
-                    <h2 class="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
-                        <i class="fas fa-paper-plane text-[#8b949e] w-4"></i>
-                        Auto Apply
-                    </h2>
-                    <p class="text-xs text-[#8b949e] mt-0.5">Configure and start automated applications</p>
+                    {{-- Providers + Today's Goal --}}
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            {{-- JobStreet checkbox --}}
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-white/70">
+                                <input type="checkbox" name="providers[]" value="jobstreet"
+                                       class="provider-checkbox w-4 h-4 rounded border-white/20 bg-[#0d0f16] text-blue-500 focus:ring-0"
+                                    {{ $hasJobstreet ? 'checked' : 'disabled' }}>
+                                JobStreet
+                            </label>
+                            {{-- Glints checkbox --}}
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-white/70">
+                                <input type="checkbox" name="providers[]" value="glints"
+                                       class="provider-checkbox w-4 h-4 rounded border-white/20 bg-[#0d0f16] text-blue-500 focus:ring-0"
+                                    {{ $hasGlints ? 'checked' : 'disabled' }}>
+                                Glints
+                            </label>
+                            @if($isPaused)
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
+                                    <i class="fas fa-pause-circle text-[10px]"></i> Paused
+                                </span>
+                            @endif
+                        </div>
+                        <div class="flex-1 min-w-[120px]">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs text-white/30">Today</span>
+                                <div class="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                                    <div id="today-progress" class="h-full bg-blue-500 rounded-full" style="width:0%"></div>
+                                </div>
+                                <span class="text-xs font-medium text-white/60" id="today-count">0 / 200</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-6 flex-1">
-                    <form method="POST" action="{{ route('apply.start') }}" class="space-y-5">
-                        @csrf
-                        <div class="grid grid-cols-3 gap-3">
-{{--                            <div>--}}
-{{--                                <label class="block text-xs font-medium text-[#8b949e] mb-1">Interval (s)</label>--}}
-{{--                                <input type="number" name="interval" value="5" min="1"--}}
-{{--                                       class="w-full rounded-md border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#e6edf3] focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">--}}
-{{--                            </div>--}}
-                            <div class="col-span-2">
-                                <label class="block text-xs font-medium text-[#8b949e] mb-1">Keyword</label>
-                                <input type="text" name="keyword" required placeholder="Web Developer"
-                                       class="w-full rounded-md border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#e6edf3] placeholder-[#6e7681] focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
-                            </div>
-                            {{-- Pesan Peringatan PageSize JobStreet --}}
 
-                            <div class="col-span-1">
-                                <label class="block text-xs font-medium text-[#8b949e] mb-1">Per Batch (Maks. 40)</label>
-                                <input type="number" name="pageSize" value="5" min="1" max="40"
-                                       class="w-full rounded-md border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#e6edf3] focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
-                            </div>
-{{--                            <div>--}}
-{{--                                <label class="block text-xs font-medium text-[#8b949e] mb-1">Max Apply</label>--}}
-{{--                                <input type="number" name="max_applications" value="10" min="1"--}}
-{{--                                       class="w-full rounded-md border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#e6edf3] focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">--}}
-{{--                            </div>--}}
-                        </div>
-                        <p class="mt-2 text-[11px] text-yellow-500 italic">
-                            * Dalam satu provider, maksimal 20 job / 10 menit, jika lebih dari itu maka sisanya akan masuk ke batch berikutnya
-                        </p>
-                        <div class="border border-[#30363d] rounded-md p-4 bg-[#0d1117] space-y-4">
-                            {{-- JobStreet --}}
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <label for="provider_jobstreet" class="relative inline-flex cursor-pointer items-center {{ $hasJobstreet ? '' : 'opacity-50 cursor-not-allowed' }}">
-                                        <input type="checkbox"
-                                               name="providers[]"
-                                               value="jobstreet"
-                                               id="provider_jobstreet"
-                                               class="peer sr-only"
-                                            {{ $hasJobstreet ? '' : 'disabled' }}
-                                            {{ $hasJobstreet ? 'checked' : '' }}>
-                                        <div class="h-6 w-11 rounded-full bg-[#30363d] transition-colors
-                            after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5
-                            after:rounded-full after:border after:border-gray-300 after:bg-white
-                            after:transition-all after:content-['']
-                            peer-checked:bg-[#238636] peer-checked:after:translate-x-full
-                            peer-checked:after:border-white focus:outline-none">
-                                        </div>
-                                    </label>
-                                    <span class="text-sm font-medium text-[#e6edf3]">JobStreet</span>
-                                </div>
-                                @if(!$hasJobstreet)
-                                    <span class="text-xs px-2 py-0.5 rounded border border-yellow-700 text-yellow-400 bg-[#2d1b00]">Not connected</span>
-                                @else
-                                    <span class="text-xs px-2 py-0.5 rounded border border-green-700 text-green-400 bg-[#0f2a1c]">Ready</span>
-                                @endif
-                            </div>
+                {{-- Tombol Aksi --}}
+                <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
+                    {{-- Push / Start --}}
+                    <button id="push-btn"
+                            class="inline-flex items-center justify-center gap-2 px-5 h-10 rounded-xl
+                   bg-blue-600 hover:bg-blue-500 active:scale-[0.97]
+                   text-sm font-semibold text-white transition-all duration-150 shadow-lg shadow-blue-600/20
+                   {{ $isPaused ? 'opacity-50 pointer-events-none' : '' }}">
+                        <i class="fas fa-plus-circle text-xs"></i>
+                        Push
+                    </button>
 
-                            {{-- Glints --}}
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <label for="provider_glints" class="relative inline-flex cursor-pointer items-center {{ $hasGlints ? '' : 'opacity-50 cursor-not-allowed' }}">
-                                        <input type="checkbox"
-                                               name="providers[]"
-                                               value="glints"
-                                               id="provider_glints"
-                                               class="peer sr-only"
-                                            {{ $hasGlints ? '' : 'disabled' }}
-                                            {{ $hasGlints ? 'checked' : '' }}>
-                                        <div class="h-6 w-11 rounded-full bg-[#30363d] transition-colors
-                            after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5
-                            after:rounded-full after:border after:border-gray-300 after:bg-white
-                            after:transition-all after:content-['']
-                            peer-checked:bg-[#238636] peer-checked:after:translate-x-full
-                            peer-checked:after:border-white focus:outline-none">
-                                        </div>
-                                    </label>
-                                    <span class="text-sm font-medium text-[#e6edf3]">Glints</span>
-                                </div>
-                                @if(!$hasGlints)
-                                    <span class="text-xs px-2 py-0.5 rounded border border-yellow-700 text-yellow-400 bg-[#2d1b00]">Not connected</span>
-                                @else
-                                    <span class="text-xs px-2 py-0.5 rounded border border-green-700 text-green-400 bg-[#0f2a1c]">Ready</span>
-                                @endif
-                            </div>
-                        </div>
-                        <button type="submit"
-                                class="inline-flex items-center justify-center rounded-md bg-[#238636] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#2ea043] transition w-full">
-                            Start Apply
-                        </button>
-                    </form>
+                    {{-- Stop --}}
+                    <button id="stop-btn"
+                            class="inline-flex items-center justify-center gap-2 px-5 h-10 rounded-xl
+                   bg-red-600 hover:bg-red-500 active:scale-[0.97]
+                   text-sm font-semibold text-white transition-all duration-150 shadow-lg shadow-red-600/20
+                   {{ $isPaused ? 'opacity-50 pointer-events-none' : '' }}">
+                        <i class="fas fa-stop-circle text-xs"></i>
+                        Stop
+                    </button>
+
+                    {{-- Resume --}}
+                    <button id="resume-btn"
+                            class="inline-flex items-center justify-center gap-2 px-5 h-10 rounded-xl
+                   bg-emerald-600 hover:bg-emerald-500 active:scale-[0.97]
+                   text-sm font-semibold text-white transition-all duration-150 shadow-lg shadow-emerald-600/20
+                   {{ !$isPaused ? 'opacity-50 pointer-events-none' : '' }}">
+                        <i class="fas fa-play-circle text-xs"></i>
+                        Resume
+                    </button>
                 </div>
             </div>
 
-            {{-- JOBSTREET CONFIG --}}
-            <div class="bg-[#161b22] border border-[#30363d] rounded-md flex flex-col">
-                <div class="px-6 py-4 border-b border-[#30363d]">
-                    <h2 class="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
-                        <i class="fas fa-briefcase text-[#8b949e] w-4"></i>
-                        JobStreet
-                    </h2>
-                    <p class="text-xs text-[#8b949e] mt-0.5">Platform configuration</p>
+            {{-- Running Jobs (live) --}}
+            <div id="running-jobs-container" class="space-y-2">
+                <div class="flex items-center gap-2 text-xs text-white/30">
+                    <i class="fas fa-sync-alt fa-spin text-[10px]"></i>
+                    <span>Live jobs</span>
                 </div>
-                <div class="p-6 flex-1">
-                    @if (!$hasJobstreet)
-                        <div class="mt-2 text-sm text-yellow-400">
-                            JobStreet is not connected.
-                            <a href="{{ route('profile') }}" class="text-blue-400 hover:text-blue-300 underline font-medium">
-                                Klik disini
-                            </a> untuk menghubungkan akun Anda.
-                        </div>
-                    @else
-                        <form action="{{ route('platform.save-config', ['provider' => 'jobstreet']) }}" method="POST" class="space-y-4">
+                <div id="running-jobs-list" class="space-y-1.5">
+                    <div class="text-sm text-white/20 italic">No active jobs</div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ═══ QUICK STATS ═══ --}}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-[#111317] border border-white/5 rounded-xl p-4 text-center">
+                <div class="text-xs font-medium text-white/30 uppercase tracking-wider">Queued</div>
+                <div id="stat-queued" class="text-2xl font-bold text-white mt-1">0</div>
+            </div>
+            <div class="bg-[#111317] border border-white/5 rounded-xl p-4 text-center">
+                <div class="text-xs font-medium text-white/30 uppercase tracking-wider">Running</div>
+                <div id="stat-running" class="text-2xl font-bold text-amber-400 mt-1">0</div>
+            </div>
+            <div class="bg-[#111317] border border-white/5 rounded-xl p-4 text-center">
+                <div class="text-xs font-medium text-white/30 uppercase tracking-wider">Applied</div>
+                <div id="stat-applied" class="text-2xl font-bold text-blue-400 mt-1">0</div>
+            </div>
+            <div class="bg-[#111317] border border-white/5 rounded-xl p-4 text-center">
+                <div class="text-xs font-medium text-white/30 uppercase tracking-wider">Success</div>
+                <div id="stat-success" class="text-2xl font-bold text-emerald-400 mt-1">0%</div>
+            </div>
+        </div>
+
+        {{-- ═══ ACTIVITY TIMELINE ═══ --}}
+        <div class="bg-[#111317] border border-white/5 rounded-2xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-semibold text-white/80">Activity</h3>
+                <span class="text-xs text-white/20">Last 10</span>
+            </div>
+            <div id="activity-timeline" class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scroll">
+                <div class="text-sm text-white/20 italic">No activity yet</div>
+            </div>
+        </div>
+
+        {{-- ═══ DEBUG PANEL (Raw Pusher) ═══ --}}
+        <div id="debug-panel" class="fixed bottom-6 right-6 bg-[#111317]/95 border border-white/20 p-4 rounded-xl z-50 w-80 shadow-2xl backdrop-blur-md">
+            <div class="flex justify-between items-center mb-2 border-b border-white/10 pb-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Raw Pusher Debug</span>
+                <button onclick="document.getElementById('debug-panel').style.display='none'" class="text-white/40 hover:text-white/80 text-xs">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <pre id="debug-output" class="text-[10px] text-green-400 font-mono whitespace-pre-wrap break-words max-h-48 overflow-y-auto custom-scroll">Menunggu event masuk...</pre>
+        </div>
+
+        {{-- ═══ PROVIDERS (ACCORDION) ═══ --}}
+        <div class="space-y-3">
+            {{-- JobStreet --}}
+            <div class="bg-[#111317] border border-white/5 rounded-2xl overflow-hidden">
+                <button type="button" class="provider-toggle w-full px-5 py-4 flex items-center justify-between hover:bg-white/5 transition">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-briefcase text-white/30 text-sm"></i>
+                        <span class="text-sm font-medium text-white/80">JobStreet</span>
+                        @if($hasJobstreet)
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                Connected
+                            </span>
+                        @else
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">Not connected</span>
+                        @endif
+                    </div>
+                    <i class="fas fa-chevron-down text-white/20 text-xs transition-transform duration-200"></i>
+                </button>
+                <div class="provider-content px-5 pb-5 hidden">
+                    @if($hasJobstreet)
+                        <form action="{{ route('platform.save-config', ['provider' => 'jobstreet']) }}" method="POST" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             @csrf
-                            <div>
-                                <label class="block text-xs font-medium text-[#8b949e] mb-2">Auto-answer</label>
-                                <div class="flex items-center">
-                                    <label for="auto_answer_jobstreet" class="relative inline-flex cursor-pointer items-center">
-                                        <input type="checkbox" name="auto_answer" id="auto_answer_jobstreet" value="1"
-                                               class="peer sr-only" {{ ($jobstreet_config['auto_answer'] ?? false) ? 'checked' : '' }}>
-
-                                        <div class="h-6 w-11 rounded-full bg-[#30363d] transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#238636] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                                        <span id="status-text_jobstreet" class="ml-3 text-sm font-medium transition-colors {{ ($jobstreet_config['auto_answer'] ?? false) ? 'text-[#238636]' : 'text-[#8b949e]' }}">
-                {{ ($jobstreet_config['auto_answer'] ?? false) ? 'Enabled' : 'Disabled' }}
-            </span>
-                                    </label>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-medium text-white/40">Auto-answer</span>
+                                    <div class="flex items-center gap-2">
+                                        <label for="auto_answer_jobstreet" class="relative inline-flex cursor-pointer items-center">
+                                            <input type="checkbox" name="auto_answer" id="auto_answer_jobstreet" value="1"
+                                                   class="peer sr-only" {{ ($jobstreet_config['auto_answer'] ?? false) ? 'checked' : '' }}>
+                                            <div class="h-5 w-9 rounded-full bg-white/10 transition-colors peer-checked:bg-blue-600
+                                                    after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4
+                                                    after:rounded-full after:bg-white after:transition-transform
+                                                    peer-checked:after:translate-x-full"></div>
+                                        </label>
+                                        <span id="status-text-jobstreet" class="text-xs font-medium {{ ($jobstreet_config['auto_answer'] ?? false) ? 'text-blue-400' : 'text-white/30' }}">
+                                            {{ ($jobstreet_config['auto_answer'] ?? false) ? 'On' : 'Off' }}
+                                        </span>
+                                    </div>
                                 </div>
-                                {{-- Pesan Peringatan JobStreet --}}
-                                <p class="mt-2 text-[11px] text-yellow-500 italic">
-                                    * Dengan mengaktifkan ini, pertanyaan screening akan dijawab secara random (Tidak Direkomendasikan).
-                                </p>
+                                <div>
+                                    <label class="text-xs font-medium text-white/30 uppercase tracking-wider">Resume</label>
+                                    <select name="resume" class="w-full mt-1 h-9 rounded-lg border border-white/10 bg-[#0d0f16] px-3 text-sm text-white">
+                                        @if(isset($jobstreet_profile['resumes']))
+                                            @php($selected = $jobstreet_config['resume'] ?? null)
+                                            <option value="">Select</option>
+                                            @foreach($jobstreet_profile['resumes'] as $r)
+                                                <option value="{{ $r['id'] }}" {{ $selected == $r['id'] ? 'selected' : '' }}>{{ $r['fileMetadata']['name'] }}</option>
+                                            @endforeach
+                                        @else
+                                            <option value="">No resumes</option>
+                                        @endif
+                                    </select>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-[#8b949e] mb-1">Resume</label>
-                                <select name="resume" class="w-full rounded-md border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#e6edf3] focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
-                                    @if(isset($jobstreet_profile['resumes']))
-                                        @php $selected_resume = $jobstreet_config['resume'] ?? null; @endphp
-                                        <option value="">Select Resume</option>
-                                        @foreach ($jobstreet_profile['resumes'] as $resume)
-                                            <option value="{{ $resume['id'] }}" {{ $selected_resume == $resume['id'] ? 'selected' : '' }}>
-                                                {{ $resume['fileMetadata']['name'] }} @if($selected_resume == $resume['id']) (Selected) @endif
-                                            </option>
-                                        @endforeach
-                                    @else
-                                        <option value="">No resumes found</option>
-                                    @endif
-                                </select>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs font-medium text-white/30 uppercase tracking-wider">Role</label>
+                                    <select name="role" class="w-full mt-1 h-9 rounded-lg border border-white/10 bg-[#0d0f16] px-3 text-sm text-white">
+                                        @if(isset($jobstreet_profile['roles']))
+                                            @php($selected = $jobstreet_config['role'] ?? null)
+                                            <option value="">Select</option>
+                                            @foreach($jobstreet_profile['roles'] as $r)
+                                                <option value="{{ $r['id'] }}" {{ $selected == $r['id'] ? 'selected' : '' }}>{{ $r['title']['text'] }}</option>
+                                            @endforeach
+                                        @else
+                                            <option value="">No roles</option>
+                                        @endif
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-medium text-white/30 uppercase tracking-wider">Location</label>
+                                    <input type="text" name="location" placeholder="Indonesia" value="{{ old('location', $jobstreet_config['location'] ?? '') }}"
+                                           class="w-full mt-1 h-9 rounded-lg border border-white/10 bg-[#0d0f16] px-3 text-sm text-white">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-[#8b949e] mb-1">Role</label>
-                                <select name="role" class="w-full rounded-md border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#e6edf3] focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
-                                    @if(isset($jobstreet_profile['roles']))
-                                        @php $selected_role = $jobstreet_config['role'] ?? null; @endphp
-                                        <option value="">Select Role</option>
-                                        @foreach ($jobstreet_profile['roles'] as $role)
-                                            <option value="{{ $role['id'] }}" {{ $selected_role == $role['id'] ? 'selected' : '' }}>
-                                                {{ $role['title']['text'] }} @if($selected_role == $role['id']) (Selected) @endif
-                                            </option>
-                                        @endforeach
-                                    @else
-                                        <option value="">No roles found</option>
-                                    @endif
-                                </select>
+                            <div class="sm:col-span-2">
+                                <button type="submit" class="w-full sm:w-auto px-6 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-white/80 transition">Save</button>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-[#8b949e] mb-1">Location</label>
-                                <input type="text" name="location" placeholder="Banten" value="{{ old('location', $jobstreet_config['location'] ?? '') }}" class="w-full rounded-md border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#e6edf3] placeholder-[#6e7681] focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
-                            </div>
-                            <button type="submit" class="inline-flex items-center justify-center rounded-md bg-[#238636] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#2ea043] transition w-full">
-                                Save Configuration
-                            </button>
                         </form>
+                    @else
+                        <div class="py-4 text-center text-sm text-amber-400/70">
+                            <i class="fas fa-plug-circle-xmark mr-2"></i> Not connected.
+                            <a href="{{ route('profile') }}" class="underline hover:text-amber-300">Connect now</a>
+                        </div>
                     @endif
                 </div>
             </div>
 
-            {{-- GLINTS CONFIG --}}
-            <div class="bg-[#161b22] border border-[#30363d] rounded-md flex flex-col">
-                <div class="px-6 py-4 border-b border-[#30363d]">
-                    <h2 class="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
-                        <i class="fas fa-globe text-[#8b949e] w-4"></i>
-                        Glints
-                    </h2>
-                    <p class="text-xs text-[#8b949e] mt-0.5">Platform configuration</p>
-                </div>
-                <div class="p-6 flex-1">
-                    @if (!$hasGlints)
-                        <p class="text-sm text-yellow-400">
-                            Not connected <a class="text-blue-400" href="{{ route('profile') }}">Klik disini</a> untuk menghubungkan
-                        </p>
-                    @else
+            {{-- Glints --}}
+            <div class="bg-[#111317] border border-white/5 rounded-2xl overflow-hidden">
+                <button type="button" class="provider-toggle w-full px-5 py-4 flex items-center justify-between hover:bg-white/5 transition">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-globe text-white/30 text-sm"></i>
+                        <span class="text-sm font-medium text-white/80">Glints</span>
+                        @if($hasGlints)
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                Connected
+                            </span>
+                        @else
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">Not connected</span>
+                        @endif
+                    </div>
+                    <i class="fas fa-chevron-down text-white/20 text-xs transition-transform duration-200"></i>
+                </button>
+                <div class="provider-content px-5 pb-5 hidden">
+                    @if($hasGlints)
                         <form action="{{ route('platform.save-config', ['provider' => 'glints']) }}" method="POST" class="space-y-4">
                             @csrf
-                            {{-- Glints Auto-answer Toggle (Disabled) --}}
-                            <div>
-                                <label class="block text-xs font-medium text-[#8b949e] mb-2">Auto-answer</label>
-                                <div class="flex items-center opacity-60 cursor-not-allowed">
-                                    <label for="auto_answer_glints" class="relative inline-flex cursor-not-allowed items-center">
-                                        <input type="checkbox" name="auto_answer" id="auto_answer_glints" value="1"
-                                               class="peer sr-only" disabled {{ ($glints_config['auto_answer'] ?? false) ? 'checked' : '' }}>
-
-                                        <div class="h-6 w-11 rounded-full bg-[#30363d] transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#30363d] peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                                        <span class="ml-3 text-sm font-medium text-[#8b949e]">
-                Disabled
-            </span>
-                                    </label>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-medium text-white/40">Auto-answer</span>
+                                <div class="flex items-center gap-2 opacity-40 pointer-events-none">
+                                    <div class="h-5 w-9 rounded-full bg-white/10 after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white/40"></div>
+                                    <span class="text-xs font-medium text-white/30">Off</span>
                                 </div>
                             </div>
-                            <div class="relative w-full">
-                                <label class="block text-xs font-medium text-[#8b949e] mb-1">Locations</label>
-                                <div id="location-tags-container" class="flex flex-wrap gap-2 mb-2"></div>
-                                <div class="relative">
+                            <div>
+                                <label class="text-xs font-medium text-white/30 uppercase tracking-wider">Locations</label>
+                                <div id="location-tags-container" class="flex flex-wrap gap-1.5 mt-2 empty:hidden"></div>
+                                <div class="relative mt-1">
                                     <input type="text" id="location-search-input" placeholder="Type location…" autocomplete="off"
-                                           class="w-full rounded-md border border-[#30363d] bg-[#0d1117] px-3 py-2 text-sm text-[#e6edf3] placeholder-[#6e7681] focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff]">
-                                    <div id="location-loading" class="absolute right-3 top-2.5 hidden">
-                                        <i class="fas fa-spinner fa-spin text-[#8b949e]"></i>
-                                    </div>
+                                           class="w-full h-9 rounded-lg border border-white/10 bg-[#0d0f16] px-3 text-sm text-white placeholder-white/20 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 outline-none transition">
+                                    <div id="location-loading" class="absolute right-3 top-2.5 hidden"><i class="fas fa-spinner fa-spin text-white/25 text-xs"></i></div>
                                 </div>
                                 <div id="location-hidden-inputs"></div>
                                 <div id="glints-initial-locations"
                                      data-ids="{{ json_encode(old('location_ids', $glints_config['location_ids'] ?? [])) }}"
                                      data-names="{{ json_encode(old('location_names', $glints_config['location_names'] ?? [])) }}"
                                      class="hidden"></div>
-                                <ul id="location-results" class="absolute z-50 w-full mt-1 max-h-48 overflow-y-auto rounded-md border border-[#30363d] bg-[#161b22] py-1 text-sm shadow-xl hidden custom-scrollbar"></ul>
+                                <ul id="location-results" class="absolute z-50 w-full mt-1 max-h-44 overflow-y-auto rounded-lg border border-white/10 bg-[#111317] py-1 shadow-2xl hidden"></ul>
                             </div>
-                            <button type="submit" class="inline-flex items-center justify-center rounded-md bg-[#238636] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#2ea043] transition w-full">
-                                Save Configuration
-                            </button>
+                            <button type="submit" class="px-6 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-white/80 transition">Save</button>
                         </form>
+                    @else
+                        <div class="py-4 text-center text-sm text-amber-400/70">
+                            <i class="fas fa-plug-circle-xmark mr-2"></i> Not connected.
+                            <a href="{{ route('profile') }}" class="underline hover:text-amber-300">Connect now</a>
+                        </div>
                     @endif
                 </div>
             </div>
         </div>
 
-        <p class="mt-6 text-xs text-[#8b949e] text-center">Keep your connection stable while automation is running.</p>
-
-        {{-- QUEUE STATUS --}}
-        <div class="mt-8 bg-[#161b22] border border-[#30363d] rounded-md">
-            <div class="px-6 py-4 border-b border-[#30363d] flex justify-between items-center flex-wrap gap-2">
-                <div>
-                    <h2 class="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
-                        <i class="fas fa-tasks text-[#8b949e] w-4"></i>
-                        Queue Status
-                    </h2>
-                    <p class="text-xs text-[#8b949e] mt-0.5">Real-time status of your job queue</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div id="queue-status-badge" class="flex items-center gap-2">
-                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-500" id="queue-status-dot"></span>
-                        <span class="text-xs font-medium text-[#e6edf3]" id="queue-status-text">Loading...</span>
-                    </div>
-                    <span id="last-updated" class="text-xs text-[#8b949e]">--</span>
-                </div>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-4 text-center">
-                        <div class="text-xs text-[#8b949e] uppercase tracking-wide">Pending</div>
-                        <div id="pending-count" class="text-2xl font-bold text-[#e6edf3]">0</div>
-                    </div>
-                    <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-4 text-center">
-                        <div class="text-xs text-[#8b949e] uppercase tracking-wide">Processing</div>
-                        <div id="processing-count" class="text-2xl font-bold text-yellow-400">0</div>
-                    </div>
-                    <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-4 text-center">
-                        <div class="text-xs text-[#8b949e] uppercase tracking-wide">Failed</div>
-                        <div id="failed-count" class="text-2xl font-bold text-red-400">0</div>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-xs font-medium text-[#8b949e] uppercase tracking-wide mb-3">Recent Jobs (Last 5)</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-[#e6edf3]">
-                            <thead class="text-xs uppercase text-[#8b949e] border-b border-[#30363d]">
-                            <tr>
-                                <th class="px-4 py-2">Job ID</th>
-                                <th class="px-4 py-2">Status</th>
-                                <th class="px-4 py-2">Attempts</th>
-                                <th class="px-4 py-2">Created</th>
-                            </tr>
-                            </thead>
-                            <tbody id="recent-jobs-table">
-                            <tr>
-                                <td colspan="4" class="px-4 py-3 text-center text-[#8b949e]">No data yet…</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- APPLICATION STATUS --}}
-        <div class="mt-8 bg-[#161b22] border border-[#30363d] rounded-md">
-            <div class="px-6 py-4 border-b border-[#30363d] flex justify-between items-center flex-wrap gap-2">
-                <div>
-                    <h2 class="text-sm font-semibold text-[#e6edf3] flex items-center gap-2">
-                        <i class="fas fa-file-alt text-[#8b949e] w-4"></i>
-                        Application Status (Glints)
-                    </h2>
-                    <p class="text-xs text-[#8b949e] mt-0.5">Summary of automated applications</p>
-                </div>
-                <span id="app-last-updated" class="text-xs text-[#8b949e]">--</span>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-center">
-                        <div class="text-xs text-[#8b949e] uppercase tracking-wide">✅ Success</div>
-                        <div id="stat-success" class="text-xl font-bold text-green-400">0</div>
-                    </div>
-                    <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-center">
-                        <div class="text-xs text-[#8b949e] uppercase tracking-wide">📩 Applied</div>
-                        <div id="stat-applied" class="text-xl font-bold text-blue-400">0</div>
-                    </div>
-                    <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-center">
-                        <div class="text-xs text-[#8b949e] uppercase tracking-wide">🔗 Link Out</div>
-                        <div id="stat-linkout" class="text-xl font-bold text-yellow-400">0</div>
-                    </div>
-                    <div class="bg-[#0d1117] border border-[#30363d] rounded-md p-3 text-center">
-                        <div class="text-xs text-[#8b949e] uppercase tracking-wide">📝 Screening</div>
-                        <div id="stat-questionnaire" class="text-xl font-bold text-purple-400">0</div>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-xs font-medium text-[#8b949e] uppercase tracking-wide mb-3">Latest Applications (Last 5)</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-[#e6edf3]">
-                            <thead class="text-xs uppercase text-[#8b949e] border-b border-[#30363d]">
-                            <tr>
-                                <th class="px-4 py-2">Job ID</th>
-                                <th class="px-4 py-2">Status</th>
-                                <th class="px-4 py-2">Updated</th>
-                            </tr>
-                            </thead>
-                            <tbody id="recent-apps-table">
-                            <tr>
-                                <td colspan="3" class="px-4 py-3 text-center text-[#8b949e]">No applications yet.</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 @endsection
 
-<script>
-    // Helper: format tanggal (menerima timestamp integer atau string)
-    function formatDate(value) {
-        if (!value) return 'N/A';
-        let date;
-        if (typeof value === 'number') {
-            // Anggap sebagai UNIX timestamp (detik)
-            date = new Date(value * 1000);
-        } else if (typeof value === 'string') {
-            date = new Date(value);
-        } else {
-            return 'N/A';
+@push('styles')
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; background: #09090b; color: #e8edf4; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+
+        .animate-ping { animation: ping 1.6s cubic-bezier(0,0,0.2,1) infinite; }
+        @keyframes ping { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2.4); opacity: 0; } }
+
+        .provider-content { transition: all 0.2s ease; }
+        .provider-toggle .fa-chevron-down { transition: transform 0.25s ease; }
+        .provider-toggle[aria-expanded="true"] .fa-chevron-down { transform: rotate(180deg); }
+
+        .running-job-item {
+            animation: slideIn 0.3s ease;
         }
-        if (isNaN(date.getTime())) return 'N/A';
-        return date.toLocaleString('id-ID', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        });
-    }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    // Update status badge queue
-    function updateQueueStatusBadge(status) {
-        const dot = document.getElementById('queue-status-dot');
-        const text = document.getElementById('queue-status-text');
-        if (!dot || !text) return;
-        const map = {
-            'running': { color: 'bg-green-500', label: 'Running' },
-            'idle': { color: 'bg-yellow-500', label: 'Idle' },
-            'stopped': { color: 'bg-red-500', label: 'Stopped' },
-            'default': { color: 'bg-gray-500', label: 'Unknown' }
-        };
-        const s = map[status] || map.default;
-        dot.className = `inline-block w-2.5 h-2.5 rounded-full ${s.color}`;
-        text.textContent = s.label;
-    }
+        .progress-bar {
+            background: linear-gradient(90deg, #4F8CFF, #22C55E);
+            border-radius: 9999px;
+            height: 4px;
+            transition: width 0.6s ease;
+        }
+    </style>
+@endpush
 
-    // Fetch queue status
-    function fetchQueueStatus() {
-        fetch('{{ route("user.queue.status") }}', {
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            credentials: 'same-origin'
-        })
-            .then(response => response.json())
-            .then(data => {
-                const pending = data.pending || 0;
-                const processing = data.processing || 0;
-                const failed = data.failed || 0;
+<script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
 
-                document.getElementById('pending-count').textContent = pending;
-                document.getElementById('processing-count').textContent = processing;
-                document.getElementById('failed-count').textContent = failed;
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ─── HELPERS ──────────────────────────────────────────────
+        function formatTime(ts) {
+            if (!ts) return 'Now';
+            const d = typeof ts === 'number' ? new Date(ts * 1000) : new Date(ts);
+            if (isNaN(d.getTime())) return 'Now';
+            const now = new Date();
+            const diff = Math.floor((now - d) / 1000);
+            if (diff < 60) return diff + 's ago';
+            if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+            return d.toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+        }
 
-                // Status queue
-                const queueStatus = (pending > 0 || processing > 0) ? 'running' : 'idle';
-                updateQueueStatusBadge(queueStatus);
+        function statusColor(status) {
+            const map = {
+                'running':   'bg-emerald-400',
+                'idle':      'bg-amber-400',
+                'stopped':   'bg-red-400',
+                'error':     'bg-red-400',
+                'success':   'bg-emerald-400',
+                'applied':   'bg-blue-400',
+                'linkout':   'bg-amber-400',
+                'questionnaire': 'bg-purple-400',
+                'pending':   'bg-blue-400',
+                'processing':'bg-amber-400',
+            };
+            return map[status] || 'bg-white/30';
+        }
 
-                // Tabel recent jobs
-                const tbody = document.getElementById('recent-jobs-table');
-                tbody.innerHTML = '';
-                if (data.recent && data.recent.length > 0) {
-                    data.recent.forEach(job => {
-                        const tr = document.createElement('tr');
-                        tr.className = 'border-b border-[#30363d] last:border-0';
+        function statusLabel(status) {
+            const map = {
+                'running': 'Running',
+                'idle': 'Idle',
+                'stopped': 'Stopped',
+                'error': 'Error',
+                'success': 'Success',
+                'applied': 'Applied',
+                'linkout': 'Link Out',
+                'questionnaire': 'Screening',
+                'pending': 'Pending',
+                'processing': 'Processing',
+            };
+            return map[status] || status;
+        }
 
-                        const isProcessing = job.reserved_at !== null;
-                        const statusClass = isProcessing
-                            ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500'
-                            : 'bg-blue-500/20 text-blue-400 border-blue-500';
-                        const statusText = isProcessing ? 'Processing' : 'Pending';
+        // ─── DOM REFS ──────────────────────────────────────────────
+        const statusDot = document.getElementById('status-dot');
+        const statusDotPing = document.getElementById('status-dot-ping');
+        const statusLabelEl = document.getElementById('status-label');
+        const pushBtn = document.getElementById('push-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const resumeBtn = document.getElementById('resume-btn');
+        const runningList = document.getElementById('running-jobs-list');
+        const todayProgress = document.getElementById('today-progress');
+        const todayCount = document.getElementById('today-count');
+        const queuedEl = document.getElementById('stat-queued');
+        const runningStatEl = document.getElementById('stat-running');
+        const appliedStatEl = document.getElementById('stat-applied');
+        const successStatEl = document.getElementById('stat-success');
+        const activityTimeline = document.getElementById('activity-timeline');
+        const keywordInput = document.getElementById('keyword-input');
 
-                        tr.innerHTML = `
-                        <td class="px-4 py-2 font-mono text-xs">#${job.id}</td>
-                        <td class="px-4 py-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusClass}">
-                                ${statusText}
-                            </span>
-                        </td>
-                        <td class="px-4 py-2">${job.attempts}</td>
-                        <td class="px-4 py-2 text-xs text-[#8b949e]">${formatDate(job.created_at)}</td>
-                    `;
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-3 text-center text-[#8b949e]">No jobs in queue.</td></tr>';
-                }
+        // ─── STATE ──────────────────────────────────────────────────
+        let isRunning = false;
 
-                document.getElementById('last-updated').textContent = `Updated: ${formatDate(data.updated_at)}`;
-            })
-            .catch(error => {
-                console.error('Error fetching queue status:', error);
-                document.getElementById('recent-jobs-table').innerHTML =
-                    '<tr><td colspan="4" class="px-4 py-3 text-center text-red-400">Failed to load data.</td></tr>';
-                updateQueueStatusBadge('stopped');
+        // ─── GET SELECTED PROVIDERS ──────────────────────────────
+        function getSelectedProviders() {
+            return Array.from(document.querySelectorAll('.provider-checkbox:checked'))
+                .map(cb => cb.value);
+        }
+
+        // ─── UPDATE MAIN STATUS ────────────────────────────────────
+        function updateMainStatus(status) {
+            if (!statusDot || !statusDotPing || !statusLabelEl) return;
+
+            const colorMap = {
+                'running': 'bg-emerald-400',
+                'stopped': 'bg-red-400',
+                'idle': 'bg-amber-400'
+            };
+            const labelMap = {
+                'running': 'Running',
+                'stopped': 'Stopped',
+                'idle': 'Idle'
+            };
+            const color = colorMap[status] || 'bg-white/30';
+            const label = labelMap[status] || 'Unknown';
+
+            statusDot.className = `relative inline-flex h-2.5 w-2.5 rounded-full ${color}`;
+            statusDotPing.className = `absolute inline-flex h-full w-full rounded-full ${color} opacity-60 animate-ping`;
+            statusLabelEl.textContent = label;
+
+            isRunning = (status === 'running');
+        }
+
+        // ─── RENDER RUNNING JOBS ──────────────────────────────────
+        function renderRunningJobs(jobs) {
+            if (!runningList) return;
+            if (!jobs || jobs.length === 0) {
+                runningList.innerHTML = '<div class="text-sm text-white/20 italic">No active jobs</div>';
+                return;
+            }
+            const active = jobs.slice(0, 5);
+            let html = '';
+            active.forEach(job => {
+                const status = job.reserved_at ? 'processing' : 'pending';
+                const label = statusLabel(status);
+                const color = statusColor(status);
+                const time = formatTime(job.created_at);
+                html += `
+                    <div class="running-job-item flex items-center justify-between bg-[#0d0f16] border border-white/5 rounded-xl px-4 py-2.5">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-block w-2 h-2 rounded-full ${color}"></span>
+                            <span class="text-sm font-medium text-white/80">Job #${job.id}</span>
+                            <span class="text-xs text-white/40">${label}</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-white/30">
+                            <span>${job.attempts} attempts</span>
+                            <span>·</span>
+                            <span>${time}</span>
+                        </div>
+                    </div>
+                `;
             });
-    }
+            runningList.innerHTML = html;
+        }
 
-    // Fetch application status (tidak berubah)
-    function fetchApplicationStatus() {
-        fetch('{{ route("user.jobs.status") }}', {
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            credentials: 'same-origin'
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById('stat-success').textContent = data.stats.success || 0;
-                document.getElementById('stat-applied').textContent = data.stats.applied || 0;
-                document.getElementById('stat-linkout').textContent = data.stats.linkout || 0;
-                document.getElementById('stat-questionnaire').textContent = data.stats.questionnaire || 0;
-
-                const tbody = document.getElementById('recent-apps-table');
-                tbody.innerHTML = '';
-                if (data.recent && data.recent.length > 0) {
-                    data.recent.forEach(app => {
-                        const map = {
-                            'success': { label: 'Success', class: 'bg-green-500/20 text-green-400 border-green-500' },
-                            'applied': { label: 'Applied', class: 'bg-blue-500/20 text-blue-400 border-blue-500' },
-                            'linkout': { label: 'Link Out', class: 'bg-yellow-500/20 text-yellow-400 border-yellow-500' },
-                            'questionnaire': { label: 'Screening', class: 'bg-purple-500/20 text-purple-400 border-purple-500' }
-                        };
-                        const status = map[app.status] || { label: app.status, class: 'bg-gray-500/20 text-gray-400 border-gray-500' };
-                        const tr = document.createElement('tr');
-                        tr.className = 'border-b border-[#30363d] last:border-0';
-                        const jobIdShort = app.job_id ? app.job_id.substring(0, 8) + '…' : 'Unknown';
-                        tr.innerHTML = `
-                        <td class="px-4 py-2 font-mono text-xs">${jobIdShort}</td>
-                        <td class="px-4 py-2">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${status.class}">
-                                ${status.label}
-                            </span>
-                        </td>
-                        <td class="px-4 py-2 text-xs text-[#8b949e]">${formatDate(app.updated_at)}</td>
-                    `;
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="3" class="px-4 py-3 text-center text-[#8b949e]">No applications yet.</td></tr>';
-                }
-                document.getElementById('app-last-updated').textContent = `Updated: ${formatDate(data.updated_at)}`;
-            })
-            .catch(error => {
-                console.error('Error fetching application status:', error);
-                document.getElementById('recent-apps-table').innerHTML =
-                    '<tr><td colspan="3" class="px-4 py-3 text-center text-red-400">Failed to load data.</td></tr>';
+        // ─── RENDER ACTIVITY TIMELINE ──────────────────────────────
+        function renderActivity(items) {
+            if (!activityTimeline) return;
+            if (!items || items.length === 0) {
+                activityTimeline.innerHTML = '<div class="text-sm text-white/20 italic">No activity yet</div>';
+                return;
+            }
+            const recent = items.slice(0, 10);
+            let html = '';
+            recent.forEach(item => {
+                const status = item.status || 'applied';
+                const label = statusLabel(status);
+                const color = statusColor(status);
+                const time = formatTime(item.updated_at);
+                const provider = item.provider ? item.provider.charAt(0).toUpperCase() + item.provider.slice(1) : '';
+                const jobId = item.job_id ? item.job_id.substring(0, 8) + '…' : 'Unknown';
+                html += `
+                    <div class="flex items-start gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                        <span class="inline-block w-2 h-2 rounded-full ${color} mt-1.5"></span>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-white/80">${label}</span>
+                                <span class="text-xs text-white/40">${provider}</span>
+                            </div>
+                            <div class="text-xs text-white/30">${jobId} · ${time}</div>
+                        </div>
+                    </div>
+                `;
             });
-    }
+            activityTimeline.innerHTML = html;
+        }
 
-    // Location autocomplete (sama seperti sebelumnya, tidak diubah)
-    function initLocationAutocomplete() {
-        const els = {
-            input: document.getElementById('location-search-input'),
-            results: document.getElementById('location-results'),
-            tagsContainer: document.getElementById('location-tags-container'),
-            hiddenInputs: document.getElementById('location-hidden-inputs'),
-            loading: document.getElementById('location-loading'),
-            initialData: document.getElementById('glints-initial-locations')
-        };
-        if (!els.input) return;
+        // ─── FETCH STATUS ──────────────────────────────────────────
+        function fetchStatus() {
+            fetch('{{ route("user.queue.status") }}', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                credentials: 'same-origin'
+            })
+                .then(r => r.json())
+                .then(data => {
+                    const pending = data.pending || 0;
+                    const processing = data.processing || 0;
 
-        let selectedLocations = [];
-        try {
-            const ids = JSON.parse(els.initialData.dataset.ids || '[]');
-            const names = JSON.parse(els.initialData.dataset.names || '[]');
-            if (Array.isArray(ids) && Array.isArray(names)) {
-                ids.forEach((id, index) => {
-                    if (names[index]) {
-                        selectedLocations.push({ id: id, name: names[index] });
+                    if (queuedEl) queuedEl.textContent = pending;
+                    if (runningStatEl) runningStatEl.textContent = processing;
+
+                    const status = (processing > 0) ? 'running' : 'stopped';
+                    updateMainStatus(status);
+
+                    if (todayProgress && todayCount) {
+                        const total = 200;
+                        const done = Math.min(pending + processing + (data.recent ? data.recent.length : 0), total);
+                        const pct = Math.round((done / total) * 100);
+                        todayProgress.style.width = pct + '%';
+                        todayCount.textContent = done + ' / ' + total;
+                    }
+
+                    renderRunningJobs(data.recent || []);
+                })
+                .catch(() => {
+                    updateMainStatus('stopped');
+                    if (runningList) {
+                        runningList.innerHTML = '<div class="text-sm text-white/20 italic">Failed to load</div>';
                     }
                 });
-            }
-        } catch (e) {
-            console.error("Failed to parse initial locations", e);
         }
 
-        const renderTags = () => {
-            els.tagsContainer.innerHTML = '';
-            els.hiddenInputs.innerHTML = '';
-            selectedLocations.forEach((loc, index) => {
-                const tag = document.createElement('div');
-                tag.className = 'flex items-center gap-1 bg-[#1f6feb] border border-[#388bfd] text-white px-2 py-1 rounded text-xs font-medium';
-                const textSpan = document.createElement('span');
-                textSpan.textContent = loc.name;
-                const removeBtn = document.createElement('button');
-                removeBtn.type = 'button';
-                removeBtn.className = 'ml-1 hover:text-red-300 focus:outline-none font-bold';
-                removeBtn.innerHTML = '&times;';
-                removeBtn.onclick = function(e) {
-                    e.preventDefault();
-                    selectedLocations.splice(index, 1);
-                    renderTags();
-                };
-                tag.appendChild(textSpan);
-                tag.appendChild(removeBtn);
-                els.tagsContainer.appendChild(tag);
-
-                const inputId = document.createElement('input');
-                inputId.type = 'hidden';
-                inputId.name = 'location_ids[]';
-                inputId.value = loc.id;
-                const inputName = document.createElement('input');
-                inputName.type = 'hidden';
-                inputName.name = 'location_names[]';
-                inputName.value = loc.name;
-                els.hiddenInputs.appendChild(inputId);
-                els.hiddenInputs.appendChild(inputName);
-            });
-        };
-        renderTags();
-
-        const debounce = (func, delay) => {
-            let timeout;
-            return (...args) => {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func(...args), delay);
-            };
-        };
-
-        const fetchLocationData = async (keyword) => {
-            const formData = new FormData();
-            formData.append('keyword', keyword);
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-            const response = await fetch('{{ route("api.search.location", ["provider" => "glints"]) }}', {
-                method: 'POST',
-                body: formData,
-                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
-            });
-            if (!response.ok) throw new Error('Network response was not ok');
-            return await response.json();
-        };
-
-        const renderResults = (list) => {
-            els.results.innerHTML = '';
-            if (!list || list.length === 0) {
-                els.results.innerHTML = '<li class="px-3 py-2 text-[#8b949e] italic">Location not found</li>';
-                els.results.classList.remove('hidden');
-                return;
-            }
-            let renderedCount = 0;
-            list.forEach(item => {
-                if (selectedLocations.some(loc => loc.id === item.id)) return;
-                const li = document.createElement('li');
-                li.className = 'cursor-pointer px-3 py-2 text-[#e6edf3] hover:bg-[#1f242c] transition-colors border-b border-[#30363d] last:border-0';
-                let fullName = item.name;
-                if (item.parents && item.parents.length > 0) {
-                    const parentNames = item.parents.map(p => p.name).join(', ');
-                    fullName += `<span class="text-xs text-[#8b949e] block mt-0.5">${parentNames}</span>`;
-                }
-                li.innerHTML = fullName;
-                li.addEventListener('click', () => {
-                    selectedLocations.push({ id: item.id, name: item.name });
-                    renderTags();
-                    els.input.value = '';
-                    els.results.classList.add('hidden');
-                    els.input.focus();
+        function fetchApplicationStats() {
+            fetch('{{ route("user.jobs.status") }}', {
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            })
+                .then(r => r.json())
+                .then(data => {
+                    const stats = data.stats || {};
+                    if (appliedStatEl) appliedStatEl.textContent = stats.applied || 0;
+                    if (successStatEl) {
+                        const success = stats.success || 0;
+                        const total = stats.total || 1;
+                        successStatEl.textContent = Math.round((success / total) * 100) + '%';
+                    }
+                    renderActivity(data.recent || []);
+                })
+                .catch(() => {
+                    if (activityTimeline) {
+                        activityTimeline.innerHTML = '<div class="text-sm text-white/20 italic">Failed to load activity</div>';
+                    }
                 });
-                els.results.appendChild(li);
-                renderedCount++;
-            });
-            if (renderedCount === 0) {
-                els.results.innerHTML = '<li class="px-3 py-2 text-[#8b949e] italic">All locations already selected</li>';
-            }
-            els.results.classList.remove('hidden');
-        };
+        }
 
-        const handleInput = async (e) => {
-            const keyword = e.target.value.trim();
-            if (keyword.length < 2) {
-                els.results.classList.add('hidden');
-                els.results.innerHTML = '';
-                return;
-            }
-            els.loading.classList.remove('hidden');
-            try {
-                const data = await fetchLocationData(keyword);
-                let list = [];
-                if (Array.isArray(data.data?.searchHierarchicalLocations)) {
-                    list = data.data.searchHierarchicalLocations;
-                } else if (data.data?.searchHierarchicalLocations?.list) {
-                    list = data.data.searchHierarchicalLocations.list;
-                } else if (Array.isArray(data.list)) {
-                    list = data.list;
+        // ─── PUSH BUTTON ────────────────────────────────────────────
+        if (pushBtn) {
+            pushBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const providers = getSelectedProviders();
+                if (providers.length === 0) {
+                    alert('Select at least one provider.');
+                    return;
                 }
-                renderResults(list);
-            } catch (error) {
-                console.error('Error fetching location:', error);
-                els.results.innerHTML = '<li class="px-3 py-2 text-red-400">Failed to load data</li>';
-                els.results.classList.remove('hidden');
-            } finally {
-                els.loading.classList.add('hidden');
-            }
-        };
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("apply.push") }}';
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                form.appendChild(csrf);
 
-        els.input.addEventListener('input', debounce(handleInput, 500));
-        document.addEventListener('click', (e) => {
-            if (!els.input.contains(e.target) && !els.results.contains(e.target)) {
-                els.results.classList.add('hidden');
-            }
+                const keyword = keywordInput ? keywordInput.value : '';
+                const k = document.createElement('input');
+                k.type = 'hidden';
+                k.name = 'keyword';
+                k.value = keyword;
+                form.appendChild(k);
+
+                const batch = document.querySelector('input[name="pageSize"]');
+                if (batch) {
+                    const b = document.createElement('input');
+                    b.type = 'hidden';
+                    b.name = 'pageSize';
+                    b.value = batch.value;
+                    form.appendChild(b);
+                }
+
+                providers.forEach(p => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'providers[]';
+                    input.value = p;
+                    form.appendChild(input);
+                });
+
+                document.body.appendChild(form);
+                form.submit();
+            });
+        }
+
+        // ─── STOP BUTTON ────────────────────────────────────────────
+        if (stopBtn) {
+            stopBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                if (!confirm('Stop all automation?')) return;
+
+                fetch('{{ route("apply.stop") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            location.reload();
+                        } else {
+                            alert('Failed to stop: ' + (data.errors?.general?.[0] || 'Unknown error'));
+                        }
+                    })
+                    .catch(() => alert('Failed to stop automation.'));
+            });
+        }
+
+        // ─── RESUME BUTTON ──────────────────────────────────────────
+        if (resumeBtn) {
+            resumeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                fetch('{{ route("apply.resume") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            location.reload();
+                        } else {
+                            alert('Failed to resume: ' + (data.errors?.general?.[0] || 'Unknown error'));
+                        }
+                    })
+                    .catch(() => alert('Failed to resume automation.'));
+            });
+        }
+
+        // ─── ACCORDION PROVIDERS ───────────────────────────────────
+        document.querySelectorAll('.provider-toggle').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const expanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !expanded);
+                if (content) content.classList.toggle('hidden');
+            });
         });
-    }
 
-    // DOM ready
-    document.addEventListener("DOMContentLoaded", function() {
-        // Toggle text
-        const cbJS = document.getElementById('auto_answer_jobstreet');
-        const stJS = document.getElementById('status-text_jobstreet');
-        if (cbJS && stJS) {
-            cbJS.addEventListener('change', function() {
-                stJS.textContent = this.checked ? 'Enabled' : 'Disabled';
-                stJS.classList.toggle('text-[#238636]', this.checked);
-                stJS.classList.toggle('text-[#8b949e]', !this.checked);
+        // ─── LOCATION AUTOCOMPLETE (Glints) ──────────────────────
+        function initLocationAutocomplete() {
+            const input = document.getElementById('location-search-input');
+            const results = document.getElementById('location-results');
+            const tagsContainer = document.getElementById('location-tags-container');
+            const hiddenInputs = document.getElementById('location-hidden-inputs');
+            const loading = document.getElementById('location-loading');
+            const initialData = document.getElementById('glints-initial-locations');
+
+            if (!input) return;
+
+            let selectedLocations = [];
+            try {
+                const ids = JSON.parse(initialData?.dataset?.ids || '[]');
+                const names = JSON.parse(initialData?.dataset?.names || '[]');
+                ids.forEach((id, i) => { if (names[i]) selectedLocations.push({ id, name: names[i] }); });
+            } catch(e) {}
+
+            const renderTags = () => {
+                if (!tagsContainer || !hiddenInputs) return;
+                tagsContainer.innerHTML = '';
+                hiddenInputs.innerHTML = '';
+                selectedLocations.forEach((loc, index) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'flex items-center gap-1 bg-white/10 text-white/70 px-2.5 py-1 rounded-md text-xs';
+                    const span = document.createElement('span');
+                    span.textContent = loc.name;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'text-white/30 hover:text-red-400 text-[10px]';
+                    btn.innerHTML = '×';
+                    btn.onclick = () => { selectedLocations.splice(index, 1); renderTags(); };
+                    tag.appendChild(span);
+                    tag.appendChild(btn);
+                    tagsContainer.appendChild(tag);
+
+                    const h1 = document.createElement('input');
+                    h1.type = 'hidden';
+                    h1.name = 'location_ids[]';
+                    h1.value = loc.id;
+                    const h2 = document.createElement('input');
+                    h2.type = 'hidden';
+                    h2.name = 'location_names[]';
+                    h2.value = loc.name;
+                    hiddenInputs.appendChild(h1);
+                    hiddenInputs.appendChild(h2);
+                });
+            };
+            renderTags();
+
+            const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+
+            input.addEventListener('input', debounce(async (e) => {
+                const kw = e.target.value.trim();
+                if (kw.length < 2) {
+                    if (results) results.classList.add('hidden');
+                    return;
+                }
+                if (loading) loading.classList.remove('hidden');
+                try {
+                    const fd = new FormData();
+                    fd.append('keyword', kw);
+                    fd.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+                    const r = await fetch('{{ route("api.search.location", ["provider" => "glints"]) }}', {
+                        method: 'POST',
+                        body: fd,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                    });
+                    if (!r.ok) throw new Error();
+                    const data = await r.json();
+                    let list = data.data?.searchHierarchicalLocations?.list || data.data?.searchHierarchicalLocations || data.list || [];
+                    if (!results) return;
+                    results.innerHTML = '';
+                    if (!list.length) {
+                        results.innerHTML = '<div class="px-3 py-2 text-sm text-white/30 italic">No results</div>';
+                        results.classList.remove('hidden');
+                        return;
+                    }
+                    let count = 0;
+                    list.forEach(item => {
+                        if (selectedLocations.some(l => l.id === item.id)) return;
+                        const li = document.createElement('div');
+                        li.className = 'cursor-pointer px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white transition';
+                        li.textContent = item.name;
+                        li.onclick = () => {
+                            selectedLocations.push({ id: item.id, name: item.name });
+                            renderTags();
+                            input.value = '';
+                            results.classList.add('hidden');
+                        };
+                        results.appendChild(li);
+                        count++;
+                    });
+                    if (!count) results.innerHTML = '<div class="px-3 py-2 text-sm text-white/30 italic">All selected</div>';
+                    results.classList.remove('hidden');
+                } catch(e) {
+                    if (results) {
+                        results.innerHTML = '<div class="px-3 py-2 text-sm text-red-400/70">Failed to load</div>';
+                        results.classList.remove('hidden');
+                    }
+                } finally {
+                    if (loading) loading.classList.add('hidden');
+                }
+            }, 500));
+
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && results && !results.contains(e.target)) {
+                    results.classList.add('hidden');
+                }
             });
         }
-        const cbGlints = document.getElementById('auto_answer_glints');
-        const stGlints = document.getElementById('status-text_glints');
-        if (cbGlints && stGlints) {
-            cbGlints.addEventListener('change', function() {
-                stGlints.textContent = this.checked ? 'Enabled' : 'Disabled';
-                stGlints.classList.toggle('text-[#238636]', this.checked);
-                stGlints.classList.toggle('text-[#8b949e]', !this.checked);
+
+        // ─── TOGGLE TEXT ───────────────────────────────────────────
+        const cb = document.getElementById('auto_answer_jobstreet');
+        const st = document.getElementById('status-text-jobstreet');
+        if (cb && st) {
+            cb.addEventListener('change', function() {
+                st.textContent = this.checked ? 'On' : 'Off';
+                st.className = `text-xs font-medium transition-colors ${this.checked ? 'text-blue-400' : 'text-white/30'}`;
             });
         }
 
-        fetchQueueStatus();
-        fetchApplicationStatus();
-        setInterval(fetchQueueStatus, 5000);
-        setInterval(fetchApplicationStatus, 5000);
+        // ─── START & INITIALIZATIONS ────────────────────────────────
+        fetchStatus();
+        fetchApplicationStats();
+
+        // Interval dikurangi menjadi 60 detik sebagai cadangan (fallback)
+        setInterval(fetchStatus, 60000);
+        setInterval(fetchApplicationStats, 60000);
 
         initLocationAutocomplete();
+
+        // ─── REAL-TIME PUSHER (REVERB) INTEGRATION ──────────────────
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher("{{ env('REVERB_APP_KEY') }}", {
+            cluster: "",
+            wsHost: "{{ env('REVERB_HOST', '127.0.0.1') }}",
+            wsPort: {{ env('REVERB_PORT', 8080) }},
+            forceTLS: false,
+            enabledTransports: ['ws'],
+            authEndpoint: '/broadcasting/auth',
+            auth: {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            }
+        });
+
+        var userId = '{{ auth()->id() }}';
+        var channel = pusher.subscribe("private-users." + userId);
+
+        channel.bind("App\\Events\\JobStatus", (data) => {
+            console.log("Data Event Masuk:", data);
+
+            const debugOutput = document.getElementById('debug-output');
+            if (debugOutput) {
+                const time = new Date().toLocaleTimeString('id-ID');
+                const rawJson = JSON.stringify(data, null, 2);
+
+                if (debugOutput.textContent.includes('Menunggu')) {
+                    debugOutput.textContent = '';
+                }
+                debugOutput.textContent = `[${time}]\n${rawJson}\n\n` + debugOutput.textContent;
+            }
+
+            // Fungsi ini sekarang berada di dalam scope yang sama,
+            // sehingga bisa dipanggil saat event masuk!
+            fetchStatus();
+            fetchApplicationStats();
+        });
     });
 </script>

@@ -62,7 +62,7 @@ class JobstreetAdapter implements PlatformAdapter {
     }
 
     public function db(): JobstreetDB {
-        return new JobstreetDb();
+        return new JobstreetDB();
     }
 
 }

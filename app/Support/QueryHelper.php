@@ -227,6 +227,7 @@ class QueryHelper {
                      'data' => $variables['data'] ?? array_filter([
                              'SearchTerm'         => $variables['SearchTerm'] ?? 'IT',
                              'CountryCode'         => 'ID',
+                             'sortBy' => $variables['sortBy'] ?? 'LATEST',
                              'includeExternalJobs' => $variables['includeExternalJobs'] ?? false,
                              'pageSize'            => $variables['pageSize'] ?? 10,
                              'page'                => $variables['page'] ?? 1,

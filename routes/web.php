@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PanelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\PlatformController;
@@ -75,26 +74,34 @@ Route::middleware('auth')->group(function() {
     Route::get('/user/jobs/status', function () {
         $userId = auth()->id();
 
-        $stats = DB::table('glints_applications')
+        // 1. Ambil Statistik Gabungan (Glints + JobStreet) menggunakan Subquery Union
+        $stats = DB::table(DB::raw("(
+        SELECT status, user_id FROM glints_applications
+        UNION ALL
+        SELECT status, user_id FROM jobstreet_applications
+    ) as combined_apps"))
             ->where('user_id', $userId)
             ->selectRaw("
             COUNT(*) as total,
-            SUM(status = 'success') as success,
-            SUM(status = 'applied') as applied,
-            SUM(status = 'linkout') as linkout,
-            SUM(status = 'questionnaire') as questionnaire
+            COALESCE(SUM(status = 'success'), 0) as success,
+            COALESCE(SUM(status = 'applied'), 0) as applied,
+            COALESCE(SUM(status = 'linkout'), 0) as linkout,
+            COALESCE(SUM(status = 'questionnaire'), 0) as questionnaire
         ")
             ->first();
 
-        $recent = DB::table('glints_applications')
+        $glints = DB::table('glints_applications')
             ->where('user_id', $userId)
-            ->latest()
-            ->limit(10) // Tambah limit sedikit agar lebih jelas
-            ->get([
-                'job_id',
-                'status',
-                'updated_at' // Pastikan nama kolom ini benar di database!
-            ]);
+            ->select('job_id', 'status', 'updated_at', DB::raw("'glints' as provider"));
+
+        $jobstreet = DB::table('jobstreet_applications')
+            ->where('user_id', $userId)
+            ->select('job_id', 'status', 'updated_at', DB::raw("'jobstreet' as provider"));
+
+        $recent = $glints->unionAll($jobstreet)
+            ->orderBy('updated_at', 'desc')
+            ->limit(10)
+            ->get();
 
         return response()->json([
             'stats' => $stats,
@@ -102,7 +109,6 @@ Route::middleware('auth')->group(function() {
             'updated_at' => now()->toDateTimeString(),
         ]);
     })->name('user.jobs.status');
-    //   Tambahkan disini Route::get('/user/jobs/status', function () {})
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/apply', [ApplyController::class, 'index'])->name('apply');

@@ -3,10 +3,13 @@
 
 namespace App\Jobs;
 
+use App\Events\JobStatus;
+use App\Models\GlintsAccount;
+use App\Models\User;
+use App\Support\ProviderHelper;
 use Illuminate\Queue\SerializesModels;
 use App\Clients\Application\UseCase\ApplyUseCase;
 use App\Exceptions\CantApply;
-use App\Http\Controllers\JobController;
 use App\Infrastructure\Contracts\PlatformAccount;
 use App\Infrastructure\Contracts\PlatformAdapter;
 use Illuminate\Bus\Queueable;
@@ -37,19 +40,29 @@ class ProcessApplications implements ShouldQueue
 
     public function handle()
     {
-        if (RateLimiter::tooManyAttempts('glints-apply', 20)) {
-            Log::warning("Job {$this->job_id} kena rate limit, di-release...");
-            $this->release(RateLimiter::availableIn('glints-apply'));
+//        if (RateLimiter::tooManyAttempts('glints-apply', 20)) {
+//            Log::warning("Job {$this->job_id} kena rate limit, di-release...");
+//            $this->release(RateLimiter::availableIn('glints-apply'));
+//            return;
+//        }
+//        $attempts = RateLimiter::attempts('glints-apply');
+//        Log::info("Job dalam 10 menit terakhir: {$attempts}");
+//
+//        RateLimiter::hit('glints-apply', 600);
+        $user = User::findOrFail($this->user_id);
+        if($user->automation_paused){
+            Log::warning('Automation paused');
             return;
         }
-
-        RateLimiter::hit('glints-apply', 600);
-
+        JobStatus::dispatch($this->user_id, $this->job_id, ProviderHelper::who($this->account), 'start');
         Log::info("Memproses Lamaran ID: " . $this->job_id . " - User ID : " . $this->account->user->id . " - Platform : " . get_class($this->adapter));
 
         try {
             $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
+
             if($result){
+                JobStatus::dispatch($this->user_id, $this->job_id, ProviderHelper::who($this->account), 'success');
+
                 $this->adapter->db()->upsert_job($this->account->user->id, $this->job_id, 'success');
                 $this->account->user->stats()->firstOrCreate(
                     ['date' => now()->toDateString()],
