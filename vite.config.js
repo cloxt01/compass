@@ -9,13 +9,5 @@ export default defineConfig({
             refresh: true,
         }),
         tailwindcss(),
-    ],
-    server: {
-        host: '0.0.0.0',          // Dengarkan di semua antarmuka
-        port: 5173,
-        strictPort: true,
-        hmr: {
-            host: '192.168.239.72', // <-- IP yang Anda akses dari browser
-        },
-    },
+    ]
 });

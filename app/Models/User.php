@@ -21,6 +21,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'job_id',
+        'job_title',
+        'job_company',
+        'status',
+        'provider',
     ];
 
     /**
@@ -48,15 +53,23 @@ class User extends Authenticatable
 
     public function jobstreetAccount()
     {
-        return $this->hasOne(JobstreetAccount::class);
+        return $this->hasOne(JobstreetAccount::class, 'user_id');
     }
     public function glintsAccount()
     {
-        return $this->hasOne(GlintsAccount::class);
+        return $this->hasOne(GlintsAccount::class, 'user_id');
     }
-    public function stats()
+    public function jobstreetApplication()
     {
-        return $this->hasMany(UserStat::class);
+        return $this->hasMany(JobstreetApplication::class, 'user_id');
+    }
+    public function glintsApplication()
+    {
+        return $this->hasMany(GlintsApplication::class, 'user_id');
+    }
+    public function applications()
+    {
+        return $this->hasMany(Application::class, 'user_id');
     }
 
 }

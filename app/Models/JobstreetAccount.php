@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\Token\JobstreetToken;
 use App\Infrastructure\Contracts\PlatformAccount;
@@ -24,7 +25,7 @@ class JobstreetAccount extends Model implements PlatformAccount
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
     public function isExpired(int $bufferSeconds = 60): bool
     {

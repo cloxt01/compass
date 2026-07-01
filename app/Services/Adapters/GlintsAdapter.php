@@ -7,7 +7,6 @@ use App\Infrastructure\Contracts\PlatformAdapter;
 use App\Infrastructure\Glints\GlintsPayloadBuilder;
 
 // Adapters
-use App\Services\Glints\GlintsDB;
 use App\Services\Glints\GlintsProfile;
 use App\Services\Glints\GlintsJob;
 
@@ -30,9 +29,6 @@ class GlintsAdapter implements PlatformAdapter {
     }
     public function job():GlintsJob {
         return new GlintsJob($this->client);
-    }
-    public function db(): GlintsDB {
-        return new GlintsDb();
     }
 
     public function loadJob(string $jobId): array {

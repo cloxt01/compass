@@ -19,7 +19,6 @@ Route::get('/request/{id}', [RequestController::class, 'request_info'])->name('a
 // --------------------
 // routes/web.php
 Route::middleware(['web','auth','token'])->group(function () {
-    Route::get('/apply', [ApplyController::class, 'index'])->name('apply');
     Route::post('/apply/push', [ApplyController::class, 'push'])->name('apply.push');
     Route::post('/apply/stop', [ApplyController::class, 'stop'])->name('apply.stop');
     Route::post('/apply/resume', [ApplyController::class, 'resume'])->name('apply.resume');

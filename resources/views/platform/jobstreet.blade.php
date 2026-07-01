@@ -1,10 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Connect JobStreet')
+@section('title', 'Connect JobStreet · ' . config('ui.brand.name'))
+@section('titleNavbar', 'Platform Connection')
 
 @section('content')
-@vite('resources/js/app.js')
-
 <div class="max-w-xl mx-auto py-10 space-y-6">
 
     {{-- STATUS & ERROR --}}
@@ -13,13 +12,13 @@
     <div id="response" class="text-xs text-gray-500 break-all"></div>
 
     {{-- CARD --}}
-    <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+    <div class="ui-card overflow-hidden">
 
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-800">
+        <div class="px-6 py-4 border-b border-slate-800">
+            <h2 class="text-lg font-semibold text-slate-100">
                 Passwordless Login JobStreet
             </h2>
-            <p class="text-sm text-gray-500 mt-1">
+            <p class="text-sm text-slate-400 mt-1">
                 Masukkan email, lalu verifikasi dengan OTP
             </p>
         </div>
@@ -37,7 +36,7 @@
                                 <input type="hidden" name="user_id" value="{{ auth()->id() }}">
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <label class="block text-sm font-medium text-slate-300 mb-1">
                         Email
                     </label>
                     <input
@@ -45,20 +44,18 @@
                         name="email"
                         required
                         placeholder="email@example.com"
-                        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm
-                               focus:outline-none focus:ring-2 focus:ring-gray-800/30"
+                        class="ui-input"
                     >
                 </div>
 
                 <button
                     type="submit"
-                    class="w-full rounded-md bg-gray-900 text-white py-2 text-sm font-medium
-                           hover:bg-gray-800 transition">
+                    class="ui-btn ui-btn-primary w-full">
                     Kirim OTP
                 </button>
             </form>
 
-            <hr class="border-gray-200">
+            <hr class="border-slate-800">
 
             {{-- VERIFY OTP --}}
             <form method="POST"
@@ -72,7 +69,7 @@
                 <input type="hidden" name="user_id" value="{{ auth()->id() }}">
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <label class="block text-sm font-medium text-slate-300 mb-1">
                         Kode OTP
                     </label>
                     <input
@@ -80,15 +77,13 @@
                         name="verification_code"
                         required
                         placeholder="XXXXXX"
-                        class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm tracking-widest
-                               focus:outline-none focus:ring-2 focus:ring-gray-800/30"
+                        class="ui-input tracking-widest"
                     >
                 </div>
 
                 <button
                     type="submit"
-                    class="w-full rounded-md bg-gray-700 text-white py-2 text-sm font-medium
-                           hover:bg-gray-600 transition">
+                    class="ui-btn ui-btn-muted w-full">
                     Verifikasi & Login
                 </button>
             </form>

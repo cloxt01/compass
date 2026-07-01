@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Profile · Compass')
+@section('title', 'Profile · ' . config('ui.brand.name'))
+@section('titleNavbar', 'Profile')
 
 @section('content')
 @php
@@ -32,14 +33,17 @@
                     {{ $user->email }}
                 </div>
 
-                <a
-                    href="{{ route('auth.logout') }}"
-                    class="inline-flex w-full justify-center rounded-md
-                           bg-[#da3633] px-4 py-2 text-sm font-medium text-white
-                           hover:bg-[#f85149] transition"
-                >
-                    Sign out
-                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="inline-flex w-full justify-center rounded-md
+                               bg-[#da3633] px-4 py-2 text-sm font-medium text-white
+                               hover:bg-[#f85149] transition"
+                    >
+                        Sign out
+                    </button>
+                </form>
             </div>
         </div>
 

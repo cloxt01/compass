@@ -1,11 +1,10 @@
 @extends('layouts.app')
 
-@section('header')
-    <title>Dashboard · Compass</title>
-    @livewireStyles
-@endsection
+@section('title', 'Dashboard · ' . config('ui.brand.name'))
+@section('titleNavbar', 'Dashboard')
 
 @section('content')
+@livewireStyles
 @livewireScripts
 
 <div class="max-w-6xl mx-auto px-4 py-8 space-y-6">
@@ -35,16 +34,19 @@
                 Go to Apply
             </a>
 
-            <a href="{{ route('auth.logout') }}"
-               class="rounded-md border border-[#30363d] px-4 py-2 text-sm font-medium
-                      text-[#e6edf3] hover:bg-[#161b22] transition">
-                Logout
-            </a>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                        class="rounded-md border border-[#30363d] px-4 py-2 text-sm font-medium
+                               text-[#e6edf3] hover:bg-[#161b22] transition">
+                    Logout
+                </button>
+            </form>
         </div>
     </div>
 
     {{-- CONTENT --}}
-    <div class="bg-[#161b22] border border-[#30363d] rounded-md p-4">
+    <div class="border border-[#30363d] rounded-md p-4">
         <livewire:applied-jobs />
     </div>
 

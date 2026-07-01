@@ -37,6 +37,7 @@ class JobStatus implements ShouldBroadcastNow
      */
     public function broadcastWith()
     {
+
         return [
             'job_id' => $this->job_id,
             'provider' => $this->provider,

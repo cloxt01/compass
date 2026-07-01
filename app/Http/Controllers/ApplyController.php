@@ -132,6 +132,7 @@ class ApplyController extends Controller
                 // 7. Dispatch tiap job ke queue
                 foreach ($data as $job) {
                     $queue = new ProcessApplications(
+                        $this->user,
                         $this->adapter[$provider],
                         $this->account[$provider],
                         $job['id']
@@ -139,7 +140,7 @@ class ApplyController extends Controller
                     $queueId = Queue::connection('database')->push($queue);
                     DB::table('jobs')
                         ->where('id', $queueId)
-                        ->update(['user_id' => $queue->user_id]);
+                        ->update(['user_id' => $queue->user->id]);
                 }
             }
 

@@ -27,48 +27,37 @@ class ProcessApplications implements ShouldQueue
     protected string $job_id;
     protected PlatformAdapter $adapter;
     protected PlatformAccount $account;
-    public int $user_id;
-    public function __construct(PlatformAdapter $adapter, PlatformAccount $account, string $job_id)
+    public User $user;
+    public function __construct(User $user, PlatformAdapter $adapter, PlatformAccount $account, string $job_id)
     {
         $this->adapter = $adapter;
         $this->account = $account;
         $this->job_id = $job_id;
-        $this->user_id = $this->account->user->id;
+        $this->user = $user;
     }
 
 
 
     public function handle()
     {
-//        if (RateLimiter::tooManyAttempts('glints-apply', 20)) {
-//            Log::warning("Job {$this->job_id} kena rate limit, di-release...");
-//            $this->release(RateLimiter::availableIn('glints-apply'));
-//            return;
-//        }
-//        $attempts = RateLimiter::attempts('glints-apply');
-//        Log::info("Job dalam 10 menit terakhir: {$attempts}");
-//
-//        RateLimiter::hit('glints-apply', 600);
-        $user = User::findOrFail($this->user_id);
-        if($user->automation_paused){
+        if($this->user->automation_paused){
             Log::warning('Automation paused');
             return;
         }
-        JobStatus::dispatch($this->user_id, $this->job_id, ProviderHelper::who($this->account), 'start');
-        Log::info("Memproses Lamaran ID: " . $this->job_id . " - User ID : " . $this->account->user->id . " - Platform : " . get_class($this->adapter));
+        JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), 'start');
+        Log::info("Memproses Lamaran ID: " . $this->job_id . " - User ID : " . $this->user->id . " - Platform : " . get_class($this->adapter));
 
         try {
             $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
+            JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), $result['status']);
+            $this->user->applications()->create([
+                'job_id' => $result['job']['job_id'] ?? $this->job_id,
+                'job_title' => $result['job']['job_title'] ?? 'Unknown',
+                'job_company' => $result['job']['job_company'] ?? 'Unknown',
+                'provider' => $result['provider'] ?? 'Unknown',
+                'status' => $result['status']
+            ]);
 
-            if($result){
-                JobStatus::dispatch($this->user_id, $this->job_id, ProviderHelper::who($this->account), 'success');
-
-                $this->adapter->db()->upsert_job($this->account->user->id, $this->job_id, 'success');
-                $this->account->user->stats()->firstOrCreate(
-                    ['date' => now()->toDateString()],
-                    ['total_applied' => 0]
-                )->increment('total_applied');
-            }
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result ? "Ya" : "Tidak"));
         } catch (CantApply $e){
             Log::info($e->getMessage());

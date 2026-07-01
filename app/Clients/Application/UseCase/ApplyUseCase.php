@@ -18,9 +18,22 @@ class ApplyUseCase {
         $this->user_id = $this->account->user->id;
     }
 
-    public function apply(string $jobId): bool {
+    public function apply(string $jobId): ?array {
+
         JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'load_job');
         $job = $this->adapter->loadJob($jobId);
+
+        $result = [
+            'success' => null,
+            'status' => 'unknown',
+            'provider' => ProviderHelper::who($this->account),
+            'issues' => [],
+            'job' => [
+                'job_id' => $jobId,
+                'job_title' => $job['metadata']['title'],
+                'job_company' => $job['metadata']['company']
+            ]
+        ];
 
         JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'load_profile');
         $profile = $this->adapter->loadProfile();
@@ -39,14 +52,24 @@ class ApplyUseCase {
         if(!$inspector['canApply']){
             Log::warning("Tidak dapat melamar pekerjaan ID: " . $jobId . " karena tidak memenuhi syarat.");
             Log::warning(json_encode($inspector['issues']));
-            $this->adapter->db()->upsert_job($this->account->user->id, $jobId, $inspector['issues'][0]['type']);
-            return false;
+            $result['status'] = $inspector['issues'][0]['type'] ?? 'unknown';
+            $result['success'] = false;
+            $result['issues'] = $inspector['issues'];
+            return $result;
         }
         JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'build_payload');
         $payload = $this->adapter->buildPayload($job, $profile, $config);
 
         JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'apply');
 
-        return $this->adapter->execute($jobId, $payload, $config);
+        $success = $this->adapter->execute($jobId, $payload, $config);
+        if($success)
+        {
+            $result['status'] = 'success';
+            $result['success'] = true;
+        } else{
+            $result['success'] = false;
+        }
+        return $result;
     }
 }

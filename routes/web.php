@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\PlatformController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redis;
 
@@ -31,12 +31,6 @@ Route::get('/debug/redis', function () {
     Redis::rpush('queue:test', 'item1');
     $list = Redis::lrange('queue:test', 0, -1);
     return $list;
-});
-
-// Guest routes
-Route::middleware('guest')->group(function() {
-    Route::get('/login', fn() => view('login'))->name('login');
-    Route::get('/register', fn() => view('register'))->name('register');
 });
 
 Route::middleware('auth')->group(function() {
@@ -125,11 +119,4 @@ Route::middleware('auth')->group(function() {
 });
 
 
-// Platform routes
-
-// Web-based auth actions
-Route::prefix('auth')->group(function() {
-    Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
-    Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
-    Route::get('/logout', [AuthController::class, 'logout'])->name('auth.logout');
-});
+require __DIR__.'/auth.php';

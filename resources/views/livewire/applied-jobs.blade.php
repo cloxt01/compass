@@ -1,4 +1,4 @@
-<div class="overflow-x-auto rounded-md border border-[#30363d] bg-[#161b22]">
+<div class="overflow-x-auto rounded-md border border-[#30363d]">
     @if(count($jobs))
         <table class="min-w-full text-sm text-left text-[#e6edf3]">
             <thead class="bg-[#0d1117] border-b border-[#30363d]">

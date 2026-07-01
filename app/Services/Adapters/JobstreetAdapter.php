@@ -7,7 +7,6 @@ use App\Infrastructure\Contracts\PlatformAdapter;
 use App\Infrastructure\Jobstreet\JobstreetPayloadBuilder;
 
 // Adapters
-use App\Services\Jobstreet\JobstreetDB;
 use App\Services\Jobstreet\JobstreetProfile;
 use App\Services\Jobstreet\JobstreetJob;
 
@@ -18,6 +17,7 @@ use App\Services\JobDetails;
 
 class JobstreetAdapter implements PlatformAdapter {
 
+    protected $builder;
     public function __construct(protected JobstreetAPI $client){
         $this->client = $client;
         $this->builder = new JobstreetPayloadBuilder();
@@ -61,8 +61,5 @@ class JobstreetAdapter implements PlatformAdapter {
         return $this->job()->apply($jobId, $payload);
     }
 
-    public function db(): JobstreetDB {
-        return new JobstreetDB();
-    }
 
 }
