@@ -146,7 +146,7 @@ Desktop / Web:
                                     <a
                                         href="{{ $hasGlints
                                             ? route('connection.disconnect', ['provider' => 'glints'])
-                                            : route('connection.connect.glints') }}"
+                                            : route('connection.glints') }}"
                                         class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium
                                                {{ $hasGlints
                                                    ? 'bg-[#da3633] text-white hover:bg-[#f85149]'

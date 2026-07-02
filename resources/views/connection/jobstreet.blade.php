@@ -1,98 +1,119 @@
 @extends('layouts.app')
 
-@section('title', 'Connect JobStreet · ' . config('ui.brand.name'))
+@section('title', 'Connect JobStreet · Compass')
 @section('titleNavbar', 'Platform Connection')
 
 @section('content')
-<div class="max-w-xl mx-auto py-10 space-y-6">
+    <div class="mx-auto max-w-[600px] space-y-6 px-1 pb-6 pt-6">
 
-    {{-- STATUS & ERROR --}}
-    <div id="errors" class="space-y-2 text-sm text-red-600"></div>
-    <div id="status" class="text-sm text-gray-600"></div>
-    <div id="response" class="text-xs text-gray-500 break-all"></div>
+        {{-- STATUS & ERROR --}}
+        <div id="errors" class="space-y-2 text-sm text-red-400 empty:hidden"></div>
+        <div id="status" class="text-sm text-blue-400 empty:hidden"></div>
+        <div id="response" class="break-all font-mono text-xs text-[#a1a1aa] empty:hidden"></div>
 
-    {{-- CARD --}}
-    <div class="ui-card overflow-hidden">
+        {{-- CARD --}}
+        <div class="saas-card overflow-hidden">
 
-        <div class="px-6 py-4 border-b border-slate-800">
-            <h2 class="text-lg font-semibold text-slate-100">
-                Passwordless Login JobStreet
-            </h2>
-            <p class="text-sm text-slate-400 mt-1">
-                Masukkan email, lalu verifikasi dengan OTP
-            </p>
+            <div class="border-b border-[#262626] px-6 py-5">
+                <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">
+                    Passwordless Login JobStreet
+                </h2>
+                <p class="mt-1 text-sm text-[#a1a1aa]">
+                    Masukkan email, lalu verifikasi menggunakan kode OTP
+                </p>
+            </div>
+
+            <div class="p-6 space-y-6">
+
+                {{-- SEND OTP --}}
+                <form method="POST"
+                      action="{{ route('api.connection.passwordless-login', ['provider' => 'jobstreet']) }}"
+                      id="sendOtpForm"
+                      class="space-y-4">
+                    @csrf
+
+                    <input type="hidden" name="request_id" id="request_id_send">
+                    <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+
+                    <div>
+                        <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
+                            Email Address
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            required
+                            placeholder="name@example.com"
+                            class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]"
+                        >
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="h-11 w-full cursor-pointer rounded-xl bg-white/85 text-sm font-semibold text-black transition hover:bg-white">
+                        Kirim OTP
+                    </button>
+                </form>
+
+                {{-- SPACER SUBSTITUTION FOR HR TAG --}}
+                <div class="py-1"></div>
+
+                {{-- VERIFY OTP --}}
+                <form method="POST"
+                      action="{{ route('api.connection.verify-otp', ['provider' => 'jobstreet']) }}"
+                      id="verifyOtpForm"
+                      class="space-y-4">
+                    @csrf
+
+                    <input type="hidden" name="request_id" id="request_id_verify">
+                    <input type="hidden" name="email" id="verifyEmailInput">
+                    <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+
+                    <div>
+                        <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
+                            Kode OTP
+                        </label>
+                        <input
+                            type="text"
+                            name="verification_code"
+                            required
+                            placeholder="XXXXXX"
+                            class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a] tracking-widest font-mono"
+                        >
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="h-11 w-full cursor-pointer rounded-xl border border-[#262626] bg-[#111111] text-sm font-semibold text-[#fafafa] transition hover:bg-[#1c1c1c] hover:border-[#333]">
+                        Verifikasi & Login
+                    </button>
+                </form>
+
+            </div>
         </div>
 
-        <div class="p-6 space-y-6">
-
-            {{-- SEND OTP --}}
-            <form method="POST"
-                action="{{ route('api.connection.passwordless-login', ['provider' => 'jobstreet']) }}"
-                  id="sendOtpForm"
-                  class="space-y-4">
-                @csrf
-
-                <input type="hidden" name="request_id" id="request_id_send">
-                                <input type="hidden" name="user_id" value="{{ auth()->id() }}">
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1">
-                        Email
-                    </label>
-                    <input
-                        type="email"
-                        name="email"
-                        required
-                        placeholder="email@example.com"
-                        class="ui-input"
-                    >
-                </div>
-
-                <button
-                    type="submit"
-                    class="ui-btn ui-btn-primary w-full">
-                    Kirim OTP
-                </button>
-            </form>
-
-            <hr class="border-slate-800">
-
-            {{-- VERIFY OTP --}}
-            <form method="POST"
-                  action="{{ route('api.connection.verify-otp', ['provider' => 'jobstreet']) }}"
-                  id="verifyOtpForm"
-                  class="space-y-4">
-                @csrf
-
-                <input type="hidden" name="request_id" id="request_id_verify">
-                <input type="hidden" name="email" id="verifyEmailInput">
-                <input type="hidden" name="user_id" value="{{ auth()->id() }}">
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-1">
-                        Kode OTP
-                    </label>
-                    <input
-                        type="text"
-                        name="verification_code"
-                        required
-                        placeholder="XXXXXX"
-                        class="ui-input tracking-widest"
-                    >
-                </div>
-
-                <button
-                    type="submit"
-                    class="ui-btn ui-btn-muted w-full">
-                    Verifikasi & Login
-                </button>
-            </form>
-
+        <div class="text-center">
+            <a href="{{ route('apply') }}" class="text-xs text-[#a1a1aa] hover:text-[#fafafa] transition">
+                <i class="fas fa-arrow-left mr-1"></i> Kembali ke Panel Utama
+            </a>
         </div>
     </div>
-</div>
 
+@endsection
 
+@push('styles')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Geist', system-ui, sans-serif; background:#0A0A0A; color:#FAFAFA; }
+        .font-mono { font-family: 'Geist Mono', monospace !important; }
+        .saas-card { background:#111111; border:1px solid #262626; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.28); transition:all .2s ease; }
+        .saas-card:hover { border-color:#333333; }
+        .saas-input { border:1px solid #262626; background:#0A0A0A; outline:0; transition:.2s ease; }
+        .saas-input:focus { border-color:#3B82F6; box-shadow:0 0 0 2px rgba(59,130,246,.15); }
+    </style>
+@endpush
 
 <script>
     // UTILS
@@ -261,6 +282,3 @@
         }
     )
 </script>
-
-
-@endsection

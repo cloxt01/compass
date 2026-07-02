@@ -10,27 +10,27 @@
     </div>
 
     <div class="ml-auto flex items-center gap-3">
-        <span class="hidden items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400 lg:inline-flex">
-            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-            Automation Online
-        </span>
+        @if(auth()->user()->automation_paused)
+            <span class="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1 text-xs text-red-400">
+                <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                Automation Offline
+            </span>
+        @else
+            <span class="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400">
+                <span class="relative flex h-2 w-2">
+                    <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+                    <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+                </span>
+                Automation Online
+            </span>
+        @endif
 
         <div class="hidden items-center rounded-xl border border-[#262626] bg-[#111111] px-3 py-2 lg:flex">
             <i class="fas fa-search mr-2 text-xs text-[#71717a]"></i>
             <input type="text" placeholder="Search..." class="w-40 bg-transparent text-sm text-[#fafafa] outline-none placeholder:text-[#71717a]">
         </div>
 
-        @if (session('success'))
-            <div class="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-300">
-                {{ session('success') }}
-            </div>
-        @endif
 
-        @if (session('error'))
-            <div class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-300">
-                {{ session('error') }}
-            </div>
-        @endif
 
         <div class="hidden rounded-xl border border-[#262626] bg-[#111111] px-3 py-2 text-right sm:block">
             <p class="text-sm font-medium text-[#fafafa]">{{ auth()->user()->name }}</p>
@@ -44,14 +44,5 @@
             </button>
         </form>
 
-        @if ($errors->any())
-            <div class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
-                <ul class="space-y-0.5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
     </div>
 </nav>

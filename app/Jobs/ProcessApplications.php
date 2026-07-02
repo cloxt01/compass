@@ -6,6 +6,7 @@ namespace App\Jobs;
 use App\Events\JobStatus;
 use App\Models\GlintsAccount;
 use App\Models\User;
+use App\Support\ApplicationHelper;
 use App\Support\ProviderHelper;
 use Illuminate\Queue\SerializesModels;
 use App\Clients\Application\UseCase\ApplyUseCase;
@@ -41,29 +42,32 @@ class ProcessApplications implements ShouldQueue
 
     public function handle()
     {
-
-
         if($this->user->automation_paused){
             Log::warning('Automation paused');
             return;
         }
 
+        $is_already = ApplicationHelper::alreadyApplied($this->user->id, $this->job_id);
+
+        if($is_already){
+            JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), $is_already);
+            return;
+        }
+
         JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), 'start');
-        Log::info("Memproses Lamaran ID: " . $this->job_id . " - User ID : " . $this->user->id . " - Platform : " . get_class($this->adapter));
 
         try {
             $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
             JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), $result['status']);
-            $this->user->applications()->updateOrInsert(
+            $this->user->applications()->create(
                 [
-                    'job_id' => $result['job']['job_id'] ?? $this->job_id
-                ],
-                [
-                'job_title' => $result['job']['job_title'] ?? 'Unknown',
-                'job_company' => $result['job']['job_company'] ?? 'Unknown',
-                'provider' => $result['provider'] ?? 'Unknown',
-                'status' => $result['status']
-            ]);
+                    'job_id' => $result['job']['job_id'] ?? $this->job_id,
+                    'job_title' => $result['job']['job_title'] ?? 'Unknown',
+                    'job_company' => $result['job']['job_company'] ?? 'Unknown',
+                    'provider' => $result['provider'] ?? 'Unknown',
+                    'status' => $result['status']
+                ]
+            );
 
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result ? "Ya" : "Tidak"));
         } catch (CantApply $e){

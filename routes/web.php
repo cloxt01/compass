@@ -46,7 +46,6 @@ Route::middleware('auth')->group(function() {
     });
     Route::prefix('connection')->group(function() {
 
-        Route::get('/', [ConnectionController::class, 'index'])->name('connection');
         Route::get('/connect/jobstreet', fn() => view('connection.jobstreet'))->name('connection.jobstreet');
         Route::get('/connect/glints', fn() => view('connection.glints'))->name('connection.glints');
         Route::get('/{provider}/disconnect', [ConnectionController::class, 'disconnect'])->name('connection.disconnect');

@@ -24,6 +24,8 @@
 
 @section('content')
     <div class="mx-auto max-w-[1400px] space-y-6 px-1 pb-6 pt-2">
+
+        {{-- STAT CARDS AUTOMATION --}}
         <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <article class="saas-card p-5">
                 <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">STATUS</p>
@@ -59,14 +61,20 @@
                 </div>
             </article>
         </section>
-        <section id="analytics-section" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+
+        {{-- ANALYTICS SECTIONS (SEKARANG 3 KOLOM: TOTAL, APPLIED, SUCCESS RATE) --}}
+        <section id="analytics-section" class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TOTAL LAMARAN</p>
-                <p id="stat-applied" class="mt-3 text-3xl font-semibold text-[#fafafa]">0</p>
+                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TOTAL LAMARAN BARU (SUCCESS)</p>
+                <p id="stat-success-count" class="mt-3 text-3xl font-semibold text-emerald-400">0</p>
             </article>
             <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TINGKAT KEBERHASILAN</p>
-                <p id="stat-success" class="mt-3 text-3xl font-semibold text-emerald-400">0%</p>
+                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">SUDAH PERNAH DILAMAR (APPLIED)</p>
+                <p id="stat-applied" class="mt-3 text-3xl font-semibold text-violet-400">0</p>
+            </article>
+            <article class="saas-card p-5">
+                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TINGKAT KEBERHASILAN (APPLIED & SUCCESS)</p>
+                <p id="stat-success" class="mt-3 text-3xl font-semibold text-[#fafafa]">0%</p>
             </article>
         </section>
 
@@ -78,17 +86,11 @@
                         <p class="mt-1 text-sm text-[#a1a1aa]">Atur konfigurasi lamaran anda</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
-{{--                        <button id="push-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-black transition hover:bg-white {{ $isPaused ? 'pointer-events-none opacity-50' : '' }}">Push</button>--}}
                         <button id="save-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-black transition hover:bg-white">Simpan</button>
-
                         @if ($isPaused)
-                            <button id="resume-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white">
-                                Resume
-                            </button>
+                            <button id="resume-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white">Resume</button>
                         @else
-                            <button id="stop-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white">
-                                Stop
-                            </button>
+                            <button id="stop-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white">Stop</button>
                         @endif
                     </div>
                 </div>
@@ -100,7 +102,7 @@
                     </div>
                     <div>
                         <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Batch</label>
-                        <input type="number" name="pageSize" required value="{{ $apply_configuration['batch'] ?? '1' }}" min="1" max="40" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa]" />
+                        <input type="number" name="pageSize" required value="{{ $apply_configuration['batch'] ?? '1' }}" min="1" max="20" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa]" />
                     </div>
                     <div>
                         <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Interval</label>
@@ -152,6 +154,8 @@
                         <div id="current-progress-bar" class="h-full w-0 rounded-full bg-blue-600 transition-all duration-500"></div>
                     </div>
                     <div class="mt-4 flex flex-wrap gap-2">
+                        <span class="progress-step" data-step="applied">Already Applied</span>
+                        <span class="progress-step" data-step="questionnaire">Need Screening</span>
                         <span class="progress-step" data-step="loading_job">Loading Job</span>
                         <span class="progress-step" data-step="loading_profile">Loading Profile</span>
                         <span class="progress-step" data-step="inspecting">Inspecting</span>
@@ -172,6 +176,7 @@
             </div>
         </section>
 
+        {{-- QUEUE TABLE --}}
         <section id="queue-section" class="saas-card overflow-hidden">
             <div class="border-b border-[#262626] px-6 py-4">
                 <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">ANTRIAN</h2>
@@ -179,34 +184,34 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full">
                     <thead class="bg-[#0a0a0a]">
-                        <tr class="text-left text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
-                            <th class="px-6 py-3">Provider</th>
-                            <th class="px-6 py-3">Keyword</th>
-                            <th class="px-6 py-3">Status</th>
-                            <th class="px-6 py-3">Attempts</th>
-                            <th class="px-6 py-3">Created</th>
-                            <th class="px-6 py-3">Action</th>
-                        </tr>
+                    <tr class="text-left text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
+                        <th class="px-6 py-3">Provider</th>
+                        <th class="px-6 py-3">Keyword</th>
+                        <th class="px-6 py-3">Status</th>
+                        <th class="px-6 py-3">Attempts</th>
+                        <th class="px-6 py-3">Created</th>
+                        <th class="px-6 py-3">Action</th>
+                    </tr>
                     </thead>
                     <tbody id="running-jobs-list" class="divide-y divide-[#262626]">
-                        <tr>
-                            <td colspan="6" class="px-6 py-6 text-sm italic text-[#8b949e]">No active jobs</td>
-                        </tr>
+                    <tr>
+                        <td colspan="6" class="px-6 py-6 text-sm italic text-[#8b949e]">No active jobs</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
+        {{-- DEPLOYMENT LOG --}}
         <section class="saas-card p-6">
             <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">Deployment Log</h2>
             <p class="mt-1 text-sm text-[#a1a1aa]">Pantau lamaran melalui konsol</p>
             <pre id="debug-output" class="custom-scroll mt-4 max-h-72 overflow-y-auto rounded-xl border border-[#262626] bg-[#0a0a0a] p-4 font-mono text-xs text-[#fafafa]">[00:00:00] [IDLE] [SYSTEM] Menunggu event masuk...</pre>
         </section>
 
-
+        {{-- PROVIDER SETTINGS --}}
         <section id="settings-section" class="space-y-4">
-            <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">Providers</h2>
-
+            <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">Konfigurasi Provider</h2>
             <div class="saas-card overflow-hidden">
                 <button type="button" class="provider-toggle flex w-full items-center justify-between px-5 py-4 transition hover:bg-[#171717]">
                     <div class="flex items-center gap-3">
@@ -330,9 +335,12 @@
 @endsection
 
 @push('styles')
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Inter, system-ui, sans-serif; background:#0A0A0A; color:#FAFAFA; }
+        body { font-family: 'Geist', system-ui, sans-serif; background:#0A0A0A; color:#FAFAFA; }
+        .font-mono { font-family: 'Geist Mono', monospace !important; }
         .saas-card { background:#111111; border:1px solid #262626; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.28); transition:all .2s ease; }
         .saas-card:hover { border-color:#333333; }
         .saas-input { border:1px solid #262626; background:#0A0A0A; outline:0; transition:.2s ease; }
@@ -350,7 +358,14 @@
         .badge-start,.badge-load_job { color:#60a5fa; background:rgba(59,130,246,.16); border-color:rgba(59,130,246,.28); }
         .badge-load_profile,.badge-load_userConfig { color:#f59e0b; background:rgba(245,158,11,.16); border-color:rgba(245,158,11,.28); }
         .badge-inspect { color:#f59e0b; background:rgba(245,158,11,.16); border-color:rgba(245,158,11,.28); }
-        .badge-success,.badge-applied { color:#22c55e; background:rgba(34,197,94,.16); border-color:rgba(34,197,94,.28); }
+        .badge-success { color:#22c55e; background:rgba(34,197,94,.16); border-color:rgba(34,197,94,.28); }
+        /* Badge Applied Khusus: Ungu/Violet */
+        .badge-screening {
+            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.16);
+            border-color: rgba(245, 158, 11, 0.28);
+        }
+        .badge-applied { color:#a78bfa; background:rgba(167,139,250,.16); border-color:rgba(167,139,250,.28); }
         .badge-error { color:#ef4444; background:rgba(239,68,68,.16); border-color:rgba(239,68,68,.28); }
         .badge-default { color:#a1a1aa; background:rgba(161,161,170,.16); border-color:rgba(161,161,170,.28); }
     </style>
@@ -380,8 +395,9 @@
                 inspect: { icon: 'fa-search', label: 'Inspect', description: 'Memeriksa apakah dapat dilamar', badgeClass: 'badge-inspect' },
                 build_payload: { icon: 'fa-cog', label: 'Build', description: 'Membangun payload lamaran', badgeClass: 'badge-load_userConfig' },
                 apply: { icon: 'fa-paper-plane', label: 'Apply', description: 'Mengirim lamaran', badgeClass: 'badge-start' },
-                success: { icon: 'fa-check-circle', label: 'Success', description: 'Berhasil melamar pekerjaan', badgeClass: 'badge-success' },
-                applied: { icon: 'fa-check-circle', label: 'Applied', description: 'Lamaran terkirim', badgeClass: 'badge-applied' },
+                questionnaire: { icon: 'fa-clipboard-list', label: 'Need Screening', description: 'Dilewati, perlu menjawab pertanyaan screening', badgeClass: 'badge-screening' },
+                applied: { icon: 'fa-history', label: 'Already Applied', description: 'Dilewati, posisi ini sudah pernah dilamar sebelumnya', badgeClass: 'badge-applied' },
+                success: { icon: 'fa-check-circle', label: 'Success', description: 'Berhasil melamar pekerjaan baru', badgeClass: 'badge-success' },
                 error: { icon: 'fa-exclamation-circle', label: 'Error', description: 'Terjadi kesalahan', badgeClass: 'badge-error' }
             };
             return map[status] || { icon: 'fa-circle', label: status || 'Unknown', description: status || 'Unknown status', badgeClass: 'badge-default' };
@@ -390,7 +406,6 @@
         const statusDot = document.getElementById('status-dot');
         const statusDotPing = document.getElementById('status-dot-ping');
         const statusLabelEl = document.getElementById('status-label');
-        // const pushBtn = document.getElementById('push-btn');
         const saveBtn = document.getElementById('save-btn')
         const stopBtn = document.getElementById('stop-btn');
         const resumeBtn = document.getElementById('resume-btn');
@@ -399,8 +414,12 @@
         const todayCount = document.getElementById('today-count');
         const queuedEl = document.getElementById('stat-queued');
         const runningStatEl = document.getElementById('stat-running');
+
+        // Element stat baru hasil pemisahan
+        const successCountStatEl = document.getElementById('stat-success-count');
         const appliedStatEl = document.getElementById('stat-applied');
         const successStatEl = document.getElementById('stat-success');
+
         const activityTimeline = document.getElementById('activity-timeline');
         const keywordInput = document.getElementById('keyword-input');
         const currentProvider = document.getElementById('current-provider');
@@ -410,7 +429,7 @@
         const currentLogLine = document.getElementById('current-log-line');
         const remainingJobs = document.getElementById('remaining-jobs');
         const debugOutput = document.getElementById('debug-output');
-        let lastKnownAutomation = null; // simpan data job terakhir yang diterima
+        let lastKnownAutomation = null;
 
         function setProgressStep(step) {
             document.querySelectorAll('.progress-step').forEach(el => el.classList.remove('active'));
@@ -431,7 +450,6 @@
         }
 
         function setCurrentAutomation(data, queueData) {
-            // simpan data terbaru kalau ada (dari pusher event)
             if (data) {
                 lastKnownAutomation = data;
             }
@@ -440,14 +458,12 @@
             const pending = queueData?.pending || 0;
             const processing = queueData?.processing || 0;
 
-            // beneran stopped: gak ada antrian & gak ada data yang diketahui -> baru direset
             if (!source && pending === 0 && processing === 0) {
                 resetCurrentAutomation();
                 return;
             }
 
-            // masih running/ada antrian: tampilin data terakhir yang diketahui
-            if (!source) return; // masih ada antrian tapi belum ada data job spesifik, biarin apa adanya
+            if (!source) return;
 
             const status = source.status || 'idle';
             const provider = source.provider || '-';
@@ -468,12 +484,14 @@
                 load_profile: 'loading_profile',
                 load_userConfig: 'loading_profile',
                 build_payload: 'building_payload',
+                questionnaire: 'questionnaire',
+                applied: 'applied',
                 apply: 'applying',
-                success: 'success',
-                applied: 'success'
+                success: 'success'
             };
             setProgressStep(mapStep[status] || null);
         }
+
         function appendDeploymentLog(data) {
             if (!debugOutput) return;
             const info = getStatusInfo(data.status || 'idle');
@@ -550,9 +568,12 @@
                 </div>
             `;
             activityTimeline.prepend(item);
-            while (activityTimeline.children.length > 50) activityTimeline.removeChild(activityTimeline.lastChild);
+            if (activityTimeline.children.length > 50) activityTimeline.removeChild(activityTimeline.lastChild);
             setCurrentAutomation(data, null);
             appendDeploymentLog(data);
+
+            // Ketika ada real-time event masuk dari Pusher, refresh statistik counter secara instan
+            fetchApplicationStats();
         }
 
         function fetchStatus() {
@@ -579,7 +600,6 @@
             });
         }
 
-
         function fetchApplicationStats() {
             fetch('{{ route("user.applications") }}', {
                 headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
@@ -587,109 +607,63 @@
             }).then(r => r.json()).then(data => {
                 const stats = data.stats || {};
 
-                // Update Total Lamaran
-                if (appliedStatEl) appliedStatEl.textContent = stats.applied || 0;
+                // PEMISAHAN DATA UTAMA SAMA SEPERTI DI DASHBOARD
+                const successCount = stats.success || 0;
+                const appliedCount = stats.applied || 0;
+                const total = stats.total || 1;
 
-                // Update Tingkat Keberhasilan
+                // Update masing-masing Card Stat
+                if (successCountStatEl) successCountStatEl.textContent = successCount;
+                if (appliedStatEl) appliedStatEl.textContent = appliedCount;
+
+                // Hitung Tingkat Keberhasilan (Gabungan success & applied terhadap total keseluruhan)
                 if (successStatEl) {
-                    const success = stats.success || 0 + stats.applied || 0;
-                    const total = stats.total || 1;
-                    successStatEl.textContent = Math.round((success / total) * 100) + '%';
+                    const rate = Math.round(((successCount + appliedCount) / total) * 100);
+                    successStatEl.textContent = rate + '%';
                 }
 
-                // --- UPDATE PROGRES HARI INI ---
+                // Progres Batas Harian
                 const dailyLimit = 200;
                 const todayDone = stats.today_count || 0;
                 const progressPct = Math.min((todayDone / dailyLimit) * 100, 100);
 
-                if (todayProgress) {
-                    todayProgress.style.width = progressPct + '%';
-                }
-                if (todayCount) {
-                    todayCount.textContent = todayDone + ' / ' + dailyLimit;
-                }
+                if (todayProgress) todayProgress.style.width = progressPct + '%';
+                if (todayCount) todayCount.textContent = todayDone + ' / ' + dailyLimit;
             }).catch(() => {});
         }
-
-        {{--if (pushBtn) {--}}
-        {{--    pushBtn.addEventListener('click', function(e) {--}}
-        {{--        e.preventDefault();--}}
-        {{--        const providers = getSelectedProviders();--}}
-        {{--        if (providers.length === 0) { alert('Select at least one provider.'); return; }--}}
-        {{--        const form = document.createElement('form');--}}
-        {{--        form.method = 'POST';--}}
-        {{--        form.action = '{{ route("apply.save") }}';--}}
-        {{--        const csrf = document.createElement('input');--}}
-        {{--        csrf.type = 'hidden';--}}
-        {{--        csrf.name = '_token';--}}
-        {{--        csrf.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');--}}
-        {{--        form.appendChild(csrf);--}}
-        {{--        const keyword = keywordInput ? keywordInput.value : '';--}}
-        {{--        const k = document.createElement('input');--}}
-        {{--        k.type = 'hidden';--}}
-        {{--        k.name = 'keyword';--}}
-        {{--        k.value = keyword;--}}
-        {{--        form.appendChild(k);--}}
-        {{--        const batch = document.querySelector('input[name="pageSize"]');--}}
-        {{--        if (batch) {--}}
-        {{--            const b = document.createElement('input');--}}
-        {{--            b.type = 'hidden';--}}
-        {{--            b.name = 'pageSize';--}}
-        {{--            b.value = batch.value;--}}
-        {{--            form.appendChild(b);--}}
-        {{--        }--}}
-        {{--        providers.forEach(p => {--}}
-        {{--            const input = document.createElement('input');--}}
-        {{--            input.type = 'hidden';--}}
-        {{--            input.name = 'providers[]';--}}
-        {{--            input.value = p;--}}
-        {{--            form.appendChild(input);--}}
-        {{--        });--}}
-        {{--        document.body.appendChild(form);--}}
-        {{--        form.submit();--}}
-        {{--    });--}}
-        {{--}--}}
 
         if (saveBtn) {
             saveBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-
                 const providers = getSelectedProviders();
-                if (providers.length === 0) {
-                    alert('Pilih minimal 1 provider.');
-                    return;
-                }
+                if (providers.length === 0) { alert('Pilih minimal 1 provider.'); return; }
 
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '{{ route("apply.save") }}';
 
-                // CSRF Token
                 const csrf = document.createElement('input');
                 csrf.type = 'hidden';
                 csrf.name = '_token';
                 csrf.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 form.appendChild(csrf);
 
-                // apply_configuration[keyword]
                 const keyword = keywordInput ? keywordInput.value : '';
                 const k = document.createElement('input');
                 k.type = 'hidden';
-                k.name = 'apply_configuration[keyword]'; // Diubah menjadi bentuk array
+                k.name = 'apply_configuration[keyword]';
                 k.value = keyword;
                 form.appendChild(k);
 
-                // apply_configuration[batch]
                 const batch = document.querySelector('input[name="pageSize"]');
                 if (batch) {
                     const b = document.createElement('input');
                     b.type = 'hidden';
-                    b.name = 'apply_configuration[batch]'; // Diubah menjadi bentuk array
+                    b.name = 'apply_configuration[batch]';
                     b.value = batch.value;
                     form.appendChild(b);
                 }
 
-                // providers[] (tetap sebagai array terpisah)
                 providers.forEach(p => {
                     const input = document.createElement('input');
                     input.type = 'hidden';

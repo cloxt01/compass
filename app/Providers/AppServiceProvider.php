@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 
+use App\Models\GlintsAccount;
+use App\Models\JobstreetAccount;
+use App\Observers\ProviderAccountObserver;
 use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        GlintsAccount::observe(ProviderAccountObserver::class);
+        JobstreetAccount::observe(ProviderAccountObserver::class);
 
          if (config('app.env') !== 'local') {
             URL::forceScheme('https');

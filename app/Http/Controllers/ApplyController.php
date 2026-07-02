@@ -60,11 +60,12 @@ class ApplyController extends Controller
         $request->validate([
             'apply_configuration' => 'required|array',
             'apply_configuration.keyword' => 'required|string',
-            'apply_configuration.batch' => 'required|integer|min:1|max:25',
+            'apply_configuration.batch' => 'required|integer|min:1',
             'apply_configuration.providers' => 'required|array',
         ]);
 
-        if($request->interval || $request->apply_configuration['interval']){
+
+        if(isset($request->interval) || isset($request->apply_configuration['interval']) || $request->apply_configuration['batch'] > 20){
             return response()->json([
                 'success' => false,
                 'message' => "Gak boleh ya dekk",

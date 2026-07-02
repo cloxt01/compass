@@ -24,27 +24,6 @@ class ConnectionController extends Controller {
         // return response()->json(['status' => 'failed', 'errors' => ['redis' => ['Redis connection failed']]], 500);;
     }
 
-    public function index()
-    {
-        $user = auth()->user();
-
-        return view('connection', [
-            'providers' => [
-                [
-                    'key' => 'glints',
-                    'name' => 'Glints',
-                    'description' => 'Hubungkan akun Glints Anda.',
-                    'connected' => optional($user->glintsAccount)->access_token,
-                ],
-                [
-                    'key' => 'jobstreet',
-                    'name' => 'JobStreet',
-                    'description' => 'Kelola koneksi akun JobStreet.',
-                    'connected' => optional($user->jobstreetAccount)->access_token,
-                ],
-            ]
-        ]);
-    }
 
     public function passwordless_login(Request $request, $provider){
         $request->validate([
@@ -117,16 +96,15 @@ class ConnectionController extends Controller {
 
             $user = auth()->user();
             $account = match($provider) {
-                'jobstreet' => $user->jobstreetAccount(),
-                'glints' => $user->glintsAccount(),
-                // Provider lainn
+                'jobstreet' => $user->jobstreetAccount,
+                'glints' => $user->glintsAccount,
                 default => throw new UnknownProvider($provider)
             };
 
             $account->delete();
             $user->refresh();
-            return redirect()->route('profile');
-            return response()->json(['success' => false, 'message' => 'Account not found'], 404);
+            return redirect()->route('settings');
+//            return response()->json(['success' => false, 'message' => 'Account not found'], 404);
 
         } catch(\UnknownProvider $e){
             return response()->json(['status' => 'failed', 'errors' => ['provider' =>[$e->getMessage()]]], 400);
@@ -154,7 +132,7 @@ class ConnectionController extends Controller {
             );
 
             return response()->json([
-                'redirect' => route('profile')
+                'redirect' => route('settings')
             ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);
@@ -229,7 +207,7 @@ class ConnectionController extends Controller {
 
 
         if($saved){
-            return redirect()->route('profile')->with('success', 'Login berhasil');
+            return redirect()->route('settings')->with('success', 'Login berhasil');
         }
         return back()->with('error', 'Failed to save token');
     }

@@ -19,6 +19,7 @@
         "dotenv": "^17.2.3",
         "ioredis": "^5.9.2",
         "laravel-echo": "^2.3.7",
+        "lucide": "^1.23.0",
         "mysql2": "^3.16.2",
         "puppeteer": "^24.36.1",
         "puppeteer-extra": "^3.3.6",

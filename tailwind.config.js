@@ -13,6 +13,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Geist', ...defaultTheme.fontFamily.sans],
+                mono: ['Geist Mono', ...defaultTheme.fontFamily.mono],
             },
         },
     },

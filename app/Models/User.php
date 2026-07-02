@@ -32,6 +32,7 @@ class User extends Authenticatable
         'access_token',
         'cookie',
         'updated_at',
+        'automation_paused',
     ];
 
     /**
