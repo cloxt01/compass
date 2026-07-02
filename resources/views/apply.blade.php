@@ -400,19 +400,48 @@
         const currentLogLine = document.getElementById('current-log-line');
         const remainingJobs = document.getElementById('remaining-jobs');
         const debugOutput = document.getElementById('debug-output');
+        let lastKnownAutomation = null; // simpan data job terakhir yang diterima
 
         function setProgressStep(step) {
             document.querySelectorAll('.progress-step').forEach(el => el.classList.remove('active'));
+            if (!step) return;
             const target = document.querySelector(`.progress-step[data-step="${step}"]`);
             if (target) target.classList.add('active');
         }
 
+        function resetCurrentAutomation() {
+            if (currentProvider) currentProvider.textContent = '-';
+            if (currentJob) currentJob.textContent = '-';
+            if (currentStage) currentStage.textContent = 'Idle';
+            if (currentProgressBar) currentProgressBar.style.width = '0%';
+            if (remainingJobs) remainingJobs.textContent = 'Estimated remaining jobs: 0';
+            if (currentLogLine) currentLogLine.textContent = 'No active process';
+            setProgressStep(null);
+            lastKnownAutomation = null;
+        }
+
         function setCurrentAutomation(data, queueData) {
-            const status = data?.status || 'idle';
-            const provider = data?.provider || '-';
-            const jobId = data?.job_id ? data.job_id.substring(0, 12) + '...' : '-';
+            // simpan data terbaru kalau ada (dari pusher event)
+            if (data) {
+                lastKnownAutomation = data;
+            }
+
+            const source = data || lastKnownAutomation;
             const pending = queueData?.pending || 0;
             const processing = queueData?.processing || 0;
+
+            // beneran stopped: gak ada antrian & gak ada data yang diketahui -> baru direset
+            if (!source && pending === 0 && processing === 0) {
+                resetCurrentAutomation();
+                return;
+            }
+
+            // masih running/ada antrian: tampilin data terakhir yang diketahui
+            if (!source) return; // masih ada antrian tapi belum ada data job spesifik, biarin apa adanya
+
+            const status = source.status || 'idle';
+            const provider = source.provider || '-';
+            const jobId = source.job_id ? source.job_id.substring(0, 12) + '...' : '-';
             const pct = pending + processing > 0 ? Math.max(8, Math.min(95, Math.round((processing / (pending + processing)) * 100))) : 0;
 
             if (currentProvider) currentProvider.textContent = provider;
@@ -429,14 +458,12 @@
                 load_profile: 'loading_profile',
                 load_userConfig: 'loading_profile',
                 build_payload: 'building_payload',
-                // questionnaire: 'questionnaire',
                 apply: 'applying',
                 success: 'success',
                 applied: 'success'
             };
-            setProgressStep(mapStep[status] || 'searching');
+            setProgressStep(mapStep[status] || null);
         }
-
         function appendDeploymentLog(data) {
             if (!debugOutput) return;
             const info = getStatusInfo(data.status || 'idle');

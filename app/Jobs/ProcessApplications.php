@@ -54,8 +54,11 @@ class ProcessApplications implements ShouldQueue
         try {
             $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
             JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), $result['status']);
-            $this->user->applications()->create([
-                'job_id' => $result['job']['job_id'] ?? $this->job_id,
+            $this->user->applications()->updateOrInsert(
+                [
+                    'job_id' => $result['job']['job_id'] ?? $this->job_id
+                ],
+                [
                 'job_title' => $result['job']['job_title'] ?? 'Unknown',
                 'job_company' => $result['job']['job_company'] ?? 'Unknown',
                 'provider' => $result['provider'] ?? 'Unknown',
