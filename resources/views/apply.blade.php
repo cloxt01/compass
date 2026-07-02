@@ -62,7 +62,7 @@
             </article>
         </section>
 
-        {{-- ANALYTICS SECTIONS (SEKARANG 3 KOLOM: TOTAL, APPLIED, SUCCESS RATE) --}}
+        {{-- ANALYTICS SECTIONS --}}
         <section id="analytics-section" class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <article class="saas-card p-5">
                 <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TOTAL LAMARAN BARU (SUCCESS)</p>
@@ -95,6 +95,7 @@
                     </div>
                 </div>
 
+                {{-- INPUT FIELDS --}}
                 <div class="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
                     <div>
                         <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Kata Kunci</label>
@@ -110,26 +111,46 @@
                     </div>
                 </div>
 
-                <div class="mt-4 flex flex-wrap items-center gap-4">
-                    <label class="inline-flex items-center gap-2 text-sm text-[#fafafa]">
-                        <input type="checkbox" name="providers[]" value="jobstreet" class="provider-checkbox h-4 w-4 rounded border-[#3f3f46] bg-[#0a0a0a] text-blue-600 focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
-                            {{ in_array('jobstreet', $apply_configuration['providers'] ?? []) ? 'checked' : '' }}
-                            {{ !$hasJobstreet ? 'disabled' : '' }}>
-                        JobStreet
-                    </label>
+                {{-- TOGGLES & CHECKBOXES AREA --}}
+                <div class="mt-5 border-t border-[#262626] pt-4 flex flex-wrap items-center justify-between gap-4">
+                    {{-- Provider Selection --}}
+                    <div class="flex flex-wrap items-center gap-6">
+                        <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-[#fafafa] select-none group">
+                            {{-- Ditambahkan kembali class: provider-checkbox --}}
+                            <input type="checkbox" name="providers[]" value="jobstreet" class="provider-checkbox h-4 w-4 rounded border-[#262626] bg-[#0a0a0a] text-blue-600 focus:ring-0 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-40 transition"
+                                {{ in_array('jobstreet', $apply_configuration['providers'] ?? []) ? 'checked' : '' }}
+                                {{ !$hasJobstreet ? 'disabled' : '' }}>
+                            <span class="group-hover:text-[#fafafa] transition-colors {{ !$hasJobstreet ? 'opacity-40' : '' }}">JobStreet</span>
+                        </label>
 
-                    <label class="inline-flex items-center gap-2 text-sm text-[#fafafa]">
-                        <input type="checkbox" name="providers[]" value="glints" class="provider-checkbox h-4 w-4 rounded border-[#3f3f46] bg-[#0a0a0a] text-blue-600 focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
-                            {{ in_array('glints', $apply_configuration['providers'] ?? []) ? 'checked' : '' }}
-                            {{ !$hasGlints ? 'disabled' : '' }}>
-                        Glints
-                    </label>
+                        <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-[#fafafa] select-none group">
+                            {{-- Ditambahkan kembali class: provider-checkbox --}}
+                            <input type="checkbox" name="providers[]" value="glints" class="provider-checkbox h-4 w-4 rounded border-[#262626] bg-[#0a0a0a] text-blue-600 focus:ring-0 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-40 transition"
+                                {{ in_array('glints', $apply_configuration['providers'] ?? []) ? 'checked' : '' }}
+                                {{ !$hasGlints ? 'disabled' : '' }}>
+                            <span class="group-hover:text-[#fafafa] transition-colors {{ !$hasGlints ? 'opacity-40' : '' }}">Glints</span>
+                        </label>
 
-                    @if($isPaused)
-                        <span class="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400">Paused</span>
-                    @endif
+                        @if($isPaused)
+                            <span class="rounded-md border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">Paused</span>
+                        @endif
+                    </div>
+
+                    {{-- GLOBAL TOGGLE AUTO ANSWER --}}
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-[#a1a1aa]">Auto Answer <i>(AI Powered)</i></span>
+                        <div class="flex items-center gap-2">
+                            <label class="relative inline-flex cursor-not-allowed items-center opacity-40">
+                                <input type="checkbox" disabled class="peer sr-only">
+                                <div class="w-9 h-5 rounded-full bg-[#1e1e1e] border border-[#333]"></div>
+                                <div class="absolute left-[4px] top-[4px] h-3 w-3 rounded-full bg-[#71717a]"></div>
+                            </label>
+                            <span class="text-xs font-medium text-[#71717a] uppercase tracking-wider">(Belum tersedia)</span>
+                        </div>
+                    </div>
                 </div>
 
+                {{-- MONITORING PLACES --}}
                 <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
                     <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
                         <p class="text-xs text-[#a1a1aa]">Current provider</p>
@@ -303,13 +324,13 @@
                     @if($hasGlints)
                         <form action="{{ route('connection.save-config', ['provider' => 'glints']) }}" method="POST" class="space-y-4">
                             @csrf
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs text-[#a1a1aa]">Auto-answer</span>
-                                <div class="pointer-events-none flex items-center gap-2 opacity-40">
-                                    <span class="h-5 w-9 rounded-full bg-[#27272a]"></span>
-                                    <span class="text-xs text-[#a1a1aa]">Off</span>
-                                </div>
-                            </div>
+{{--                            <div class="flex items-center justify-between">--}}
+{{--                                <span class="text-xs text-[#a1a1aa]">Auto-answer</span>--}}
+{{--                                <div class="pointer-events-none flex items-center gap-2 opacity-40">--}}
+{{--                                    <span class="h-5 w-9 rounded-full bg-[#27272a]"></span>--}}
+{{--                                    <span class="text-xs text-[#a1a1aa]">Off</span>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
                             <div>
                                 <label class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Locations</label>
                                 <div id="location-tags-container" class="mt-2 flex flex-wrap gap-1.5 empty:hidden"></div>
@@ -359,12 +380,7 @@
         .badge-load_profile,.badge-load_userConfig { color:#f59e0b; background:rgba(245,158,11,.16); border-color:rgba(245,158,11,.28); }
         .badge-inspect { color:#f59e0b; background:rgba(245,158,11,.16); border-color:rgba(245,158,11,.28); }
         .badge-success { color:#22c55e; background:rgba(34,197,94,.16); border-color:rgba(34,197,94,.28); }
-        /* Badge Applied Khusus: Ungu/Violet */
-        .badge-screening {
-            color: #fbbf24;
-            background: rgba(245, 158, 11, 0.16);
-            border-color: rgba(245, 158, 11, 0.28);
-        }
+        .badge-screening { color: #fbbf24; background: rgba(245, 158, 11, 0.16); border-color: rgba(245, 158, 11, 0.28); }
         .badge-applied { color:#a78bfa; background:rgba(167,139,250,.16); border-color:rgba(167,139,250,.28); }
         .badge-error { color:#ef4444; background:rgba(239,68,68,.16); border-color:rgba(239,68,68,.28); }
         .badge-default { color:#a1a1aa; background:rgba(161,161,170,.16); border-color:rgba(161,161,170,.28); }
@@ -415,7 +431,6 @@
         const queuedEl = document.getElementById('stat-queued');
         const runningStatEl = document.getElementById('stat-running');
 
-        // Element stat baru hasil pemisahan
         const successCountStatEl = document.getElementById('stat-success-count');
         const appliedStatEl = document.getElementById('stat-applied');
         const successStatEl = document.getElementById('stat-success');
@@ -450,10 +465,7 @@
         }
 
         function setCurrentAutomation(data, queueData) {
-            if (data) {
-                lastKnownAutomation = data;
-            }
-
+            if (data) { lastKnownAutomation = data; }
             const source = data || lastKnownAutomation;
             const pending = queueData?.pending || 0;
             const processing = queueData?.processing || 0;
@@ -462,7 +474,6 @@
                 resetCurrentAutomation();
                 return;
             }
-
             if (!source) return;
 
             const status = source.status || 'idle';
@@ -571,8 +582,6 @@
             if (activityTimeline.children.length > 50) activityTimeline.removeChild(activityTimeline.lastChild);
             setCurrentAutomation(data, null);
             appendDeploymentLog(data);
-
-            // Ketika ada real-time event masuk dari Pusher, refresh statistik counter secara instan
             fetchApplicationStats();
         }
 
@@ -606,23 +615,17 @@
                 credentials: 'same-origin'
             }).then(r => r.json()).then(data => {
                 const stats = data.stats || {};
-
-                // PEMISAHAN DATA UTAMA SAMA SEPERTI DI DASHBOARD
                 const successCount = stats.success || 0;
                 const appliedCount = stats.applied || 0;
                 const total = stats.total || 1;
 
-                // Update masing-masing Card Stat
                 if (successCountStatEl) successCountStatEl.textContent = successCount;
                 if (appliedStatEl) appliedStatEl.textContent = appliedCount;
-
-                // Hitung Tingkat Keberhasilan (Gabungan success & applied terhadap total keseluruhan)
                 if (successStatEl) {
                     const rate = Math.round(((successCount + appliedCount) / total) * 100);
                     successStatEl.textContent = rate + '%';
                 }
 
-                // Progres Batas Harian
                 const dailyLimit = 200;
                 const todayDone = stats.today_count || 0;
                 const progressPct = Math.min((todayDone / dailyLimit) * 100, 100);

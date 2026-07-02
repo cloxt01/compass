@@ -4,7 +4,7 @@
        class="fixed inset-y-0 left-0 z-50 w-[240px] -translate-x-full border-r border-[#262626] bg-[#0a0a0a] transition-transform duration-300 md:translate-x-0">
 
     <div class="flex h-16 items-center gap-3 border-b border-[#262626] px-5">
-        <img src="{{ asset(config('ui.brand.logo')) }}" alt="{{ config('ui.brand.name') }}" class="h-7 w-7 rounded-md border border-[#333]" />
+        <img src="{{ asset(config('ui.brand.logo')) }}" alt="{{ config('ui.brand.name') }}" class="h-7 w-7 rounded-md" />
         <div>
             <p class="text-sm font-semibold text-[#fafafa]">{{ config('ui.brand.name') }}</p>
             <p class="text-xs text-[#a1a1aa]">Enterprise Automation</p>
@@ -66,11 +66,11 @@
         </a>
     </nav>
 
-    <div class="absolute inset-x-0 bottom-0 border-t border-[#262626] bg-[#0a0a0a] p-4 flex items-center gap-3">
+    <div class="absolute inset-x-0 bottom-0  bg-[#0a0a0a] p-4 flex items-center gap-3">
         <img
             src="{{ asset('assets/img/goat/messi.png') }}"
             alt="Avatar"
-            class="w-9 h-9 rounded-md object-cover border border-[#333]"
+            class="w-9 h-9 rounded-md object-cover"
         >
 
         <div class="min-w-0 flex-1">
