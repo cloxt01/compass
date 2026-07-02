@@ -8,7 +8,6 @@ use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
@@ -35,5 +34,6 @@ class AppServiceProvider extends ServiceProvider
             $jobId = $event->job->getJobId();
             DB::table('apply_queue')->where('job_id', $jobId)->delete();
         });
+
     }
 }

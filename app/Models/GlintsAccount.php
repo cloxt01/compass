@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class GlintsAccount extends Model implements PlatformAccount
 {
+    protected $table = 'glints_accounts';
     protected $fillable = [
         'user_id',
         'access_token',

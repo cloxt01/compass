@@ -8,6 +8,7 @@ use App\Infrastructure\Contracts\PlatformAccount;
 
 class JobstreetAccount extends Model implements PlatformAccount
 {
+    protected $table = 'jobstreet_accounts';
      protected $fillable = [
         'user_id',
         'access_token',
