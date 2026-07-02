@@ -9,30 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redis;
 
-Route::get('/debug/test', function() {
-    return response()->json([
-        'ok' => true,
-        'session_id' => session()->getId(),
-        'user' => auth()->user()?->id,
-    ]);
-});
-
-Route::get('/debug/routes', function() {
-    return collect(\Route::getRoutes())->map(function($route) {
-        return [
-            'uri' => $route->uri(),
-            'name' => $route->getName(),
-            'methods' => $route->methods(),
-            'middleware' => $route->middleware(),
-        ];
-    });
-});
-Route::get('/debug/redis', function () {
-    Redis::select(1);
-    Redis::set('test', 'ok');
-    Redis::rpush('queue:test', 'item1');
-    $list = Redis::lrange('queue:test', 0, -1);
-    return $list;
+Route::get('/', function () {
+    return view('landing');
 });
 
 Route::middleware('auth')->group(function() {

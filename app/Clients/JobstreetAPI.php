@@ -17,6 +17,7 @@ class JobstreetAPI extends api
     protected ?string $token;
     protected ?string $cookie;
     protected array $headers;
+    protected string $userAgent;
 
     public function __construct(
         ?string $token = null,
@@ -45,6 +46,7 @@ class JobstreetAPI extends api
         array $options = []
     ): array {
         try {
+
             $options = array_merge([
                 'headers' => false,
                 'cookies' => false,
@@ -55,6 +57,9 @@ class JobstreetAPI extends api
                 "variables" => QueryHelper::buildGraphQLVariables($this, $operation, $variables) ?? new \stdClass(),
                 "query" => QueryHelper::loadGraphQLQuery($this, $operation)
             ];
+            if($operation === 'jobDetailsWithPersonalised'){
+                Log::info(json_encode($payload));
+            }
             $response = $this->post($this->host . '/graphql', $payload);
 
 

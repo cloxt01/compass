@@ -70,6 +70,7 @@ class JobstreetJob extends JobstreetAdapter
     public function details(string $jobId): array
     {
         $details = $this->client->graphql('jobDetailsWithPersonalised', ['jobId' => $jobId])['data']['data']['jobDetails'] ?? [];
+
         $process = $this->client->graphql('GetJobApplicationProcess', ['jobId' => $jobId])['data']['data']['jobApplicationProcess'] ?? [];
 
         $resp = array_merge(["details" => $details], ["process" => $process]);
