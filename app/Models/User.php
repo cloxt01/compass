@@ -24,6 +24,8 @@ class User extends Authenticatable
         'job_id',
         'job_title',
         'job_company',
+        'apply_configuration',
+        'last_apply_configuration',
         'status',
         'provider',
     ];
@@ -46,6 +48,8 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'apply_configuration' => 'array',
+            'last_apply_configuration' => 'array',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
@@ -58,14 +62,6 @@ class User extends Authenticatable
     public function glintsAccount()
     {
         return $this->hasOne(GlintsAccount::class, 'user_id');
-    }
-    public function jobstreetApplication()
-    {
-        return $this->hasMany(JobstreetApplication::class, 'user_id');
-    }
-    public function glintsApplication()
-    {
-        return $this->hasMany(GlintsApplication::class, 'user_id');
     }
     public function applications()
     {

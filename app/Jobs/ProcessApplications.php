@@ -16,6 +16,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 
@@ -40,10 +41,13 @@ class ProcessApplications implements ShouldQueue
 
     public function handle()
     {
+
+
         if($this->user->automation_paused){
             Log::warning('Automation paused');
             return;
         }
+
         JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), 'start');
         Log::info("Memproses Lamaran ID: " . $this->job_id . " - User ID : " . $this->user->id . " - Platform : " . get_class($this->adapter));
 

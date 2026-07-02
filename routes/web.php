@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\PlatformController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Redis;
@@ -34,75 +35,8 @@ Route::get('/debug/redis', function () {
 });
 
 Route::middleware('auth')->group(function() {
-    Route::get('/user/queue/status', function () {
-        $userId = auth()->id();
-
-        $pending = DB::table('jobs')
-            ->where('user_id', $userId)
-            ->whereNull('reserved_at')
-            ->count();
-
-        $processing = DB::table('jobs')
-            ->where('user_id', $userId)
-            ->whereNotNull('reserved_at')
-            ->count();
-
-        $failed = DB::table('failed_jobs')
-            ->where('user_id', $userId)
-            ->count();
-
-        $recentJobs = DB::table('jobs')
-            ->where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get(['id', 'attempts', 'reserved_at', 'created_at']);
-
-        return response()->json([
-            'pending' => $pending,
-            'processing' => $processing,
-            'failed' => $failed,
-            'recent' => $recentJobs,
-            'updated_at' => now()->toDateTimeString()
-        ]);
-    })->name('user.queue.status');
-    Route::get('/user/jobs/status', function () {
-        $userId = auth()->id();
-
-        // 1. Ambil Statistik Gabungan (Glints + JobStreet) menggunakan Subquery Union
-        $stats = DB::table(DB::raw("(
-        SELECT status, user_id FROM glints_applications
-        UNION ALL
-        SELECT status, user_id FROM jobstreet_applications
-    ) as combined_apps"))
-            ->where('user_id', $userId)
-            ->selectRaw("
-            COUNT(*) as total,
-            COALESCE(SUM(status = 'success'), 0) as success,
-            COALESCE(SUM(status = 'applied'), 0) as applied,
-            COALESCE(SUM(status = 'linkout'), 0) as linkout,
-            COALESCE(SUM(status = 'questionnaire'), 0) as questionnaire
-        ")
-            ->first();
-
-        $glints = DB::table('glints_applications')
-            ->where('user_id', $userId)
-            ->select('job_id', 'status', 'updated_at', DB::raw("'glints' as provider"));
-
-        $jobstreet = DB::table('jobstreet_applications')
-            ->where('user_id', $userId)
-            ->select('job_id', 'status', 'updated_at', DB::raw("'jobstreet' as provider"));
-
-        $recent = $glints->unionAll($jobstreet)
-            ->orderBy('updated_at', 'desc')
-            ->limit(10)
-            ->get();
-
-        return response()->json([
-            'stats' => $stats,
-            'recent' => $recent,
-            'updated_at' => now()->toDateTimeString(),
-        ]);
-    })->name('user.jobs.status');
+    Route::get('/user/queue/status', [UserController::class, 'queue_status'])->name('user.queue.status');
+    Route::get('/user/applications', [UserController::class, 'application_stats'])->name('user.applications');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/apply', [ApplyController::class, 'index'])->name('apply');

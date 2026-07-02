@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PushLog;
 use App\Services\Adapters\GlintsAdapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -51,109 +52,137 @@ class ApplyController extends Controller
         return view('apply', compact('user', 'adapters', 'accounts'));
     }
 
+    public function save(Request $request)
+    {
+        $request->validate([
+            'apply_configuration' => 'required|array',
+            'apply_configuration.keyword' => 'required|string',
+            'apply_configuration.batch' => 'required|integer|min:1|max:25',
+            'apply_configuration.providers' => 'required|array',
+        ]);
+        $user = auth()->user();
+
+        $user->apply_configuration = $request->input('apply_configuration');
+        return response()->json($user->save() ? [
+                'success' => true,
+                'message' => 'Configuration saved successfully.',
+            ] : [
+                'success' => false,
+                'message' => 'Failed to save configuration.',
+            ]
+        );
+    }
+
     /**
      * Push (Start) new automation jobs
      */
-    public function push(Request $request)
-    {
-        Log::info('apply@push DIPANGGIL');
-
-        try {
-            $request->validate([
-                'providers' => 'required|array|min:1',
-                'providers.*' => 'in:jobstreet,glints',
-                'keyword' => 'required|string',
-                'pageSize' => 'required|integer|min:1|max:40',
-            ]);
-
-            $this->user = auth()->user();
-
-            // ✅ CEK PAUSE PER USER (bukan per provider)
-            if ($this->user->automation_paused) {
-                return redirect()->back()->withErrors([
-                    'msg' => 'Automation is paused. Please resume first.'
-                ]);
-            }
-
-            foreach ($request->input('providers') as $provider) {
-                // 1. Ambil akun
-                $this->account[$provider] = match ($provider) {
-                    'jobstreet' => $this->user->jobstreetAccount,
-                    'glints'    => $this->user->glintsAccount,
-                    default     => throw new UnknownProvider($provider)
-                };
-
-                if (!$this->account[$provider]) {
-                    throw new AccountNotFound("$provider account not found");
-                }
-
-                // 2. Inisialisasi klien
-                $this->client[$provider] = match ($provider) {
-                    'jobstreet' => new JobstreetAPI($this->user->jobstreetAccount?->access_token),
-                    'glints'    => new GlintsAPI($this->user->glintsAccount->access_token, $this->user->glintsAccount->cookie),
-                };
-
-                // 3. Inisialisasi adapter
-                $this->adapter[$provider] = match ($provider) {
-                    'jobstreet' => new JobstreetAdapter($this->client[$provider]),
-                    'glints'    => new GlintsAdapter($this->client[$provider]),
-                };
-
-                // 4. Cek status koneksi
-                if ($this->account[$provider]->status === 'reauth_required') {
-                    return redirect()
-                        ->route("platform.disconnect", ['provider' => $provider])
-                        ->withErrors(['msg' => "Koneksi ke $provider terputus, silakan hubungkan ulang."]);
-                }
-
-                // 5. Bangun parameter pencarian
-                $params = match ($provider) {
-                    'jobstreet' => [
-                        'keyword'  => $request->input('keyword'),
-                        'location' => (string) $this->account[$provider]->getConfig('location', ''),
-                        'pageSize' => (int) $request->input('pageSize'),
-                    ],
-                    'glints' => [
-                        'SearchTerm'   => (string) $request->input('keyword'),
-                        'LocationIds'  => (array) $this->account[$provider]->getConfig('location_ids', []),
-                        'pageSize'     => (int) $request->input('pageSize'),
-                    ]
-                };
-
-                // 6. Cari jobs
-                $jobs = $this->adapter[$provider]->job()->search($params);
-                $data = match ($provider) {
-                    'jobstreet' => $jobs['data']['data'] ?? [],
-                    'glints'    => $jobs['data']['searchJobsV3']['jobsInPage'] ?? [],
-                };
-
-                Log::info("Found " . count($data) . " jobs on $provider for user " . $this->user->id);
-
-                // 7. Dispatch tiap job ke queue
-                foreach ($data as $job) {
-                    $queue = new ProcessApplications(
-                        $this->user,
-                        $this->adapter[$provider],
-                        $this->account[$provider],
-                        $job['id']
-                    );
-                    $queueId = Queue::connection('database')->push($queue);
-                    DB::table('jobs')
-                        ->where('id', $queueId)
-                        ->update(['user_id' => $queue->user->id]);
-                }
-            }
-
-            return redirect()->back()->with('success', 'Berhasil memasukkan ke antrian.');
-        } catch (AccountNotFound $e) {
-            return response()->json(['status' => 'failed', 'errors' => ['account' => [$e->getMessage()]]], 404);
-        } catch (UnknownProvider $e) {
-            return response()->json(['status' => 'failed', 'errors' => ['provider' => [$e->getMessage()]]], 400);
-        } catch (\Exception $e) {
-            Log::error('apply@push error: ' . $e->getMessage());
-            return response()->json(['status' => 'failed', 'errors' => ['general' => [$e->getMessage()]]], 500);
-        }
-    }
+//    public function push(Request $request)
+//    {
+//        $this->user = auth()->user();
+//
+//        Log::info('apply@push DIPANGGIL');
+//
+//        try {
+//            $request->validate([
+//                'providers' => 'required|array|min:1',
+//                'providers.*' => 'in:jobstreet,glints',
+//                'keyword' => 'required|string',
+//                'pageSize' => 'required|integer|min:1|max:40',
+//            ]);
+//            PushLog::create([
+//                'user_id' => $this->user->id,
+//                'keyword' => $request->keyword,
+//                'batch' => $request->pageSize,
+//                'glints' => in_array('glints', $request->providers) ? true : false,
+//                'jobstreet' => in_array('jobstreet', $request->providers) ? true : false
+//            ]);
+//
+//
+//            if ($this->user->automation_paused) {
+//                return redirect()->back()->withErrors([
+//                    'msg' => 'Automation is paused. Please resume first.'
+//                ]);
+//            }
+//
+//            foreach ($request->input('providers') as $provider) {
+//                // 1. Ambil akun
+//                $this->account[$provider] = match ($provider) {
+//                    'jobstreet' => $this->user->jobstreetAccount,
+//                    'glints'    => $this->user->glintsAccount,
+//                    default     => throw new UnknownProvider($provider)
+//                };
+//
+//                if (!$this->account[$provider]) {
+//                    throw new AccountNotFound("$provider account not found");
+//                }
+//
+//                // 2. Inisialisasi klien
+//                $this->client[$provider] = match ($provider) {
+//                    'jobstreet' => new JobstreetAPI($this->user->jobstreetAccount?->access_token),
+//                    'glints'    => new GlintsAPI($this->user->glintsAccount->access_token, $this->user->glintsAccount->cookie),
+//                };
+//
+//                // 3. Inisialisasi adapter
+//                $this->adapter[$provider] = match ($provider) {
+//                    'jobstreet' => new JobstreetAdapter($this->client[$provider]),
+//                    'glints'    => new GlintsAdapter($this->client[$provider]),
+//                };
+//
+//                // 4. Cek status koneksi
+//                if ($this->account[$provider]->status === 'reauth_required') {
+//                    return redirect()
+//                        ->route("platform.disconnect", ['provider' => $provider])
+//                        ->withErrors(['msg' => "Koneksi ke $provider terputus, silakan hubungkan ulang."]);
+//                }
+//
+//                // 5. Bangun parameter pencarian
+//                $params = match ($provider) {
+//                    'jobstreet' => [
+//                        'keyword'  => $request->input('keyword'),
+//                        'location' => (string) $this->account[$provider]->getConfig('location', ''),
+//                        'pageSize' => (int) $request->input('pageSize'),
+//                    ],
+//                    'glints' => [
+//                        'SearchTerm'   => (string) $request->input('keyword'),
+//                        'LocationIds'  => (array) $this->account[$provider]->getConfig('location_ids', []),
+//                        'pageSize'     => (int) $request->input('pageSize'),
+//                    ]
+//                };
+//
+//                // 6. Cari jobs
+//                $jobs = $this->adapter[$provider]->job()->search($params);
+//                $data = match ($provider) {
+//                    'jobstreet' => $jobs['data']['data'] ?? [],
+//                    'glints'    => $jobs['data']['searchJobsV3']['jobsInPage'] ?? [],
+//                };
+//
+//                Log::info("Found " . count($data) . " jobs on $provider for user " . $this->user->id);
+//
+//                // 7. Dispatch tiap job ke queue
+//                foreach ($data as $job) {
+//                    $queue = new ProcessApplications(
+//                        $this->user,
+//                        $this->adapter[$provider],
+//                        $this->account[$provider],
+//                        $job['id']
+//                    );
+//                    $queueId = Queue::connection('database')->push($queue);
+//                    DB::table('jobs')
+//                        ->where('id', $queueId)
+//                        ->update(['user_id' => $queue->user->id]);
+//                }
+//            }
+//
+//            return redirect()->back()->with('success', 'Berhasil memasukkan ke antrian.');
+//        } catch (AccountNotFound $e) {
+//            return response()->json(['status' => 'failed', 'errors' => ['account' => [$e->getMessage()]]], 404);
+//        } catch (UnknownProvider $e) {
+//            return response()->json(['status' => 'failed', 'errors' => ['provider' => [$e->getMessage()]]], 400);
+//        } catch (\Exception $e) {
+//            Log::error('apply@push error: ' . $e->getMessage());
+//            return response()->json(['status' => 'failed', 'errors' => ['general' => [$e->getMessage()]]], 500);
+//        }
+//    }
 
     /**
      * Stop automation for current user (semua provider)

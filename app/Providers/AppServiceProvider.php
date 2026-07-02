@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 
+use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
@@ -28,5 +30,10 @@ class AppServiceProvider extends ServiceProvider
          if (config('app.env') !== 'local') {
             URL::forceScheme('https');
         }
+
+        Queue::after(function (JobProcessed $event) {
+            $jobId = $event->job->getJobId();
+            DB::table('apply_queue')->where('job_id', $jobId)->delete();
+        });
     }
 }

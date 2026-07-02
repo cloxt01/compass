@@ -4,6 +4,7 @@
 @section('titleNavbar', 'Apply')
 
 @php
+    $apply_configuration = auth()->user()->apply_configuration ?? [];
     $jobstreet_profile = null;
     $glints_profile = null;
 
@@ -52,6 +53,16 @@
                 </div>
             </article>
         </section>
+        <section id="analytics-section" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <article class="saas-card p-5">
+                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TOTAL LAMARAN</p>
+                <p id="stat-applied" class="mt-3 text-3xl font-semibold text-[#fafafa]">0</p>
+            </article>
+            <article class="saas-card p-5">
+                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TINGKAT KEBERHASILAN</p>
+                <p id="stat-success" class="mt-3 text-3xl font-semibold text-emerald-400">0%</p>
+            </article>
+        </section>
 
         <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
             <div class="saas-card p-6 xl:col-span-2">
@@ -61,14 +72,15 @@
                         <p class="mt-1 text-sm text-[#a1a1aa]">Atur konfigurasi lamaran anda</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <button id="push-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-black transition hover:bg-white {{ $isPaused ? 'pointer-events-none opacity-50' : '' }}">Push</button>
+{{--                        <button id="push-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-black transition hover:bg-white {{ $isPaused ? 'pointer-events-none opacity-50' : '' }}">Push</button>--}}
+                        <button id="save-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-black transition hover:bg-white">Simpan</button>
 
                         @if ($isPaused)
-                            <button id="resume-btn" class="h-8 cursor-pointer rounded-md bg-[#121212] px-5 text-sm font-semibold text-white transition hover:bg-[#181818]">
+                            <button id="resume-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white">
                                 Resume
                             </button>
                         @else
-                            <button id="stop-btn" class="h-8 cursor-pointer rounded-md bg-[#121212] px-5 text-sm font-semibold text-white transition hover:bg-[#181818]">
+                            <button id="stop-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white">
                                 Stop
                             </button>
                         @endif
@@ -78,23 +90,29 @@
                 <div class="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
                     <div>
                         <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Kata Kunci</label>
-                        <input type="text" name="keyword" id="keyword-input" required placeholder="Web Developer" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]" />
+                        <input type="text" name="keyword" id="keyword-input" required value="{{ $apply_configuration['keyword'] ?? '' }}" placeholder="Web Developer" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]" />
                     </div>
                     <div>
                         <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Batch</label>
-                        <input type="number" name="pageSize" value="5" min="1" max="40" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa]" />
+                        <input type="number" name="pageSize" required value="{{ $apply_configuration['batch'] ?? '1' }}" min="1" max="40" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa]" />
                     </div>
                 </div>
 
                 <div class="mt-4 flex flex-wrap items-center gap-4">
                     <label class="inline-flex items-center gap-2 text-sm text-[#fafafa]">
-                        <input type="checkbox" name="providers[]" value="jobstreet" class="provider-checkbox h-4 w-4 rounded border-[#3f3f46] bg-[#0a0a0a] text-blue-600 focus:ring-0" {{ $hasJobstreet ? 'checked' : 'disabled' }}>
+                        <input type="checkbox" name="providers[]" value="jobstreet" class="provider-checkbox h-4 w-4 rounded border-[#3f3f46] bg-[#0a0a0a] text-blue-600 focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
+                            {{ in_array('jobstreet', $apply_configuration['providers'] ?? []) ? 'checked' : '' }}
+                            {{ !$hasJobstreet ? 'disabled' : '' }}>
                         JobStreet
                     </label>
+
                     <label class="inline-flex items-center gap-2 text-sm text-[#fafafa]">
-                        <input type="checkbox" name="providers[]" value="glints" class="provider-checkbox h-4 w-4 rounded border-[#3f3f46] bg-[#0a0a0a] text-blue-600 focus:ring-0" {{ $hasGlints ? 'checked' : 'disabled' }}>
+                        <input type="checkbox" name="providers[]" value="glints" class="provider-checkbox h-4 w-4 rounded border-[#3f3f46] bg-[#0a0a0a] text-blue-600 focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
+                            {{ in_array('glints', $apply_configuration['providers'] ?? []) ? 'checked' : '' }}
+                            {{ !$hasGlints ? 'disabled' : '' }}>
                         Glints
                     </label>
+
                     @if($isPaused)
                         <span class="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400">Paused</span>
                     @endif
@@ -175,16 +193,6 @@
             <pre id="debug-output" class="custom-scroll mt-4 max-h-72 overflow-y-auto rounded-xl border border-[#262626] bg-[#0a0a0a] p-4 font-mono text-xs text-[#fafafa]">[00:00:00] [IDLE] [SYSTEM] Menunggu event masuk...</pre>
         </section>
 
-        <section id="analytics-section" class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TOTAL LAMARAN</p>
-                <p id="stat-applied" class="mt-3 text-3xl font-semibold text-[#fafafa]">0</p>
-            </article>
-            <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TINGKAT KEBERHASILAN</p>
-                <p id="stat-success" class="mt-3 text-3xl font-semibold text-emerald-400">0%</p>
-            </article>
-        </section>
 
         <section id="settings-section" class="space-y-4">
             <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">Providers</h2>
@@ -372,7 +380,8 @@
         const statusDot = document.getElementById('status-dot');
         const statusDotPing = document.getElementById('status-dot-ping');
         const statusLabelEl = document.getElementById('status-label');
-        const pushBtn = document.getElementById('push-btn');
+        // const pushBtn = document.getElementById('push-btn');
+        const saveBtn = document.getElementById('save-btn')
         const stopBtn = document.getElementById('stop-btn');
         const resumeBtn = document.getElementById('resume-btn');
         const runningList = document.getElementById('running-jobs-list');
@@ -533,55 +542,125 @@
             });
         }
 
+
         function fetchApplicationStats() {
-            fetch('{{ route("user.jobs.status") }}', {
+            fetch('{{ route("user.applications") }}', {
                 headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 credentials: 'same-origin'
             }).then(r => r.json()).then(data => {
                 const stats = data.stats || {};
+
+                // Update Total Lamaran
                 if (appliedStatEl) appliedStatEl.textContent = stats.applied || 0;
+
+                // Update Tingkat Keberhasilan
                 if (successStatEl) {
                     const success = stats.success || 0;
                     const total = stats.total || 1;
                     successStatEl.textContent = Math.round((success / total) * 100) + '%';
                 }
+
+                // --- UPDATE PROGRES HARI INI ---
+                const dailyLimit = 200;
+                const todayDone = stats.today_count || 0;
+                const progressPct = Math.min((todayDone / dailyLimit) * 100, 100);
+
+                if (todayProgress) {
+                    todayProgress.style.width = progressPct + '%';
+                }
+                if (todayCount) {
+                    todayCount.textContent = todayDone + ' / ' + dailyLimit;
+                }
             }).catch(() => {});
         }
 
-        if (pushBtn) {
-            pushBtn.addEventListener('click', function(e) {
+        {{--if (pushBtn) {--}}
+        {{--    pushBtn.addEventListener('click', function(e) {--}}
+        {{--        e.preventDefault();--}}
+        {{--        const providers = getSelectedProviders();--}}
+        {{--        if (providers.length === 0) { alert('Select at least one provider.'); return; }--}}
+        {{--        const form = document.createElement('form');--}}
+        {{--        form.method = 'POST';--}}
+        {{--        form.action = '{{ route("apply.save") }}';--}}
+        {{--        const csrf = document.createElement('input');--}}
+        {{--        csrf.type = 'hidden';--}}
+        {{--        csrf.name = '_token';--}}
+        {{--        csrf.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');--}}
+        {{--        form.appendChild(csrf);--}}
+        {{--        const keyword = keywordInput ? keywordInput.value : '';--}}
+        {{--        const k = document.createElement('input');--}}
+        {{--        k.type = 'hidden';--}}
+        {{--        k.name = 'keyword';--}}
+        {{--        k.value = keyword;--}}
+        {{--        form.appendChild(k);--}}
+        {{--        const batch = document.querySelector('input[name="pageSize"]');--}}
+        {{--        if (batch) {--}}
+        {{--            const b = document.createElement('input');--}}
+        {{--            b.type = 'hidden';--}}
+        {{--            b.name = 'pageSize';--}}
+        {{--            b.value = batch.value;--}}
+        {{--            form.appendChild(b);--}}
+        {{--        }--}}
+        {{--        providers.forEach(p => {--}}
+        {{--            const input = document.createElement('input');--}}
+        {{--            input.type = 'hidden';--}}
+        {{--            input.name = 'providers[]';--}}
+        {{--            input.value = p;--}}
+        {{--            form.appendChild(input);--}}
+        {{--        });--}}
+        {{--        document.body.appendChild(form);--}}
+        {{--        form.submit();--}}
+        {{--    });--}}
+        {{--}--}}
+
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+
                 const providers = getSelectedProviders();
-                if (providers.length === 0) { alert('Select at least one provider.'); return; }
+                if (providers.length === 0) {
+                    alert('Pilih minimal 1 provider.');
+                    return;
+                }
+
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '{{ route("apply.push") }}';
+                form.action = '{{ route("apply.save") }}';
+
+                // CSRF Token
                 const csrf = document.createElement('input');
                 csrf.type = 'hidden';
                 csrf.name = '_token';
                 csrf.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 form.appendChild(csrf);
+
+                // apply_configuration[keyword]
                 const keyword = keywordInput ? keywordInput.value : '';
                 const k = document.createElement('input');
                 k.type = 'hidden';
-                k.name = 'keyword';
+                k.name = 'apply_configuration[keyword]'; // Diubah menjadi bentuk array
                 k.value = keyword;
                 form.appendChild(k);
+
+                // apply_configuration[batch]
                 const batch = document.querySelector('input[name="pageSize"]');
                 if (batch) {
                     const b = document.createElement('input');
                     b.type = 'hidden';
-                    b.name = 'pageSize';
+                    b.name = 'apply_configuration[batch]'; // Diubah menjadi bentuk array
                     b.value = batch.value;
                     form.appendChild(b);
                 }
+
+                // providers[] (tetap sebagai array terpisah)
                 providers.forEach(p => {
                     const input = document.createElement('input');
                     input.type = 'hidden';
-                    input.name = 'providers[]';
+                    input.name = 'apply_configuration[providers][]';
                     input.value = p;
                     form.appendChild(input);
                 });
+
                 document.body.appendChild(form);
                 form.submit();
             });

@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->boolean('automation_paused')->default(false);
+            $table->boolean('automation_paused')->default(true);
             $table->timestamp('email_verified_at')->nullable();
+            $table->json('apply_configuration')->nullable();
+            $table->json('last_apply_configuration')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
