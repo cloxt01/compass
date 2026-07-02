@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\ConnectionController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -40,12 +41,11 @@ Route::middleware('auth')->group(function() {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/apply', [ApplyController::class, 'index'])->name('apply');
-    Route::get('/settings', function(){return view('settings');})->name('settings');
-    Route::prefix('connection')->group(function() {
 
+    Route::prefix('settings')->group(function() {
+        Route::get('/', [SettingsController::class, 'settings'])->name('settings');
     });
     Route::prefix('connection')->group(function() {
-
         Route::get('/connect/jobstreet', fn() => view('connection.jobstreet'))->name('connection.jobstreet');
         Route::get('/connect/glints', fn() => view('connection.glints'))->name('connection.glints');
         Route::get('/{provider}/disconnect', [ConnectionController::class, 'disconnect'])->name('connection.disconnect');

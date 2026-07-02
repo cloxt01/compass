@@ -179,8 +179,12 @@
             const chartData = @json($chartData ?? []);
 
             const labels = [...Array(7)].map((_, i) => {
-                let d = new Date(); d.setDate(d.getDate() - (6 - i));
-                return d.toISOString().split('T')[0];
+                const d = new Date();
+                d.setDate(d.getDate() - (6 - i));
+
+                return d.getFullYear() + '-' +
+                    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(d.getDate()).padStart(2, '0');
             });
 
             // Fungsi murni mencari single status (karena sudah dipisahkan)

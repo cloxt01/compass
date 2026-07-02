@@ -15,6 +15,7 @@ class DashboardController extends Controller
 
     public function index()
     {
+
         $userId = auth()->user()->id;
 
         $appliedJobs = Application::where('user_id', $userId)->latest()->limit(5)->get();

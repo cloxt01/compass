@@ -30,13 +30,6 @@
             <input type="text" placeholder="Search..." class="w-40 bg-transparent text-sm text-[#fafafa] outline-none placeholder:text-[#71717a]">
         </div>
 
-
-
-        <div class="hidden rounded-xl border border-[#262626] bg-[#111111] px-3 py-2 text-right sm:block">
-            <p class="text-sm font-medium text-[#fafafa]">{{ auth()->user()->name }}</p>
-            <p class="text-xs text-[#71717a]">{{ auth()->user()->email }}</p>
-        </div>
-
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="h-10 rounded-xl bg-[#171717] px-4 text-xs font-medium text-[#fafafa] transition hover:bg-[#262626]">

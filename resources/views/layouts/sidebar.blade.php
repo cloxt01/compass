@@ -66,8 +66,17 @@
         </a>
     </nav>
 
-    <div class="absolute inset-x-0 bottom-0 border-t border-[#262626] bg-[#0a0a0a] p-4 text-xs text-[#71717a]">
-        © {{ date('Y') }} {{ config('ui.brand.name') }}
+    <div class="absolute inset-x-0 bottom-0 border-t border-[#262626] bg-[#0a0a0a] p-4 flex items-center gap-3">
+        <img
+            src="{{ asset('assets/img/goat/messi.png') }}"
+            alt="Avatar"
+            class="w-9 h-9 rounded-md object-cover border border-[#333]"
+        >
+
+        <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-[#fafafa] truncate">{{ auth()->user()->name }}</p>
+            <p class="text-xs text-[#71717a] truncate">{{ auth()->user()->email }}</p>
+        </div>
     </div>
 </aside>
 
