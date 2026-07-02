@@ -555,7 +555,7 @@
 
                 // Update Tingkat Keberhasilan
                 if (successStatEl) {
-                    const success = stats.success || 0;
+                    const success = stats.success || 0 + stats.applied || 0;
                     const total = stats.total || 1;
                     successStatEl.textContent = Math.round((success / total) * 100) + '%';
                 }

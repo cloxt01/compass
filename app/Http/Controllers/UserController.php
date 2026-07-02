@@ -9,29 +9,34 @@ use function Pest\Laravel\json;
 
 class UserController
 {
+
     public function application_stats(Request $request)
     {
         $userId = auth()->id();
-        $today = now()->startOfDay(); // Mendapatkan waktu mulai hari ini (00:00:00)
+        $today = now()->startOfDay();
 
         $stats = DB::table('applications')
             ->where('user_id', $userId)
             ->selectRaw('COUNT(*) as total')
+            // Gabungan sukses/applied sebagai "applied"
             ->selectRaw('SUM(CASE WHEN status IN ("success", "applied") THEN 1 ELSE 0 END) as applied')
-            ->selectRaw('SUM(CASE WHEN status = "success" THEN 1 ELSE 0 END) as success')
-            ->selectRaw('SUM(CASE WHEN created_at >= ? AND (status = "success" OR status = "applied") THEN 1 ELSE 0 END) as today_count', [$today])
+            // Kategori lain
+            ->selectRaw('SUM(CASE WHEN status = "questionnaire" THEN 1 ELSE 0 END) as questionnaire')
+            ->selectRaw('SUM(CASE WHEN status = "linkout" THEN 1 ELSE 0 END) as linkout')
+            // Performa hari ini
+            ->selectRaw('SUM(CASE WHEN created_at >= ? AND status IN ("success", "applied") THEN 1 ELSE 0 END) as today_count', [$today])
             ->first();
 
         return response()->json([
             'stats' => [
-                'total'       => (int) $stats->total,
-                'applied'     => (int) $stats->applied,
-                'success'     => (int) $stats->success,
-                'today_count' => (int) $stats->today_count,
+                'total'         => (int) $stats->total,
+                'applied'       => (int) $stats->applied, // Ini yang dipakai di card dasbor
+                'questionnaire' => (int) $stats->questionnaire,
+                'linkout'       => (int) $stats->linkout,
+                'today_count'   => (int) $stats->today_count,
             ]
         ]);
     }
-
     public function queue_status(Request $request)
     {
         $userId = auth()->id();
