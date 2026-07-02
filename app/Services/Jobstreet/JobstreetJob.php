@@ -31,7 +31,7 @@ class JobstreetJob extends JobstreetAdapter
                 'job_location' => $job['node']['job']['location']['label'] ?? 'Unknown',
                 'company' => $job['node']['job']['advertiser']['name'] ?? 'Unknown',
                 'status' => $job['node']['events'][count($job['node']['events']) - 1]['status'] ?? 'Unknown',
-                'platform' => 'Jobstreet',
+                'connection' => 'Jobstreet',
                 'url' => "https://id.jobstreet.com/id/job/" . $job['node']['job']['id']
             ];
         }

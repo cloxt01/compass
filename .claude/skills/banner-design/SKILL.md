@@ -1,7 +1,7 @@
 ---
 name: banner-design
 description: "Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills."
-argument-hint: "[platform] [style] [dimensions]"
+argument-hint: "[connection] [style] [dimensions]"
 license: MIT
 metadata:
   author: claudekit
@@ -69,7 +69,7 @@ For each art direction option:
    ```bash
    .claude/skills/.venv/bin/python3 .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
      --task generate --model gemini-2.5-flash-image \
-     --prompt "<banner visual prompt>" --aspect-ratio <platform-ratio> \
+     --prompt "<banner visual prompt>" --aspect-ratio <connection-ratio> \
      --size 2K --output assets/banners/
    ```
 
@@ -77,7 +77,7 @@ For each art direction option:
    ```bash
    .claude/skills/.venv/bin/python3 .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
      --task generate --model gemini-3-pro-image-preview \
-     --prompt "<creative banner prompt>" --aspect-ratio <platform-ratio> \
+     --prompt "<creative banner prompt>" --aspect-ratio <connection-ratio> \
      --size 4K --output assets/banners/
    ```
 

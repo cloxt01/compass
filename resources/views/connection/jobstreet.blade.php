@@ -27,7 +27,7 @@
 
             {{-- SEND OTP --}}
             <form method="POST"
-                action="{{ route('api.platform.passwordless-login', ['provider' => 'jobstreet']) }}"
+                action="{{ route('api.connection.passwordless-login', ['provider' => 'jobstreet']) }}"
                   id="sendOtpForm"
                   class="space-y-4">
                 @csrf
@@ -59,7 +59,7 @@
 
             {{-- VERIFY OTP --}}
             <form method="POST"
-                  action="{{ route('api.platform.verify-otp', ['provider' => 'jobstreet']) }}"
+                  action="{{ route('api.connection.verify-otp', ['provider' => 'jobstreet']) }}"
                   id="verifyOtpForm"
                   class="space-y-4">
                 @csrf
@@ -149,7 +149,7 @@
         if(typeof data === 'object'){
             data = JSON.stringify(data);
         }
-        
+
         const responseElement = document.getElementById('response');
         responseElement.innerHTML = '<p>' + data + '</p>';
     }
@@ -169,7 +169,7 @@
                 displayStatus(status);
                 if (status === 'LOGIN_SUCCESS'){
                     polling_running = false;
-                    
+
                     console.log(req);
                     const {id, token:payload, provider} = req.data;
                     console.log(id, payload, provider);
@@ -178,10 +178,10 @@
                     displayResponse(saved);
                     if(saved.status === 200 && saved.data.redirect){
                         window.location.href = saved.data.redirect;
-                    } 
+                    }
                 }
-                    
-                    
+
+
             } else {
                 displayErrors(res.errors, errorElement);
             }
@@ -198,13 +198,13 @@
     const errorElement = document.getElementById('errors');
     const verifyEmailInput = document.getElementById('verifyEmailInput');
 
-    
+
 
     const formSendOtp = document.getElementById('sendOtpForm');
     const formVerifyOtp = document.getElementById('verifyOtpForm');
     let polling_running = false
 
-    
+
 
     formSendOtp.addEventListener(
         'submit',
@@ -213,7 +213,7 @@
             event.preventDefault();
 
             const res = await formEvent(event, formSendOtp);
-            switch(res.status){ 
+            switch(res.status){
                 case 422:
                 case 500:
                     const errors = res.errors;
@@ -227,7 +227,7 @@
                     console.log('Unexpected error');
                     break;
             }
-            
+
         }
     )
     formVerifyOtp.addEventListener(
@@ -257,7 +257,7 @@
                     console.log('Unexpected error');
                     break;
             }
-            
+
         }
     )
 </script>

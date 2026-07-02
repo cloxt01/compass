@@ -35,8 +35,17 @@
         <!-- Contoh garis pemisah (Divider) ala Vercel -->
         <div class="mx-3 my-2 border-t border-[#262626]"></div>
 
-        <a href="{{ route('profile') }}"
-           class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ request()->routeIs('profile') ? 'bg-[#1e1e1e] text-[#fafafa]' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
+        <a href="{{ route('connection') }}"
+           class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ request()->routeIs('connection') ? 'bg-[#1e1e1e] text-[#fafafa]' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
+            <i class="fas fa-bolt w-4 text-center text-xs opacity-70"></i>
+            <span>Connection</span>
+        </a>
+
+        <div class="mx-3 my-2 border-t border-[#262626]"></div>
+
+
+        <a href="{{ route('settings') }}"
+           class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ request()->routeIs('settings') ? 'bg-[#1e1e1e] text-[#fafafa]' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
             <i class="fas fa-cog w-4 text-center text-xs opacity-70"></i>
             <span>Settings</span>
         </a>

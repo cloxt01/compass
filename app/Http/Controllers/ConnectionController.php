@@ -17,11 +17,33 @@ use App\Exceptions\UnknownProvider;
 
 
 
-class PlatformController extends Controller {
+class ConnectionController extends Controller {
     function __construct(){
         // $this->redis = Redis::connection();
         // if(!$this->redis->ping())
         // return response()->json(['status' => 'failed', 'errors' => ['redis' => ['Redis connection failed']]], 500);;
+    }
+
+    public function index()
+    {
+        $user = auth()->user();
+
+        return view('connection', [
+            'providers' => [
+                [
+                    'key' => 'glints',
+                    'name' => 'Glints',
+                    'description' => 'Hubungkan akun Glints Anda.',
+                    'connected' => optional($user->glintsAccount)->access_token,
+                ],
+                [
+                    'key' => 'jobstreet',
+                    'name' => 'JobStreet',
+                    'description' => 'Kelola koneksi akun JobStreet.',
+                    'connected' => optional($user->jobstreetAccount)->access_token,
+                ],
+            ]
+        ]);
     }
 
     public function passwordless_login(Request $request, $provider){
@@ -89,7 +111,7 @@ class PlatformController extends Controller {
     }
 
     public function disconnect(Request $request, $provider){
-        Log::info("Disconnecting from external platform: " . $provider);
+        Log::info("Disconnecting from external connection: " . $provider);
 
         try {
 
@@ -126,7 +148,6 @@ class PlatformController extends Controller {
                 return response()->json(['status' => 'failed', 'errors' => ['token' =>['Invalid token format']]], 400);
             }
             $user = User::find(auth()->user()->id);
-
             $add = $user->jobstreetAccount()->updateOrCreate(
                 ['user_id' => $user->id],
                 $token
@@ -175,7 +196,7 @@ class PlatformController extends Controller {
             'email' => 'required|email',
             'password' => 'required|string'
         ]);
-        Log::info("Logining from external platform: " . $provider);
+        Log::info("Logining from external connection: " . $provider);
 
         $user = User::find($request->input('user_id'));
         if(!$user) {
@@ -189,7 +210,7 @@ class PlatformController extends Controller {
         };
 
         $data = $client->getToken($request->input('email'), $request->input('password'));
-        Log::info("Logining from external platform: " . $provider);
+        Log::info("Logining from external connection: " . $provider);
         Log::info("Output from getToken : ".json_encode($data));
         if(!$data) {
             return response()->json(['status' => 'failed', 'errors' => ['token' => ['Email atau password salah']]], 400);

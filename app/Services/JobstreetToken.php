@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 
 class JobstreetToken extends api
 {
-    
+
     protected string $host = 'https://login.seek.com';
 
     public function __construct()
@@ -27,14 +27,14 @@ class JobstreetToken extends api
             'priority' => 'u=1, i',
             'sec-ch-ua' => '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
             'sec-ch-ua-mobile' => '?0',
-            'sec-ch-ua-platform' => '"Windows"',
+            'sec-ch-ua-connection' => '"Windows"',
             'sec-fetch-dest' => 'empty',
             'sec-fetch-mode' => 'cors',
             'sec-fetch-site' => 'same-origin',
             'user-agent' => config('compass.user_agent'),
         ];
     }
-    
+
     public  function verify_otp($email, $code)
     {
         $payload = [
@@ -43,7 +43,7 @@ class JobstreetToken extends api
             "email" => $email,
             "verification_code" => $code,
         ];
-    
+
         $response = $this->post('/passwordless/verify', $payload);
 
         switch($response['http_code']){
@@ -56,7 +56,7 @@ class JobstreetToken extends api
             default:
                 return 'failed';
         }
-        
+
     }
     public function refreshToken(JobstreetAccount $account): array | null
     {
@@ -76,6 +76,6 @@ class JobstreetToken extends api
         }
         return $response['data'];
     }
-     
+
 
 }

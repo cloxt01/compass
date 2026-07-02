@@ -25,7 +25,7 @@ $provider = 'glints';
 
         <div class="p-6 space-y-6">
             <form method="POST"
-                  action="{{ route('api.platform.login', ['provider' => $provider]) }}"
+                  action="{{ route('api.connection.login', ['provider' => $provider]) }}"
                   id="loginForm"
                   class="space-y-4">
                 @csrf

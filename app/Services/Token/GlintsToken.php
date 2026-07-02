@@ -28,7 +28,7 @@ class GlintsToken extends GlintsAPI implements PlatformToken
             'origin' => 'https://glints.com',
             'sec-ch-ua' => '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
             'sec-ch-ua-mobile' => '?0',
-            'sec-ch-ua-platform' => '"Windows"',
+            'sec-ch-ua-connection' => '"Windows"',
             'sec-fetch-dest' => 'empty',
             'sec-fetch-mode' => 'cors',
             'sec-fetch-site' => 'same-origin',

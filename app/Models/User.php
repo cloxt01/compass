@@ -28,6 +28,10 @@ class User extends Authenticatable
         'last_apply_configuration',
         'status',
         'provider',
+        'user_id',
+        'access_token',
+        'cookie',
+        'updated_at',
     ];
 
     /**

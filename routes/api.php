@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApplyController;
-use App\Http\Controllers\PlatformController;
+use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\InternalController;
 use App\Http\Controllers\AuthController;
@@ -31,11 +31,11 @@ Route::middleware(['web','auth','token'])->group(function () {
 // External account connection API
 // --------------------
 Route::post('/{provider}/search-location', [\App\Http\Controllers\Api\Glints\api::class, 'searchLocation'])->name('api.search.location');
-Route::prefix('platform')->group(function() {
-    Route::post('/{provider}/search-location', [PlatformController::class, 'locationInfo'])->name('api.platform.locationInfo');
-    Route::post('/{provider}/login', [PlatformController::class, 'login'])->name('api.platform.login');
-    Route::post('/{provider}/passwordless-login', [PlatformController::class, 'passwordless_login'])->name('api.platform.passwordless-login');
-    Route::post('/{provider}/verify-otp', [PlatformController::class, 'verify_otp'])->name('api.platform.verify-otp');
+Route::prefix('connection')->group(function() {
+    Route::post('/{provider}/search-location', [ConnectionController::class, 'locationInfo'])->name('api.connection.locationInfo');
+    Route::post('/{provider}/login', [ConnectionController::class, 'login'])->name('api.connection.login');
+    Route::post('/{provider}/passwordless-login', [ConnectionController::class, 'passwordless_login'])->name('api.connection.passwordless-login');
+    Route::post('/{provider}/verify-otp', [ConnectionController::class, 'verify_otp'])->name('api.connection.verify-otp');
 });
 
 

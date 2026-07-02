@@ -34,11 +34,17 @@
                     </span>
                     <span id="status-label" class="text-sm font-medium text-[#fafafa]">Running</span>
                 </div>
+                @if(!$isPaused && $next_run)
+                    <p class="mt-2 text-xs text-[#a1a1aa]">
+                        Next run: <span class="font-medium text-[#fafafa]">{{ \Carbon\Carbon::parse($next_run)->format('d M Y, H:i') }}</span>
+                    </p>
+                @endif
             </article>
             <article class="saas-card p-5">
                 <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TOTAL PROSES</p>
                 <p id="stat-running" class="mt-3 text-3xl font-semibold text-[#fafafa]">0</p>
             </article>
+
             <article class="saas-card p-5">
                 <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">ANTRIAN</p>
                 <p id="stat-queued" class="mt-3 text-3xl font-semibold text-[#fafafa]">0</p>
@@ -87,7 +93,7 @@
                     </div>
                 </div>
 
-                <div class="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
+                <div class="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
                     <div>
                         <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Kata Kunci</label>
                         <input type="text" name="keyword" id="keyword-input" required value="{{ $apply_configuration['keyword'] ?? '' }}" placeholder="Web Developer" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]" />
@@ -95,6 +101,10 @@
                     <div>
                         <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Batch</label>
                         <input type="number" name="pageSize" required value="{{ $apply_configuration['batch'] ?? '1' }}" min="1" max="40" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa]" />
+                    </div>
+                    <div>
+                        <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Interval</label>
+                        <input type="number" name="interval" disabled value="10" min="1" max="40" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#888]" />
                     </div>
                 </div>
 
@@ -212,7 +222,7 @@
                 </button>
                 <div class="provider-content hidden border-t border-[#262626] px-5 pb-5 pt-4">
                     @if($hasJobstreet)
-                        <form action="{{ route('platform.save-config', ['provider' => 'jobstreet']) }}" method="POST" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <form action="{{ route('connection.save-config', ['provider' => 'jobstreet']) }}" method="POST" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             @csrf
                             <div class="space-y-3">
                                 <div class="flex items-center justify-between">
@@ -266,7 +276,7 @@
                             </div>
                         </form>
                     @else
-                        <div class="py-4 text-center text-sm text-amber-400">Not connected. <a href="{{ route('profile') }}" class="underline">Connect now</a></div>
+                        <div class="py-4 text-center text-sm text-amber-400">Not connected. <a href="{{ route('connection.jobstreet') }}" class="underline">Connect now</a></div>
                     @endif
                 </div>
             </div>
@@ -286,7 +296,7 @@
                 </button>
                 <div class="provider-content hidden border-t border-[#262626] px-5 pb-5 pt-4">
                     @if($hasGlints)
-                        <form action="{{ route('platform.save-config', ['provider' => 'glints']) }}" method="POST" class="space-y-4">
+                        <form action="{{ route('connection.save-config', ['provider' => 'glints']) }}" method="POST" class="space-y-4">
                             @csrf
                             <div class="flex items-center justify-between">
                                 <span class="text-xs text-[#a1a1aa]">Auto-answer</span>
@@ -309,7 +319,7 @@
                             <button type="submit" class="h-11 rounded-xl bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-500">Save</button>
                         </form>
                     @else
-                        <div class="py-4 text-center text-sm text-amber-400">Not connected. <a href="{{ route('profile') }}" class="underline">Connect now</a></div>
+                        <div class="py-4 text-center text-sm text-amber-400">Not connected. <a href="{{ route('connection.glints') }}" class="underline">Connect now</a></div>
                     @endif
                 </div>
             </div>

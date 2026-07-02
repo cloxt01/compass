@@ -32,7 +32,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'referer: https://glints.com/id/en/login',
     'sec-ch-ua: "Google Chrome";v="149", "Chromium";v="149", "Not)A;Brand";v="24"',
     'sec-ch-ua-mobile: ?0',
-    'sec-ch-ua-platform: "Windows"',
+    'sec-ch-ua-connection: "Windows"',
     'sec-fetch-dest: empty',
     'sec-fetch-mode: cors',
     'sec-fetch-site: same-origin',

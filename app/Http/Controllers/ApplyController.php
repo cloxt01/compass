@@ -49,7 +49,10 @@ class ApplyController extends Controller
             );
         }
 
-        return view('apply', compact('user', 'adapters', 'accounts'));
+        $next_run = DB::table('schedules')
+            ->where('signature', 'app:apply-scheduler')
+            ->value('next_run');
+        return view('apply', compact('user', 'next_run', 'adapters', 'accounts'));
     }
 
     public function save(Request $request)
@@ -60,6 +63,13 @@ class ApplyController extends Controller
             'apply_configuration.batch' => 'required|integer|min:1|max:25',
             'apply_configuration.providers' => 'required|array',
         ]);
+
+        if($request->interval || $request->apply_configuration['interval']){
+            return response()->json([
+                'success' => false,
+                'message' => "Gak boleh ya dekk",
+            ]);
+        }
         $user = auth()->user();
 
         $user->apply_configuration = $request->input('apply_configuration');
@@ -131,7 +141,7 @@ class ApplyController extends Controller
 //                // 4. Cek status koneksi
 //                if ($this->account[$provider]->status === 'reauth_required') {
 //                    return redirect()
-//                        ->route("platform.disconnect", ['provider' => $provider])
+//                        ->route("connection.disconnect", ['provider' => $provider])
 //                        ->withErrors(['msg' => "Koneksi ke $provider terputus, silakan hubungkan ulang."]);
 //                }
 //
@@ -194,17 +204,13 @@ class ApplyController extends Controller
         try {
             $this->user = auth()->user();
 
-            // ✅ Set flag pause = true di USER (bukan per account)
             $this->user->automation_paused = true;
             $this->user->save();
 
-            // Hapus semua job pending untuk user ini
             DB::table('jobs')
                 ->where('payload', 'like', '%"user_id";i:' . $this->user->id . '%')
                 ->delete();
 
-            // Restart worker
-            Artisan::call('queue:restart');
 
             return response()->json([
                 'status'  => 'success',
@@ -229,12 +235,8 @@ class ApplyController extends Controller
         try {
             $this->user = auth()->user();
 
-            // ✅ Set flag pause = false di USER
             $this->user->automation_paused = false;
             $this->user->save();
-
-            // Restart worker agar siap menerima job baru
-            Artisan::call('queue:restart');
 
             return response()->json([
                 'status'  => 'success',

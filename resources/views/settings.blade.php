@@ -9,7 +9,15 @@
     $hasJobstreet = $user->jobstreetAccount && $user->jobstreetAccount->access_token;
     $hasGlints = $user->glintsAccount && $user->glintsAccount->access_token;
 @endphp
+Dimana saya menemukan email dan kata sandi akun glints ?
 
+Mobile:
+1. Login ke aplikasi Glints menggunakan akun yang ingin Anda hubungkan.
+2. Setelah berhasil login, buka menu 'Saya' -> Pengaturan (logo settings) -> Akun.
+
+Desktop / Web:
+1. Login ke situs web Glints menggunakan akun yang ingin Anda hubungkan.
+2. Setelah berhasil login, klik foto profil Anda di pojok kanan atas -> Pengaturan Akun -> Detail Login
 <div class="max-w-6xl mx-auto px-4 py-10 text-gray-200">
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -99,7 +107,7 @@
                                 <td class="px-6 py-4">
                                     <a
                                         href="{{ $hasJobstreet
-                                            ? route('platform.disconnect', ['provider' => 'jobstreet'])
+                                            ? route('connection.disconnect', ['provider' => 'jobstreet'])
                                             : '#' }}"
                                         class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium
                                                {{ $hasJobstreet
@@ -137,8 +145,8 @@
                                 <td class="px-6 py-4">
                                     <a
                                         href="{{ $hasGlints
-                                            ? route('platform.disconnect', ['provider' => 'glints'])
-                                            : route('platform.connect.glints') }}"
+                                            ? route('connection.disconnect', ['provider' => 'glints'])
+                                            : route('connection.connect.glints') }}"
                                         class="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium
                                                {{ $hasGlints
                                                    ? 'bg-[#da3633] text-white hover:bg-[#f85149]'

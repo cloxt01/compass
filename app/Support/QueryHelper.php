@@ -46,7 +46,7 @@ class QueryHelper {
                 "countryCode" => "ID",
                 "timezone" => "Asia/Jakarta",
                 "enableGetCandidateJobMatch" => false,
-                "platform" => "WEB",
+                "connection" => "WEB",
                 "visitorId" => self::generateUUID()
             ],
             'jobDetailsPersonalised' => [
@@ -54,7 +54,7 @@ class QueryHelper {
                 "id" => $variables['jobId'],
                 "languageCode" => "id",
                 "locale" => "id-ID",
-                "platform" => "WEB",
+                "connection" => "WEB",
                 "timezone" => "Asia/Jakarta",
                 "tracking" => [
                     "channel" => "WEB",
@@ -130,7 +130,7 @@ class QueryHelper {
             'GetPublicProfile' => [
                 "zone" => "asia-4",
                 "locale" => "id",
-                "platform" => "WEB"
+                "connection" => "WEB"
             ],
             'GetProfileVisibility2', 'GetProfileVisibilityOptions' => [
                 "locale" => "id-ID",
@@ -201,7 +201,7 @@ class QueryHelper {
                 ],
                 'getEnabledFeatureFlags' => [
                     'deviceId' => $variables['deviceId'] ?? '',
-                    'platform' => $variables['platform'] ?? 'DST',
+                    'connection' => $variables['connection'] ?? 'DST',
                     'featureFlagNames' => $variables['featureFlagNames'] ?? [
                         "dstTWJobFilter","dstBuilderIntegration","dstFollowUpRequest","dstHideApplicationPageBanner","dstHideApplicationPageArchiveTitle","dstFollowerNotificationPreference","dstOdyssey","dstEnableMobileDownloadBanner","dstApplicationStatusTracking","dstImproveJobSearchFilter","dstEmptyJobSearchRedirectToFYPCTA","dstShowRecommendationCard","dstHideJobCategoryFilter","dstViewEducationLevelEnabled","dstChatApplicationStatusEnabled","dstWhatsappSupport","dstHideResumeSectionInApplicationPage","dstHideSkillsV2","dstExperimentJobDetailRevising","dstExperimentApplicationWarning","dstMigrationToApiV2","dstShowLoginPopup","dstExperimentSearchJobV3","dstExperimentExplorePageFilterOrder","dstEnableMobileDownloadModal","dstAirBridgeLinksEnabled","dstGlintsTracking","allExperimentApplyOnApp","dstNormalizedWorkExperience"
                     ],
