@@ -22,7 +22,7 @@ class GlintsToken extends GlintsAPI implements PlatformToken
         parent::__construct();
         $this->headers = [
             'accept' => 'application/json, text/plain, */*',
-            'content-type' => 'application/json;charset=UTF-8',
+            'content-type' => 'application/json',
             'dnt' => '1',
             'priority' => 'u=1, i',
             'origin' => 'https://glints.com',
@@ -46,6 +46,7 @@ class GlintsToken extends GlintsAPI implements PlatformToken
             "password" => $password
         ];
 
+        Log::info('Payload to Glints token : '.json_encode($payload));
         $response = $this->post('/oauth2/token', $payload);
         Log::info('Response to Glints token : '. json_encode($response));
         if(isset($response['data']['access_token'])){

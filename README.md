@@ -26,3 +26,5 @@ install di https://curl.se/ca/cacert.pem
 
 curl.cainfo = "path file"
 openssl.cainfo = "path file"
+
+php artisan livewire:publish --assets

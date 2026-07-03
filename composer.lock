@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77bfe5b760ee3482afef3986440ab56a",
+    "content-hash": "6558fc4efaf328d1607ef3630053ff46",
     "packages": [
         {
             "name": "brick/math",
@@ -1228,6 +1228,62 @@
                 }
             ],
             "time": "2025-08-22T14:27:06+00:00"
+        },
+        {
+            "name": "hamaadraza/php-impersonate",
+            "version": "1.0.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hamaadraza/php-impersonate.git",
+                "reference": "678ce0f8f8ea373139a1b4727304c43a827279f5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hamaadraza/php-impersonate/zipball/678ce0f8f8ea373139a1b4727304c43a827279f5",
+                "reference": "678ce0f8f8ea373139a1b4727304c43a827279f5",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.21.1",
+                "pestphp/pest": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Raza\\PHPImpersonate\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hamaad Raza",
+                    "email": "hamaadraza9@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP library for making HTTP requests with browser impersonation",
+            "homepage": "https://github.com/hamaadraza/php-impersonate",
+            "keywords": [
+                "hamaadraza",
+                "php-impersonate"
+            ],
+            "support": {
+                "issues": "https://github.com/hamaadraza/php-impersonate/issues",
+                "source": "https://github.com/hamaadraza/php-impersonate/tree/v1.0.9"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/hamaadraza",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-04-01T06:49:36+00:00"
         },
         {
             "name": "laravel/framework",
