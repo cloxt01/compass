@@ -329,7 +329,7 @@
 
         var pusher = new Pusher("{{ env('REVERB_APP_KEY') }}", {
             cluster: "",
-            wsHost: window.location.hostname,
+            wsHost: "{{ request()->getHost() }}",   // otomatis jadi cloxt.tech
             wsPort: 443,
             wssPort: 443,
             forceTLS: true,
