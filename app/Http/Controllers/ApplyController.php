@@ -65,7 +65,7 @@ class ApplyController extends Controller
         ]);
 
 
-        if(isset($request->interval) || isset($request->apply_configuration['interval']) || $request->apply_configuration['batch'] > 20){
+        if(isset($request->interval) || isset($request->apply_configuration['interval']) || $request->apply_configuration['batch'] > 25){
             return response()->json([
                 'success' => false,
                 'message' => "Gak boleh ya dekk",

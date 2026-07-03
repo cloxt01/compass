@@ -37,7 +37,7 @@ new class extends Component
     {
         $this->validate([
             'keyword'   => 'required|string|max:255',
-            'batch'     => 'required|integer|min:1|max:20',
+            'batch'     => 'required|integer|min:1|max:25',
             'providers' => 'array',
         ]);
 

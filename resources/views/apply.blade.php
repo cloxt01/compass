@@ -71,7 +71,6 @@
     </style>
 @endpush
 
-<script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const saveBtn = document.getElementById('save-btn');
@@ -282,7 +281,6 @@
             });
         }
 
-        // --- Inisialisasi Realtime WebSocket (Pusher / Reverb) ---
 
         window.Echo.private(`users.{{ auth()->id() }}`)
             .listen('.JobStatus', (incomingEvent) => {
