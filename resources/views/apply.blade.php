@@ -342,27 +342,23 @@
             }
         });
 
-        var userId = '{{ auth()->id() }}';
-        var channel = pusher.subscribe("private-users." + userId);
-
-        channel.bind("JobStatus", (incomingEvent) => {
-            Livewire.dispatch('job-status-updated', {
-                payload: {
-                    data: {
-                        status: incomingEvent.status,
-                        provider: incomingEvent.provider,
-                        jobId: incomingEvent.data?.job?.id || null,
-                        jobTitle: incomingEvent.data?.job?.title || null,
-                        jobCompany: incomingEvent.data?.job?.company || null
+        window.Echo.private(`users.{{ auth()->id() }}`)
+            .listen('.JobStatus', (incomingEvent) => {
+                Livewire.dispatch('job-status-updated', {
+                    payload: {
+                        data: {
+                            status: incomingEvent.status,
+                            provider: incomingEvent.provider,
+                            jobId: incomingEvent.data?.job?.id || null,
+                            jobTitle: incomingEvent.data?.job?.title || null,
+                            jobCompany: incomingEvent.data?.job?.company || null,
+                        }
                     }
-                }
+                });
+
+                Livewire.dispatch('queue-status-refreshed', {
+                    pending: incomingEvent.pending || 0
+                });
             });
-
-
-
-            Livewire.dispatch('queue-status-refreshed', {
-                pending: data.pending || 0
-            });
-        });
     });
 </script>
