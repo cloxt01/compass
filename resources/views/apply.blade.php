@@ -329,10 +329,11 @@
 
         var pusher = new Pusher("{{ env('REVERB_APP_KEY') }}", {
             cluster: "",
-            wsHost: "{{ env('REVERB_HOST', '127.0.0.1') }}",
-            wsPort: {{ env('REVERB_PORT', 8080) }},
-            forceTLS: false,
-            enabledTransports: ['ws'],
+            wsHost: window.location.hostname,
+            wsPort: 443,
+            wssPort: 443,
+            forceTLS: true,
+            enabledTransports: ['ws', 'wss'],
             authEndpoint: '/broadcasting/auth',
             auth: {
                 headers: {
