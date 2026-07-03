@@ -57,21 +57,7 @@ new class extends Component
 <div wire:init="init">
     {{-- TOP STAT CARDS (STRUKTUR CARD SELALU ADA) --}}
     <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5 mb-6">
-        <article class="saas-card p-5">
-            <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">STATUS SYSTEM</p>
-            <div class="mt-3 inline-flex items-center gap-2 rounded-full border border-[#262626] bg-[#0a0a0a] px-3 py-1.5">
-                <span class="relative flex h-2.5 w-2.5">
-                    @if(!$isPaused)
-                        <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping"></span>
-                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
-                    @else
-                        <span class="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60 animate-ping"></span>
-                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-400"></span>
-                    @endif
-                </span>
-                <span class="text-sm font-medium text-[#fafafa]">{{ !$isPaused ? 'Running' : 'Paused' }}</span>
-            </div>
-        </article>
+
 
         <article class="saas-card p-5">
             <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TOTAL LAMARAN</p>
@@ -144,7 +130,7 @@ new class extends Component
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="hidden overflow-x-auto md:block">
             <table class="w-full text-left border-collapse">
                 <thead class="bg-[#0a0a0a]">
                 <tr class="border-b border-[#262626] text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
@@ -229,11 +215,126 @@ new class extends Component
                 </tbody>
             </table>
         </div>
+        {{-- MOBILE --}}
+        <div class="divide-y divide-[#262626] md:hidden">
+            @if(!$isReady)
 
+                @foreach(range(1,5) as $i)
+                    <div class="space-y-3 p-4">
+                        <div class="h-4 w-40 rounded bg-[#222] animate-pulse"></div>
+                        <div class="h-3 w-28 rounded bg-[#1c1c1e] animate-pulse"></div>
+
+                        <div class="flex justify-between">
+                            <div class="h-5 w-20 rounded bg-[#222] animate-pulse"></div>
+                            <div class="h-5 w-24 rounded bg-[#222] animate-pulse"></div>
+                        </div>
+
+                        <div class="h-8 w-full rounded-xl bg-[#222] animate-pulse"></div>
+                    </div>
+                @endforeach
+
+            @else
+
+                @forelse($applications as $app)
+
+                    @php
+                        $targetUrl = $app->provider === 'glints'
+                            ? "https://glints.com/id/opportunities/jobs/{$app->job_id}"
+                            : "https://www.jobstreet.co.id/id/job/{$app->job_id}";
+                    @endphp
+
+                    <div class="space-y-3 p-4" wire:key="mobile-app-{{ $app->id }}">
+
+                        <div class="flex items-start justify-between gap-3">
+
+                            <div class="min-w-0">
+                                <p class="truncate font-semibold text-[#fafafa]">
+                                    {{ $app->job_title }}
+                                </p>
+
+                                <p class="mt-1 truncate text-xs text-[#a1a1aa]">
+                                    {{ $app->job_company }}
+                                </p>
+                            </div>
+
+                            <div>
+                                @switch($app->status)
+                                    @case('success') <span class="status-badge badge-success"><i class="fas fa-check-circle mr-1"></i>Success</span> @break
+                                    @case('applied') <span class="status-badge badge-applied"><i class="fas fa-history mr-1"></i>Already Applied</span> @break
+                                    @case('questionnaire') <span class="status-badge badge-screening"><i class="fas fa-clipboard-list mr-1"></i>Screening</span> @break
+                                    @case('linkout') <span class="status-badge badge-start"><i class="fas fa-external-link-alt mr-1"></i>Linkout</span> @break
+                                    @default <span class="status-badge badge-default"><i class="fas fa-exclamation-circle mr-1"></i>Expired</span>
+                                @endswitch
+                            </div>
+
+                        </div>
+
+                        <div class="flex items-center justify-between">
+
+                    <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium border {{ $app->provider === 'glints' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' }}">
+                        {{ $app->provider === 'glints' ? 'Glints' : 'JobStreet' }}
+                    </span>
+
+                            <span class="text-xs text-[#71717a]">
+                        {{ $app->created_at ? $app->created_at->diffForHumans() : '-' }}
+                    </span>
+
+                        </div>
+
+                        <a href="{{ $targetUrl }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="flex h-10 w-full items-center justify-center rounded-xl border border-[#262626] bg-[#0a0a0a] text-sm font-medium text-[#fafafa] hover:bg-[#161618] transition">
+                            <i class="fas fa-external-link-alt mr-2 text-[11px]"></i>
+                            Preview
+                        </a>
+
+                    </div>
+
+                @empty
+
+                    <div class="p-6 text-center text-sm text-[#71717a]">
+                        Belum ada aktivitas pelamaran yang tercatat.
+                    </div>
+
+                @endforelse
+
+            @endif
+        </div>
         @if($isReady && $applications->hasPages())
-            <div class="border-t border-[#262626] px-6 py-4 bg-[#111111]">
-                {{ $applications->links() }}
+            <div class="border-t border-[#262626] bg-[#111111] px-4 py-4 sm:px-6">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <div class="min-w-max">
+                        {{ $applications->links() }}
+                    </div>
+                </div>
             </div>
         @endif
     </section>
 </div>
+
+@push('styles')
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #111111;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 9999px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #52525b;
+        }
+
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #3f3f46 #111111;
+        }
+    </style>
+@endpush

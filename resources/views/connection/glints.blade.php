@@ -6,6 +6,7 @@
 @section('content')
     @php
         $provider = 'glints';
+        $hasLogged = auth()->user()->glintsAccount;
     @endphp
 
     <div class="mx-auto max-w-[600px] space-y-6 px-1 pb-6 pt-6">
@@ -26,48 +27,88 @@
             </div>
 
             <div class="p-6">
-                <form method="POST"
-                      action="{{ route('api.connection.login', ['provider' => $provider]) }}"
-                      id="loginForm"
-                      class="space-y-4">
-                    @csrf
 
-                    <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+                @if($hasLogged)
 
-                    <div>
-                        <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
-                            Email Address
-                        </label>
-                        <input
-                            type="email"
-                            name="email"
-                            required
-                            placeholder="name@example.com"
-                            class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]"
-                        >
+                    <div class="rounded-xl border border-green-500/20 bg-green-500/10 p-6 text-center">
+
+                        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-500/15">
+                            <i class="fas fa-check text-lg text-green-400"></i>
+                        </div>
+
+                        <h3 class="text-base font-semibold text-[#fafafa]">
+                            Akun Glints Sudah Terhubung
+                        </h3>
+
+                        <p class="mt-2 text-sm leading-6 text-[#a1a1aa]">
+                            Kamu sudah login ke akun Glints.
+                            <br>
+                            Silakan logout terlebih dahulu jika ingin mengganti akun.
+                        </p>
+
+                        <form
+                            method="GET"
+                            action="{{ route('api.connection.disconnect', ['provider' => $provider]) }}"
+                            class="mt-6">
+                            @csrf
+
+                            <button
+                                type="submit"
+                                class="inline-flex cursor-pointer h-11 w-full items-center justify-center rounded-xl border border-[#333333] bg-[#1a1a1a] px-4 text-sm font-semibold text-[#fafafa] transition hover:border-[#4a4a4a] hover:bg-[#222222]">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                Logout Akun
+                            </button>
+                        </form>
+
                     </div>
 
-                    <div>
-                        <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            name="password"
-                            required
-                            placeholder="Masukkan password Glints"
-                            class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]"
-                        >
-                    </div>
+                @else
 
-                    <div class="pt-2">
-                        <button
-                            type="submit"
-                            class="h-11 w-full cursor-pointer rounded-xl bg-white/85 text-sm font-semibold text-black transition hover:bg-white">
-                            Login & Hubungkan
-                        </button>
-                    </div>
-                </form>
+                    <form method="POST"
+                          action="{{ route('api.connection.login', ['provider' => $provider]) }}"
+                          id="loginForm"
+                          class="space-y-4">
+                        @csrf
+
+                        <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+
+                        <div>
+                            <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                required
+                                placeholder="name@example.com"
+                                class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]">
+                        </div>
+
+                        <div>
+                            <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                name="password"
+                                required
+                                placeholder="Masukkan password Glints"
+                                class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]">
+                        </div>
+
+                        <div class="pt-2">
+                            <button
+                                type="submit"
+                                class="h-11 w-full cursor-pointer rounded-xl bg-white/85 text-sm font-semibold text-black transition hover:bg-white">
+                                Login & Hubungkan
+                            </button>
+                        </div>
+                    </form>
+
+                @endif
+
             </div>
         </div>
 

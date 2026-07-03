@@ -68,22 +68,24 @@ new class extends Component
 };
 ?>
 
-<div class="saas-card p-6 xl:col-span-2" wire:init="init">
+<div class="saas-card h-full p-4 sm:p-6 xl:col-span-2" wire:init="init">
     @if(!$isReady)
+
         {{-- SKELETON SAAT FIRST LOAD --}}
-        <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div class="space-y-2">
                 <div class="h-5 w-16 rounded-lg bg-[#222] animate-pulse"></div>
                 <div class="h-3 w-48 rounded-lg bg-[#1c1c1e] animate-pulse"></div>
             </div>
-            <div class="flex gap-2">
-                <div class="h-8 w-20 rounded-md bg-[#222] animate-pulse"></div>
-                <div class="h-8 w-16 rounded-md bg-[#222] animate-pulse"></div>
+
+            <div class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
+                <div class="h-9 w-full rounded-md bg-[#222] animate-pulse sm:w-20"></div>
+                <div class="h-9 w-full rounded-md bg-[#222] animate-pulse sm:w-16"></div>
             </div>
         </div>
 
-        <div class="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
-            @foreach(range(1, 3) as $i)
+        <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            @foreach(range(1,3) as $i)
                 <div class="space-y-2">
                     <div class="h-3 w-20 rounded-lg bg-[#1c1c1e] animate-pulse"></div>
                     <div class="h-11 w-full rounded-xl bg-[#222] animate-pulse"></div>
@@ -91,92 +93,246 @@ new class extends Component
             @endforeach
         </div>
 
-        <div class="mt-5 border-t border-[#262626] pt-4 flex gap-6">
+        <div class="mt-5 flex flex-wrap gap-4 border-t border-[#262626] pt-4">
             <div class="h-5 w-24 rounded-lg bg-[#1c1c1e] animate-pulse"></div>
             <div class="h-5 w-16 rounded-lg bg-[#1c1c1e] animate-pulse"></div>
         </div>
+
     @else
-        <div class="flex flex-wrap items-start justify-between gap-4">
+
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
             <div>
-                <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">Panel</h2>
-                <p class="mt-1 text-sm text-[#a1a1aa]">Atur konfigurasi lamaran anda</p>
+                <h2 class="text-base font-semibold tracking-tight text-[#fafafa] sm:text-lg">
+                    Panel
+                </h2>
+
+                <p class="mt-1 text-xs text-[#a1a1aa] sm:text-sm">
+                    Atur konfigurasi lamaran anda
+                </p>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <button wire:click="save"
-                        wire:loading.attr="disabled"
-                        wire:target="save"
-                        class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-black transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60">
-                    <span wire:loading.remove wire:target="save">Simpan</span>
-                    <span wire:loading wire:target="save">Menyimpan...</span>
+
+            <div class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+
+                <button
+                    wire:click="save"
+                    wire:loading.attr="disabled"
+                    wire:target="save"
+                    class="h-9 w-full cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-black transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+
+                    <span wire:loading.remove wire:target="save">
+                        Simpan
+                    </span>
+
+                    <span wire:loading wire:target="save">
+                        Menyimpan...
+                    </span>
+
                 </button>
 
                 @if ($isPaused)
-                    <button wire:click="resume"
-                            wire:loading.attr="disabled"
-                            wire:target="resume"
-                            class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60">
+
+                    <button
+                        wire:click="resume"
+                        wire:loading.attr="disabled"
+                        wire:target="resume"
+                        class="h-9 w-full cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+
                         Resume
+
                     </button>
+
                 @else
-                    <button wire:click="stop"
-                            wire:loading.attr="disabled"
-                            wire:target="stop"
-                            class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60">
+
+                    <button
+                        wire:click="stop"
+                        wire:loading.attr="disabled"
+                        wire:target="stop"
+                        class="h-9 w-full cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+
                         Stop
+
                     </button>
+
                 @endif
+
             </div>
+
         </div>
 
-        <div class="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
+        <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+
             <div>
-                <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Kata Kunci</label>
-                <input type="text" wire:model="keyword" placeholder="Web Developer"
-                       class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]" />
-                @error('keyword') <span class="text-xs text-red-400">{{ $message }}</span> @enderror
+                <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
+                    Kata Kunci
+                </label>
+
+                <input
+                    type="text"
+                    wire:model="keyword"
+                    placeholder="Web Developer"
+                    class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]" />
+
+                @error('keyword')
+                <span class="text-xs text-red-400">{{ $message }}</span>
+                @enderror
             </div>
+
             <div>
-                <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Batch</label>
-                <input type="number" wire:model="batch" min="1" max="20"
-                       class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa]" />
-                @error('batch') <span class="text-xs text-red-400">{{ $message }}</span> @enderror
+                <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
+                    Batch
+                </label>
+
+                <input
+                    type="number"
+                    wire:model="batch"
+                    min="1"
+                    max="20"
+                    class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa]" />
+
+                @error('batch')
+                <span class="text-xs text-red-400">{{ $message }}</span>
+                @enderror
             </div>
+
             <div>
-                <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Interval</label>
-                <input type="number" disabled value="10" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#888]" />
+                <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
+                    Interval
+                </label>
+
+                <input
+                    type="number"
+                    disabled
+                    value="10"
+                    class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#888]" />
             </div>
+
         </div>
 
-        <div class="mt-5 border-t border-[#262626] pt-4 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-6">
-                <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-[#fafafa] select-none group">
-                    <input type="checkbox" wire:model="providers" value="jobstreet" {{ !$hasJobstreet ? 'disabled' : '' }}
-                    class="provider-checkbox h-4 w-4 rounded border-[#262626] bg-[#0a0a0a] text-blue-600 focus:ring-0 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-40 transition">
-                    <span class="group-hover:text-[#fafafa] transition-colors {{ !$hasJobstreet ? 'opacity-40' : '' }}">JobStreet</span>
-                </label>
+        <div class="mt-5 grid grid-cols-1 items-stretch gap-5 border-t border-[#262626] pt-5 lg:grid-cols-3">
 
-                <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-[#fafafa] select-none group">
-                    <input type="checkbox" wire:model="providers" value="glints" {{ !$hasGlints ? 'disabled' : '' }}
-                    class="provider-checkbox h-4 w-4 rounded border-[#262626] bg-[#0a0a0a] text-blue-600 focus:ring-0 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-40 transition">
-                    <span class="group-hover:text-[#fafafa] transition-colors {{ !$hasGlints ? 'opacity-40' : '' }}">Glints</span>
-                </label>
+            {{-- PROVIDER --}}
+            <div class="flex flex-col">
 
-                @if($isPaused)
-                    <span class="rounded-md border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">Paused</span>
-                @endif
-            </div>
+                <p class="mb-3 text-xs font-medium uppercase tracking-[0.14em] text-[#71717a]">
+                    Provider
+                </p>
 
-            <div class="flex items-center gap-3">
-                <span class="text-sm text-[#a1a1aa]">Auto Answer <i>(AI Powered)</i></span>
-                <div class="flex items-center gap-2">
-                    <label class="relative inline-flex cursor-not-allowed items-center opacity-40">
-                        <input type="checkbox" disabled class="peer sr-only">
-                        <div class="w-9 h-5 rounded-full bg-[#1e1e1e] border border-[#333]"></div>
-                        <div class="absolute left-[4px] top-[4px] h-3 w-3 rounded-full bg-[#71717a]"></div>
-                    </label>
-                    <span class="text-xs font-medium text-[#71717a] uppercase tracking-wider">(Belum tersedia)</span>
+                <div class="flex min-h-[170px] flex-1 flex-col rounded-xl border border-[#262626] bg-[#0a0a0a] p-3 sm:p-4">
+
+                    <div class="flex-1 space-y-3">
+
+                        {{-- JobStreet --}}
+                        <label class="flex items-center justify-between gap-3 rounded-lg border border-[#262626] bg-[#111111] px-3 py-3 transition hover:border-[#3a3a3a] {{ !$hasJobstreet ? 'cursor-not-allowed opacity-40' : 'cursor-pointer' }}">
+
+                            <div>
+                                <p class="text-sm font-medium text-[#fafafa]">
+                                    JobStreet
+                                </p>
+
+                                <p class="mt-0.5 text-xs text-[#71717a]">
+                                    Gunakan akun JobStreet
+                                </p>
+                            </div>
+
+                            <label class="relative inline-flex items-center">
+                                <input
+                                    type="checkbox"
+                                    wire:model="providers"
+                                    value="jobstreet"
+                                    {{ !$hasJobstreet ? 'disabled' : '' }}
+                                    class="peer sr-only">
+
+                                <div class="h-6 w-11 rounded-full bg-[#1f1f1f] transition peer-checked:bg-blue-600 peer-disabled:bg-[#161616]"></div>
+
+                                <div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-all peer-checked:translate-x-5"></div>
+                            </label>
+
+                        </label>
+
+                        {{-- Glints --}}
+                        <label class="flex items-center justify-between gap-3 rounded-lg border border-[#262626] bg-[#111111] px-3 py-3 transition hover:border-[#3a3a3a] {{ !$hasGlints ? 'cursor-not-allowed opacity-40' : 'cursor-pointer' }}">
+
+                            <div>
+                                <p class="text-sm font-medium text-[#fafafa]">
+                                    Glints
+                                </p>
+
+                                <p class="mt-0.5 text-xs text-[#71717a]">
+                                    Gunakan akun Glints
+                                </p>
+                            </div>
+
+                            <label class="relative inline-flex items-center">
+                                <input
+                                    type="checkbox"
+                                    wire:model="providers"
+                                    value="glints"
+                                    {{ !$hasGlints ? 'disabled' : '' }}
+                                    class="peer sr-only">
+
+                                <div class="h-6 w-11 rounded-full bg-[#1f1f1f] transition peer-checked:bg-blue-600 peer-disabled:bg-[#161616]"></div>
+
+                                <div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-all peer-checked:translate-x-5"></div>
+                            </label>
+
+                        </label>
+
+                    </div>
+
+                    @if($isPaused)
+                        <span class="mt-4 inline-flex w-fit rounded-md border border-amber-500/20 bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-400">
+                            Automation Paused
+                        </span>
+                    @endif
+
                 </div>
+
             </div>
+
+            {{-- AUTO ANSWER --}}
+            <div class="flex flex-col lg:col-span-2">
+
+                <p class="mb-3 text-xs font-medium uppercase tracking-[0.14em] text-[#71717a]">
+                    Auto Answer
+                </p>
+
+                <div class="flex min-h-[170px] flex-1 flex-col justify-center gap-5 rounded-xl border border-[#262626] bg-[#0a0a0a] p-4 opacity-55 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+
+                    <div>
+                        <p class="text-sm font-medium text-[#fafafa]">
+                            AI Powered Auto Answer
+                        </p>
+
+                        <p class="mt-1 max-w-full text-xs leading-5 text-[#71717a] sm:max-w-md">
+                            Menjawab screening question secara otomatis menggunakan AI.
+                        </p>
+                    </div>
+
+                    <div class="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start">
+
+                        <label class="relative inline-flex cursor-not-allowed items-center">
+                            <input
+                                type="checkbox"
+                                disabled
+                                class="peer sr-only">
+
+                            <div class="h-6 w-11 rounded-full border border-[#333] bg-[#1e1e1e]"></div>
+
+                            <div class="absolute left-[4px] top-[4px] h-4 w-4 rounded-full bg-[#666]"></div>
+                        </label>
+
+                        <span class="inline-flex items-center rounded-full border border-[#333] bg-[#161616] px-3 py-1 text-xs font-medium text-[#9ca3af]">
+                            Belum tersedia
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
+
     @endif
 </div>

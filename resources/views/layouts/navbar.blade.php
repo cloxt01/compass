@@ -11,17 +11,21 @@
 
     <div class="ml-auto flex items-center gap-3">
         @if(auth()->user()->automation_paused)
-            <span class="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1 text-xs text-red-400">
-                <span class="h-2 w-2 rounded-full bg-red-500"></span>
-                Automation Offline
-            </span>
-        @else
-            <span class="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400">
-                <span class="relative flex h-2 w-2">
-                    <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
-                    <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+            <span class="inline-flex items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 p-2 md:px-3 md:py-1">
+                <span class="h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                <span class="ml-2 hidden text-xs text-red-400 md:inline">
+                    Automation Offline
                 </span>
-                Automation Online
+            </span>
+                @else
+                    <span class="inline-flex items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10 p-2 md:px-3 md:py-1">
+                <span class="relative flex h-2.5 w-2.5">
+                    <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+                    <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+                </span>
+                <span class="ml-2 hidden text-xs text-emerald-400 md:inline">
+                    Automation Online
+                </span>
             </span>
         @endif
 

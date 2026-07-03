@@ -23,18 +23,78 @@
 @endphp
 
 @section('content')
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-6">
         <livewire:stats-overview />
-        <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            <livewire:panel-configuration :accounts="$accounts" :adapters="$adapters" />
-            <livewire:live-monitoring />
 
+        <section class="grid grid-cols-1 gap-6 lg:grid-cols-3 ">
+
+            <div class="lg:col-span-2 gap-6">
+                <livewire:panel-configuration :accounts="$accounts" :adapters="$adapters" />
+            </div>
+
+            <div class="lg:col-span-1">
+                <livewire:live-monitoring />
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1">
             <div class="saas-card p-6">
                 <livewire:activity-timeline />
             </div>
         </section>
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        body { background:#0A0A0A; color:#FAFAFA; }
+        .saas-card { background:#111111; border:1px solid #262626; border-radius:16px; }
+        .custom-scroll::-webkit-scrollbar { width:6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background:#262626; border-radius:9999px; }
+    </style>
+@endpush
+
+<script src="https://js.pusher.com/8.0.1/pusher.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi Pusher
+        var pusher = new Pusher("{{ env('REVERB_APP_KEY') }}", {
+            cluster: "",
+            wsHost: "{{ env('REVERB_HOST', '127.0.0.1') }}",
+            wsPort: {{ env('REVERB_PORT', 8080) }},
+            forceTLS: false,
+            enabledTransports: ['ws'],
+            authEndpoint: '/broadcasting/auth',
+            auth: {
+                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }
+            }
+        });
+
+        var channel = pusher.subscribe("private-users.{{ auth()->id() }}");
+
+        channel.bind("JobStatus", (incomingEvent) => {
+            // Update Timeline & Monitoring
+            Livewire.dispatch('job-status-updated', {
+                payload: {
+                    data: {
+                        status: incomingEvent.status,
+                        provider: incomingEvent.provider,
+                        jobId: incomingEvent.data?.job?.id || null,
+                        jobTitle: incomingEvent.data?.job?.title || null,
+                        jobCompany: incomingEvent.data?.job?.company || null
+                    }
+                }
+            });
+
+            // Update Stats Overview
+            Livewire.dispatch('queue-status-refreshed', {
+                pending: incomingEvent.pending || 0
+            });
+        });
+    });
+</script>
+
+
 
 @push('styles')
     <link rel="preconnect" href="https://fonts.googleapis.com">

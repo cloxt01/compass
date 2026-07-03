@@ -30,7 +30,7 @@
 
         <a href="{{ route('applications') }}"
            class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ request()->routeIs('applications') ? 'bg-[#1e1e1e] text-[#fafafa]' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
-            <i data-lucide="zap" class="w-4 h-4 opacity-70"></i>
+            <i data-lucide="file-text" class="w-4 h-4 opacity-70"></i>
             <span>Application</span>
         </a>
 

@@ -29,8 +29,8 @@ Route::middleware(['auth','verified'])->group(function() {
     Route::prefix('connection')->group(function() {
         Route::get('/connect/jobstreet', fn() => view('connection.jobstreet'))->name('connection.jobstreet');
         Route::get('/connect/glints', fn() => view('connection.glints'))->name('connection.glints');
-        Route::get('/{provider}/disconnect', [ConnectionController::class, 'disconnect'])->name('connection.disconnect');
         Route::post('/{provider}/save-token', [ConnectionController::class, 'save_token'])->name('connection.save-token');
+        Route::get('/{provider}/disconnect', [ConnectionController::class, 'disconnect'])->name('api.connection.disconnect');
         Route::post('/{provider}/save-config', [ConnectionController::class, 'save_config'])->name('connection.save-config');
     });
 

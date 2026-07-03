@@ -31,7 +31,7 @@ new class extends Component
     #[On('job-status-updated')]
     public function onJobStatus($payload = null, $status = null, $provider = null, $job_id = null, $job_title = null)
     {
-        // 1. SESUAIKAN: Ekstrak isi pembungkus 'data' dari JS payload
+        // Ekstrak isi pembungkus 'data' dari JS payload
         if (is_array($payload) && isset($payload['data'])) {
             $innerData = $payload['data'];
             $status    = $innerData['status'] ?? $status;
@@ -67,12 +67,13 @@ new class extends Component
 };
 ?>
 
-<div class="saas-card p-6 xl:col-span-2" wire:init="init"
+<div class="saas-card h-full p-6 xl:col-span-2" wire:init="init"
      x-data="{
         isReady: @entangle('isReady'),
         currentProvider: '-',
         currentJob: '-',
         currentStage: 'waiting',
+        lastRawStatus: null, // <-- Tambahan: Menyimpan status asli terakhir untuk validasi duplikat
         remainingJobs: 0,
         logLine: 'No active process',
         steps: @js($steps),
@@ -87,13 +88,29 @@ new class extends Component
 
         // Mengantre event yang masuk berbarengan dari Pusher
         queueEvent(e) {
-            this.eventQueue.push(e.detail[0]);
+            let data = e.detail[0] || e.detail;
+
+            // --- LOGIKA ANTI DUPLIKAT ---
+            // 1. Cek dengan event terakhir di dalam antrean (jika antrean tidak kosong)
+            let lastInQueue = this.eventQueue.length > 0 ? this.eventQueue[this.eventQueue.length - 1] : null;
+            if (lastInQueue && lastInQueue.jobId === data.jobId && lastInQueue.status === data.status) {
+                return; // Abaikan event, ini duplikat beruntun
+            }
+
+            // 2. Cek dengan event yang SEDANG tampil di layar saat ini
+            if (this.currentJob === data.jobId && this.lastRawStatus === data.status) {
+                return; // Abaikan event, layar sudah menampilkan ini
+            }
+            // ----------------------------
+
+            this.eventQueue.push(data);
+
             if (!this.isProcessingQueue) {
                 this.processNextEvent();
             }
         },
 
-        // Memproses langkah satu per satu dengan delay buatan agar transisi UI terlihat jelas
+        // Memproses langkah secara instan tanpa delay
         async processNextEvent() {
             if (this.eventQueue.length === 0) {
                 this.isProcessingQueue = false;
@@ -103,17 +120,17 @@ new class extends Component
             this.isProcessingQueue = true;
             let data = this.eventQueue.shift();
 
+            // Render ke layar
             if (data.provider) this.currentProvider = data.provider;
             if (data.jobId) this.currentJob = data.jobId;
+            if (data.status) this.lastRawStatus = data.status; // Simpan status aslinya untuk validasi
 
             if (data.mapped) {
                 if (data.mapped.step) this.currentStage = data.mapped.step;
                 this.logLine = data.mapped.description;
             }
 
-            // Atur waktu jeda (600ms). Silakan kecilkan atau besarkan sesuai selera estetika UI kamu
-            await new Promise(resolve => setTimeout(resolve, 600));
-
+            // Langsung lanjut ke event berikutnya (Delay dihapus)
             this.processNextEvent();
         }
      }"
@@ -162,7 +179,7 @@ new class extends Component
                 <div class="h-full rounded-full bg-blue-600 transition-all duration-500" :style="'width: ' + progressPercent + '%'"></div>
             </div>
 
-            {{-- BADGES STEP LOOPING DENGAN DUKUNGAN ALPINE REALTIME --}}
+            {{-- BADGES STEP LOOPING --}}
             <div class="mt-4 flex flex-wrap gap-2">
                 <template x-for="step in steps" :key="step">
                     <span

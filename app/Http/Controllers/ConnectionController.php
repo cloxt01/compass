@@ -103,7 +103,7 @@ class ConnectionController extends Controller {
 
             $account->delete();
             $user->refresh();
-            return redirect()->route('settings');
+            return redirect()->route('connection.'.$provider);
 //            return response()->json(['success' => false, 'message' => 'Account not found'], 404);
 
         } catch(\UnknownProvider $e){
@@ -207,7 +207,7 @@ class ConnectionController extends Controller {
 
 
         if($saved){
-            return redirect()->route('settings')->with('success', 'Login berhasil');
+            return redirect()->route('connection.'.$provider)->with('success', 'Login berhasil');
         }
         return back()->with('error', 'Failed to save token');
     }
