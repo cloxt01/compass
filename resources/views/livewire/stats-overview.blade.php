@@ -20,8 +20,7 @@ new class extends Component
     #[On('job-status-updated')]
     public function refreshStats(): void
     {
-        // Tidak perlu isi apa-apa.
-        // Livewire akan me-render ulang dan memanggil with().
+        // Livewire akan re-render otomatis lewat with()
     }
 
     public function with(): array
@@ -36,6 +35,10 @@ new class extends Component
                 'appliedCount' => 0,
                 'successRate' => 0,
                 'todayDone' => 0,
+                'scheduleId' => null,   // ✅ perbaikan: tidak mengakses $schedule
+                'nextRun' => null,
+                'lastRun' => null,
+                'lastStatus' => null,
             ];
         }
 
@@ -64,10 +67,16 @@ new class extends Component
         $successRate = $totalApplications
             ? round(($successCount / $totalApplications) * 100)
             : 0;
+
         $todayDone = Application::where('user_id', $userId)
             ->where('status', '=', 'success')
             ->whereDate('created_at', today())
             ->count();
+
+        $schedule = DB::table('schedules')
+            ->where('signature', 'app:apply-scheduler')
+            ->first();
+
         return [
             'pending' => $pending,
             'processing' => $processing,
@@ -75,14 +84,75 @@ new class extends Component
             'appliedCount' => $appliedCount,
             'successRate' => $successRate,
             'todayDone' => $todayDone,
+            'scheduleId' => $schedule->id ?? null,
+            'nextRun' => $schedule->next_run ?? null,
+            'lastRun' => $schedule->last_run ?? null,
+            'lastStatus' => $schedule->last_status ?? null,
         ];
     }
 };
 ?>
 
-<div wire:init="init">
+<div wire:init="init" wire:poll.30s="refreshStats">
 
-    <section class="grid grid-cols-1 gap-4 xl:grid-cols-3">
+    <section class="grid grid-cols-1 gap-4 xl:grid-cols-4">
+
+
+        <article class="saas-card p-5">
+            <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
+                    NEXT ROUND
+                    @if($scheduleId)
+                        <span class="text-[#52525b]">#{{ $scheduleId }}</span>
+                    @endif
+                </p>
+            </div>
+
+            @if(!$isReady)
+                <div class="mt-3.5 h-8 w-32 rounded-lg bg-[#222] animate-pulse"></div>
+            @elseif($nextRun)
+                <div
+                    x-data="{
+                target: new Date('{{ \Carbon\Carbon::parse($nextRun)->toIso8601String() }}').getTime(),
+                isRunning: false,
+                tick() {
+                    this.isRunning = (this.target - Date.now()) <= 0;
+                }
+            }"
+                    x-init="tick(); setInterval(() => tick(), 1000)"
+                >
+                    <div class="mt-3 flex items-center gap-2">
+                        <template x-if="isRunning">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-blue-500"></span>
+                    </span>
+                        </template>
+                        <template x-if="!isRunning">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#3f3f46]"></span>
+                    </span>
+                        </template>
+
+                        <p class="text-lg font-medium text-[#fafafa]">
+                            {{ \Carbon\Carbon::parse($nextRun)->format('d M, H:i:s') }}
+                        </p>
+                    </div>
+
+                    <p class="mt-1 text-[11px] text-[#71717a]">
+                        Last run:
+                        <span class="{{ $lastStatus === 'success' ? 'text-emerald-400' : 'text-red-400' }}">
+                    {{ $lastStatus === 'success' ? 'Success' : 'Failed' }}
+                </span>
+                        · {{ $lastRun ? \Carbon\Carbon::parse($lastRun)->diffForHumans() : '-' }}
+                    </p>
+                </div>
+            @else
+                <p class="mt-3 text-lg font-medium text-[#71717a]">
+                    Not scheduled
+                </p>
+            @endif
+        </article>
 
         <article class="saas-card p-5">
             <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
@@ -136,7 +206,6 @@ new class extends Component
         </article>
 
     </section>
-
     <section class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
 
         <article class="saas-card p-5">
