@@ -120,7 +120,7 @@ class ApplyScheduler extends Command
             ],
             [
             'last_run' => now(),
-            'next_run' => now()->addMinutes(10),
+            'next_run' => now()->addMinutes(5),
             'last_status' => 'success',
         ]);
         $this->info('Scheduler auto apply berhasil dijalankan.');

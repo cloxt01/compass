@@ -203,7 +203,7 @@ new class extends Component
                 <input
                     type="number"
                     disabled
-                    value="10"
+                    value="5"
                     class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#888]" />
             </div>
 
