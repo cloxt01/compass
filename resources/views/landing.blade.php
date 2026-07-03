@@ -8,7 +8,7 @@
     <title>Welcome to Compass</title>
 
     {{-- Favicon untuk tab browser --}}
-    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/img/icon.svg') }}">
+    <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}">
     <link rel="apple-touch-icon" href="{{ asset('assets/logo.svg') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
