@@ -18,7 +18,17 @@ new class extends Component
             ->limit($this->limit)
             ->get();
 
-        $this->activities = $rows->toArray();
+        // Map data dari database agar strukturnya konsisten dengan event realtime
+        $this->activities = $rows->map(function ($item) {
+            return [
+                'id'          => $item->id,
+                'status'      => $item->status,
+                'provider'    => $item->provider,
+                'job_title'   => $item->job_title,
+                'job_company' => $item->job_company ?? 'Unknown Company', // Pastikan kolom ini ada di DB atau fallback
+                'created_at'  => $item->created_at->toIso8601String(),
+            ];
+        })->toArray();
     }
 
     public function init()
@@ -27,27 +37,34 @@ new class extends Component
     }
 
     #[On('job-status-updated')]
-    public function appendActivity($data = [])
+    public function appendActivity($payload = [])
     {
-        $status    = $data['status'] ?? null;
-        $provider  = $data['provider'] ?? '-';
+        // 1. SESUAIKAN: Ambil data dari dalam wrapper 'data' yang dikirim JS
+        $data = $payload['data'] ?? [];
 
-        $jobId     = $data['jobId'] ?? ($data['job_id'] ?? null);
-        $jobTitle  = $data['jobTitle'] ?? ($data['job_title'] ?? null);
+        if (empty($data)) {
+            return;
+        }
 
-        $finalStatuses = ['success', 'applied', 'questionnaire', 'linkout', 'error'];
+        $status      = $data['status'] ?? null;
+        $provider    = $data['provider'] ?? '-';
+        $jobTitle    = $data['jobTitle'] ?? 'Unknown Position';
+        $jobCompany  = $data['jobCompany'] ?? 'Unknown Company';
+
+        // Tambahkan 'error' atau status awal jika ingin ditampilkan di timeline
+        $finalStatuses = ['success', 'applied', 'questionnaire', 'linkout', 'error', 'start'];
         if (!in_array($status, $finalStatuses)) {
             return;
         }
 
-        $displayTitle = $jobTitle ?? 'Unknown Position';
-
+        // 2. Dorong data baru ke urutan paling atas timeline
         array_unshift($this->activities, [
-            'id'         => uniqid(),
-            'status'     => $status,
-            'provider'   => $provider,
-            'job_title'  => $displayTitle,
-            'created_at' => now()->toIso8601String(),
+            'id'          => uniqid(),
+            'status'      => $status,
+            'provider'    => $provider,
+            'job_title'   => $jobTitle,
+            'job_company' => $jobCompany,
+            'created_at'  => now()->toIso8601String(),
         ]);
 
         $this->activities = array_slice($this->activities, 0, $this->limit);
@@ -75,31 +92,37 @@ new class extends Component
             @forelse ($activities as $activity)
                 @php
                     $dotColor = match($activity['status']) {
-                        'success' => 'bg-emerald-400',
-                        'applied' => 'bg-violet-400',
+                        'success'       => 'bg-emerald-400',
+                        'applied'       => 'bg-violet-400',
                         'questionnaire' => 'bg-amber-400',
-                        'linkout' => 'bg-blue-400',
-                        default => 'bg-[#555]',
+                        'linkout'       => 'bg-blue-400',
+                        'start'         => 'bg-sky-400 animate-pulse',
+                        'error'         => 'bg-rose-500',
+                        default         => 'bg-[#555]',
                     };
                     $statusLabel = match($activity['status']) {
-                        'success' => 'Success',
-                        'applied' => 'Already Applied',
+                        'success'       => 'Success Applied',
+                        'applied'       => 'Already Applied',
                         'questionnaire' => 'Need Screening',
-                        'linkout' => 'Linkout',
-                        default => 'Expired',
+                        'linkout'       => 'Linkout',
+                        'start'         => 'Processing...',
+                        'error'         => 'Failed',
+                        default         => 'Expired',
                     };
                 @endphp
                 <div class="flex items-start gap-3 rounded-xl border border-[#262626] bg-[#0a0a0a] p-3" wire:key="activity-{{ $activity['id'] }}">
                     <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full {{ $dotColor }}"></span>
                     <div class="flex-1">
                         <p class="text-sm font-medium text-[#fafafa]">{{ $activity['job_title'] }}</p>
-                        <p class="mt-0.5 text-xs text-[#a1a1aa]">
-                            {{ $statusLabel }} · {{ ucfirst($activity['provider']) }} · {{ \Carbon\Carbon::parse($activity['created_at'])->diffForHumans() }}
+                        <p class="text-xs text-[#a1a1aa] mt-0.5">{{ $activity['job_company'] }}</p>
+
+                        <p class="mt-1.5 text-[11px] text-[#71717a]">
+                            <span class="font-semibold text-[#a1a1aa]">{{ $statusLabel }}</span> · {{ ucfirst($activity['provider']) }} · {{ \Carbon\Carbon::parse($activity['created_at'])->diffForHumans() }}
                         </p>
                     </div>
                 </div>
             @empty
-                <div class="italic text-[#8b949e]">Menunggu aktivitas...</div>
+                <div class="italic text-sm text-[#71717a] text-center py-4">Menunggu aktivitas...</div>
             @endforelse
         @endif
     </div>

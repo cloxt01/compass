@@ -28,18 +28,27 @@ new class extends Component
         $this->isReady = true;
     }
 
-
     #[On('job-status-updated')]
-    public function onJobStatus($data = null, $status = null, $provider = null, $job_id = null, $job_title = null)
+    public function onJobStatus($payload = null, $status = null, $provider = null, $job_id = null, $job_title = null)
     {
-        if (is_array($data)) {
-            $status    = $data['status'] ?? $status;
-            $provider  = $data['provider'] ?? $provider;
-            $job_id    = $data['jobId'] ?? ($data['job_id'] ?? $job_id);
-            $job_title = $data['jobTitle'] ?? ($data['job_title'] ?? $job_title);
+        // 1. SESUAIKAN: Ekstrak isi pembungkus 'data' dari JS payload
+        if (is_array($payload) && isset($payload['data'])) {
+            $innerData = $payload['data'];
+            $status    = $innerData['status'] ?? $status;
+            $provider  = $innerData['provider'] ?? $provider;
+            $job_id    = $innerData['jobId'] ?? ($innerData['job_id'] ?? $job_id);
+            $job_title = $innerData['jobTitle'] ?? ($innerData['job_title'] ?? $job_title);
+        } elseif (is_array($payload)) {
+            // Fallback jika dikirim tanpa wrapper 'data'
+            $status    = $payload['status'] ?? $status;
+            $provider  = $payload['provider'] ?? $provider;
+            $job_id    = $payload['jobId'] ?? ($payload['job_id'] ?? $job_id);
+            $job_title = $payload['jobTitle'] ?? ($payload['job_title'] ?? $job_title);
         }
 
         $mappedData = $this->statusMap[$status] ?? null;
+
+        // Utamakan jobTitle agar yang muncul di UI berupa nama posisi (bukan UUID)
         $displayJob = $job_title ?? ($job_id ? substr($job_id, 0, 12) . '...' : '-');
 
         $this->dispatch('animate-status-step', [
@@ -111,7 +120,7 @@ new class extends Component
      @animate-status-step.window="queueEvent($event)"
      @update-remaining-jobs.window="remainingJobs = $event.detail[0].pending">
 
-    {{-- SKELETON LOADING VIEW (Menggunakan x-show agar DOM tidak hancur saat transisi) --}}
+    {{-- SKELETON LOADING VIEW --}}
     <div x-show="!isReady" class="space-y-5">
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
             @foreach(range(1, 3) as $i)
@@ -127,7 +136,7 @@ new class extends Component
         </div>
     </div>
 
-    {{-- REAL DATA AUTOMATION VIEW (Menggunakan x-show agar reactivity antrean Alpine bekerja sempurna) --}}
+    {{-- REAL DATA AUTOMATION VIEW --}}
     <div x-show="isReady" x-cloak class="space-y-5">
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
@@ -150,13 +159,19 @@ new class extends Component
                 <span>Estimated remaining jobs: <span x-text="remainingJobs"></span></span>
             </div>
             <div class="mt-3 h-2 overflow-hidden rounded-full bg-[#1b1b1b]">
-                <div class="h-full rounded-full bg-blue-600 transition-all duration-500" :style="'width: ' + progressPercent + '%' integrity"></div>
+                <div class="h-full rounded-full bg-blue-600 transition-all duration-500" :style="'width: ' + progressPercent + '%'"></div>
             </div>
 
             {{-- BADGES STEP LOOPING DENGAN DUKUNGAN ALPINE REALTIME --}}
             <div class="mt-4 flex flex-wrap gap-2">
                 <template x-for="step in steps" :key="step">
-                    <span class="progress-step" :class="step === currentStage ? 'active' : ''" x-text="step.replace('_', ' ')"></span>
+                    <span
+                        class="rounded-full border px-3 py-1 text-[11px] font-medium capitalize tracking-wide transition-colors duration-200"
+                        :class="step === currentStage
+                            ? 'border-blue-500 bg-blue-500/20 text-[#fafafa]'
+                            : 'border-[#262626] bg-[#0a0a0a] text-[#a1a1aa]'"
+                        x-text="step.replace('_', ' ')">
+                    </span>
                 </template>
             </div>
             <p class="mt-4 text-sm text-[#a1a1aa]" x-text="logLine"></p>
