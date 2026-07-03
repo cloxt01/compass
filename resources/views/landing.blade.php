@@ -35,7 +35,7 @@
     <header class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
             {{-- Gunakan logo dari config ui kamu --}}
-            <img src="{{ asset(config('ui.brand.logo', 'assets/img/logo.png')) }}" alt="Logo" class="h-7 w-7 rounded-md border border-[#333]" />
+            @include ('partials.logo', ['class' => 'h-8 w-8'])
             <span class="text-sm font-semibold tracking-wide text-[#fafafa]">{{ config('ui.brand.name', 'Compass') }}</span>
         </div>
 

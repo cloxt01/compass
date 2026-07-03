@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
+
 class JobDetails
 {
 
@@ -33,16 +35,17 @@ class JobDetails
     {
         if(empty($raw))
             return [];
+        Log::info(json_encode($raw));
         return [
             'metadata' => [
                 'id' => $raw['details']['id'] ?? '',
                 'title' => $raw['details']['title'] ?? 'Unknown',
-                'company' => $raw['details']['company']['displayName'] ?? 'Unknown',
-                'location' => $raw['details']['companyAddress']['poi']['addressLabel'] ?? 'Unknown',
+                'company' => $raw['details']['company']['name'] ?? 'Unknown',
+                'location' => $raw['details']['location']['formattedName'] ?? 'Unknown',
             ],
             'eligibility' => [
                 'linkout' => $raw['details']['job']['externalApplyURL'] ?? false,
-                'expired' => (strtotime($raw['details']['expiryDate']) < time() || !empty($raw['details']['closedAt'])) ? true : false,
+                'expired' => (empty($raw['details']['expiryDate']) && empty($raw['details']['closedAt'])) ? null : (strtotime($raw['details']['expiryDate'] ?? '') < time() || !empty($raw['details']['closedAt'])),
                 'closed' => $raw['details']['status'] === 'CLOSED' ? true : false,
                 'applied' => $raw['details']['isApplied'] ?? false,
             ],

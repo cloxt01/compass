@@ -1,76 +1,100 @@
 <?php
 
-
 namespace App\Jobs;
 
+use App\Clients\GlintsAPI;
 use App\Events\JobStatus;
-use App\Models\GlintsAccount;
 use App\Models\User;
 use App\Support\ApplicationHelper;
 use App\Support\ProviderHelper;
 use Illuminate\Queue\SerializesModels;
 use App\Clients\Application\UseCase\ApplyUseCase;
 use App\Exceptions\CantApply;
-use App\Infrastructure\Contracts\PlatformAccount;
-use App\Infrastructure\Contracts\PlatformAdapter;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\RateLimiter;
-
+use App\Clients\JobstreetAPI;
+use App\Services\Adapters\GlintsAdapter;
+use App\Services\Adapters\JobstreetAdapter;
 
 class ProcessApplications implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected string $job_id;
-    protected PlatformAdapter $adapter;
-    protected PlatformAccount $account;
+    // 1. UBAH NAMANYA DI SINI
+    public array $jobData;
     public User $user;
-    public function __construct(User $user, PlatformAdapter $adapter, PlatformAccount $account, string $job_id)
+
+    protected string $job_id;
+    protected string $provider;
+
+    public function __construct(User $user, string $provider, array $job)
     {
-        $this->adapter = $adapter;
-        $this->account = $account;
-        $this->job_id = $job_id;
         $this->user = $user;
+        $this->provider = $provider;
+
+        // 2. SIMPAN KE VARIABEL BARU
+        $this->jobData = $job;
+
+        $this->job_id = $job['metadata']['id'] ?? '';
     }
-
-
 
     public function handle()
     {
-        if($this->user->automation_paused){
+        if ($this->user->automation_paused) {
             Log::warning('Automation paused');
             return;
         }
 
-        $is_already = ApplicationHelper::alreadyApplied($this->user->id, $this->job_id);
+        $account = match ($this->provider) {
+            'glints' => $this->user->glintsAccount,
+            'jobstreet' => $this->user->jobstreetAccount,
+        };
 
-        if($is_already){
-            JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), $is_already);
+        if (!$account) {
+            Log::error("Account tidak ditemukan untuk provider: {$this->provider}");
             return;
         }
 
-        JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), 'start');
+        $adapter = match ($this->provider) {
+            'glints' => new GlintsAdapter(new GlintsAPI($account->access_token, $account->cookie)),
+            'jobstreet' => new JobstreetAdapter(new JobstreetAPI($account->access_token)),
+        };
+
+        $providerName = ProviderHelper::who($account);
+
+        $is_already = ApplicationHelper::alreadyApplied($this->user->id, $this->job_id);
+
+        if ($is_already) {
+            Log::info('Already applied : ');
+
+            // 3. GUNAKAN $jobData DI SINI
+            Log::info(json_encode($this->jobData));
+            JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $is_already);
+            return;
+        }
+
+        // 4. GUNAKAN $jobData DI SINI
+        JobStatus::dispatch($this->user->id, $this->jobData, $providerName, 'start');
 
         try {
-            $result = (new ApplyUseCase($this->adapter, $this->account))->apply($this->job_id);
-            JobStatus::dispatch($this->user->id, $this->job_id, ProviderHelper::who($this->account), $result['status']);
-            $this->user->applications()->create(
-                [
-                    'job_id' => $result['job']['job_id'] ?? $this->job_id,
-                    'job_title' => $result['job']['job_title'] ?? 'Unknown',
-                    'job_company' => $result['job']['job_company'] ?? 'Unknown',
-                    'provider' => $result['provider'] ?? 'Unknown',
-                    'status' => $result['status']
-                ]
-            );
+            $result = (new ApplyUseCase($adapter, $account))->apply($this->job_id);
+
+            // 5. GUNAKAN $jobData DI SINI
+            JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $result['status']);
+
+            $this->user->applications()->create([
+                'job_id' => $result['job']['job_id'] ?? $this->job_id,
+                'job_title' => $result['job']['job_title'] ?? 'Unknown',
+                'job_company' => $result['job']['job_company'] ?? 'Unknown',
+                'provider' => $result['provider'] ?? 'Unknown',
+                'status' => $result['status']
+            ]);
 
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result ? "Ya" : "Tidak"));
-        } catch (CantApply $e){
+        } catch (CantApply $e) {
             Log::info($e->getMessage());
         } catch (\Exception $e) {
             Log::error("Error: " . $e->getMessage());

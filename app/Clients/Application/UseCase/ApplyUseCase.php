@@ -20,8 +20,8 @@ class ApplyUseCase {
 
     public function apply(string $jobId): ?array {
 
-        JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'load_job');
         $job = $this->adapter->loadJob($jobId);
+        JobStatus::dispatch($this->user_id, $job, ProviderHelper::who($this->account), 'load_job');
 
         $result = [
             'success' => null,
@@ -35,7 +35,7 @@ class ApplyUseCase {
             ]
         ];
 
-        JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'load_profile');
+        JobStatus::dispatch($this->user_id, $job, ProviderHelper::who($this->account), 'load_profile');
         $profile = $this->adapter->loadProfile();
 
 
@@ -43,10 +43,10 @@ class ApplyUseCase {
         if(!empty($traceInfo)) {
             $this->account->saveConfig('traceInfo' , $traceInfo);
         }
-        JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'load_userConfig');
+        JobStatus::dispatch($this->user_id, $job, ProviderHelper::who($this->account), 'load_userConfig');
         $config = $this->account->getConfig();
 
-        JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'inspect');
+        JobStatus::dispatch($this->user_id, $job, ProviderHelper::who($this->account), 'inspect');
         $inspector = $this->adapter->canApply($job);
 
         if(!$inspector['canApply']){
@@ -57,10 +57,10 @@ class ApplyUseCase {
             $result['issues'] = $inspector['issues'];
             return $result;
         }
-        JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'build_payload');
+        JobStatus::dispatch($this->user_id, $job, ProviderHelper::who($this->account), 'build_payload');
         $payload = $this->adapter->buildPayload($job, $profile, $config);
 
-        JobStatus::dispatch($this->user_id, $jobId, ProviderHelper::who($this->account), 'apply');
+        JobStatus::dispatch($this->user_id, $job, ProviderHelper::who($this->account), 'apply');
 
         $success = $this->adapter->execute($jobId, $payload, $config);
         if($success)

@@ -13,16 +13,16 @@ class JobStatus implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $user_id;
-    public $job_id;
+    public $jobData;
     public $provider;
     public $status;
 
-    public function __construct($user_id, $job_id, $provider, $status)
+    public function __construct(int $user_id, $jobData, string $provider, string $status)
     {
         $this->user_id = $user_id;
-        $this->job_id = (string) $job_id;
-        $this->provider = (string) $provider;
-        $this->status = (string) $status;
+        $this->jobData = (array) $jobData;
+        $this->provider = $provider;
+        $this->status =  $status;
     }
 
     public function broadcastOn()
@@ -37,9 +37,15 @@ class JobStatus implements ShouldBroadcastNow
      */
     public function broadcastWith()
     {
-
+        Log::info(json_encode($this->jobData));
         return [
-            'job_id' => $this->job_id,
+            'data' => [
+                'job' => [
+                    'id' => $this->jobData['metadata']['id'] ?? null,
+                    'title' => $this->jobData['metadata']['title'] ?? null,
+                    'company' => $this->jobData['metadata']['company'] ?? null,
+                ],
+            ],
             'provider' => $this->provider,
             'status' => $this->status,
         ];

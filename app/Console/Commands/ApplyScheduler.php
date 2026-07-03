@@ -11,11 +11,13 @@ use App\Jobs\ProcessApplications;
 use App\Models\SchedulerLog;
 use App\Services\Adapters\GlintsAdapter;
 use App\Services\Adapters\JobstreetAdapter;
+use App\Services\JobDetails;
 use App\Support\ApplicationHelper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Util\PHP\Job;
 
 class ApplyScheduler extends Command
 {
@@ -79,8 +81,16 @@ class ApplyScheduler extends Command
                                 };
 
                                 foreach ($data as $job) {
+                                    $raw['details'] = $job;
+                                    $job = match($provider) {
+                                        'jobstreet' => JobDetails::fromJobstreet($raw),
+                                        'glints' => JobDetails::fromGlints($raw),
+                                    };
+                                    Log::info('Scheduler JOB : ');
+                                    Log::info(json_encode($job));
 
-                                    $queueId = Queue::connection('database')->push(new ProcessApplications($user, $adapter, $account, $job['id']));
+                                    $queueId = Queue::connection('database')->push(new ProcessApplications($user, $provider, $job));
+
                                     ApplyQueue::create([
                                         'job_id' => $queueId,
                                         'user_id' => $user->id,

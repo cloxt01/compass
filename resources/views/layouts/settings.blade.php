@@ -45,11 +45,11 @@
                     </a>
 
                     {{-- Keamanan Tab --}}
-                    <a href="{{ route('settings', ['tab' => 'security']) }}"
-                       class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ $currentTab === 'security' ? 'bg-[#1e1e1e] text-[#fafafa] font-medium' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
-                        <i data-lucide="shield-check" class="w-4 h-4 opacity-70 {{ $currentTab === 'security' ? 'text-[#fafafa] opacity-100' : '' }}"></i>
-                        <span>Keamanan</span>
-                    </a>
+{{--                    <a href="{{ route('settings', ['tab' => 'security']) }}"--}}
+{{--                       class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ $currentTab === 'security' ? 'bg-[#1e1e1e] text-[#fafafa] font-medium' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">--}}
+{{--                        <i data-lucide="shield-check" class="w-4 h-4 opacity-70 {{ $currentTab === 'security' ? 'text-[#fafafa] opacity-100' : '' }}"></i>--}}
+{{--                        <span>Keamanan</span>--}}
+{{--                    </a>--}}
 
                     {{-- Apply Configuration Tab --}}
                     <a href="{{ route('settings', ['tab' => 'apply-configuration']) }}"

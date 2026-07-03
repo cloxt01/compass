@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\ConnectionController;
@@ -13,9 +14,11 @@ Route::get('/', function () {
     return view('landing');
 });
 
-Route::middleware('auth')->group(function() {
+Route::middleware(['auth','verified'])->group(function() {
     Route::get('/user/queue/status', [UserController::class, 'queue_status'])->name('user.queue.status');
     Route::get('/user/applications', [UserController::class, 'application_stats'])->name('user.applications');
+
+    Route::get('/applications', [ApplicationController::class, 'index'])->name('applications');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/apply', [ApplyController::class, 'index'])->name('apply');

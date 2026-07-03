@@ -4,7 +4,8 @@
        class="fixed inset-y-0 left-0 z-50 w-[240px] -translate-x-full border-r border-[#262626] bg-[#0a0a0a] transition-transform duration-300 md:translate-x-0">
 
     <div class="flex h-16 items-center gap-3 border-b border-[#262626] px-5">
-        <img src="{{ asset(config('ui.brand.logo')) }}" alt="{{ config('ui.brand.name') }}" class="h-7 w-7 rounded-md" />
+        @include ('partials.logo')
+
         <div>
             <p class="text-sm font-semibold text-[#fafafa]">{{ config('ui.brand.name') }}</p>
             <p class="text-xs text-[#a1a1aa]">Enterprise Automation</p>
@@ -25,6 +26,12 @@
            class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ request()->routeIs('apply') ? 'bg-[#1e1e1e] text-[#fafafa]' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
             <i data-lucide="zap" class="w-4 h-4 opacity-70"></i>
             <span>Apply</span>
+        </a>
+
+        <a href="{{ route('applications') }}"
+           class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ request()->routeIs('applications') ? 'bg-[#1e1e1e] text-[#fafafa]' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
+            <i data-lucide="zap" class="w-4 h-4 opacity-70"></i>
+            <span>Application</span>
         </a>
 
         <div class="px-3 pt-4 pb-2 text-[11px] font-semibold text-[#71717a] uppercase tracking-wider">Provider</div>
@@ -66,7 +73,7 @@
         </a>
     </nav>
 
-    <div class="absolute inset-x-0 bottom-0  bg-[#0a0a0a] p-4 flex items-center gap-3">
+    <div class="absolute inset-x-0 bottom-0  bg-[#0a0a0a] p-4 flex items-center gap-3 border-t-1 border-[#262626]">
         <img
             src="{{ asset('assets/img/goat/messi.png') }}"
             alt="Avatar"

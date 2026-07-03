@@ -23,335 +23,16 @@
 @endphp
 
 @section('content')
-    <div class="mx-auto max-w-[1400px] space-y-6 px-1 pb-6 pt-2">
-
-        {{-- STAT CARDS AUTOMATION --}}
-        <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">STATUS</p>
-                <div id="main-status" class="mt-3 inline-flex items-center gap-2 rounded-full border border-[#262626] bg-[#0a0a0a] px-3 py-1.5">
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span id="status-dot-ping" class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping"></span>
-                        <span id="status-dot" class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
-                    </span>
-                    <span id="status-label" class="text-sm font-medium text-[#fafafa]">Running</span>
-                </div>
-                @if(!$isPaused && $next_run)
-                    <p class="mt-2 text-xs text-[#a1a1aa]">
-                        Next run: <span class="font-medium text-[#fafafa]">{{ \Carbon\Carbon::parse($next_run)->format('d M Y, H:i') }}</span>
-                    </p>
-                @endif
-            </article>
-            <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TOTAL PROSES</p>
-                <p id="stat-running" class="mt-3 text-3xl font-semibold text-[#fafafa]">0</p>
-            </article>
-
-            <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">ANTRIAN</p>
-                <p id="stat-queued" class="mt-3 text-3xl font-semibold text-[#fafafa]">0</p>
-            </article>
-            <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">PROGRES HARI INI</p>
-                <div class="mt-3 flex items-center gap-3">
-                    <div class="h-2 flex-1 overflow-hidden rounded-full bg-[#1b1b1b]">
-                        <div id="today-progress" class="h-full rounded-full bg-blue-600 transition-all duration-300" style="width:0%"></div>
-                    </div>
-                    <span id="today-count" class="text-xs font-medium text-[#fafafa]">0 / 200</span>
-                </div>
-            </article>
-        </section>
-
-        {{-- ANALYTICS SECTIONS --}}
-        <section id="analytics-section" class="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TOTAL LAMARAN BARU (SUCCESS)</p>
-                <p id="stat-success-count" class="mt-3 text-3xl font-semibold text-emerald-400">0</p>
-            </article>
-            <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">SUDAH PERNAH DILAMAR (APPLIED)</p>
-                <p id="stat-applied" class="mt-3 text-3xl font-semibold text-violet-400">0</p>
-            </article>
-            <article class="saas-card p-5">
-                <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">TINGKAT KEBERHASILAN (APPLIED & SUCCESS)</p>
-                <p id="stat-success" class="mt-3 text-3xl font-semibold text-[#fafafa]">0%</p>
-            </article>
-        </section>
-
+    <div class="flex flex-col gap-4">
+        <livewire:stats-overview />
         <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            <div class="saas-card p-6 xl:col-span-2">
-                <div class="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                        <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">Panel</h2>
-                        <p class="mt-1 text-sm text-[#a1a1aa]">Atur konfigurasi lamaran anda</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <button id="save-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-black transition hover:bg-white">Simpan</button>
-                        @if ($isPaused)
-                            <button id="resume-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white">Resume</button>
-                        @else
-                            <button id="stop-btn" class="h-8 cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white">Stop</button>
-                        @endif
-                    </div>
-                </div>
+            <livewire:panel-configuration :accounts="$accounts" :adapters="$adapters" />
+            <livewire:live-monitoring />
 
-                {{-- INPUT FIELDS --}}
-                <div class="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
-                    <div>
-                        <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Kata Kunci</label>
-                        <input type="text" name="keyword" id="keyword-input" required value="{{ $apply_configuration['keyword'] ?? '' }}" placeholder="Web Developer" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]" />
-                    </div>
-                    <div>
-                        <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Batch</label>
-                        <input type="number" name="pageSize" required value="{{ $apply_configuration['batch'] ?? '1' }}" min="1" max="20" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa]" />
-                    </div>
-                    <div>
-                        <label class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Interval</label>
-                        <input type="number" name="interval" disabled value="10" min="1" max="40" class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#888]" />
-                    </div>
-                </div>
-
-                {{-- TOGGLES & CHECKBOXES AREA --}}
-                <div class="mt-5 border-t border-[#262626] pt-4 flex flex-wrap items-center justify-between gap-4">
-                    {{-- Provider Selection --}}
-                    <div class="flex flex-wrap items-center gap-6">
-                        <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-[#fafafa] select-none group">
-                            {{-- Ditambahkan kembali class: provider-checkbox --}}
-                            <input type="checkbox" name="providers[]" value="jobstreet" class="provider-checkbox h-4 w-4 rounded border-[#262626] bg-[#0a0a0a] text-blue-600 focus:ring-0 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-40 transition"
-                                {{ in_array('jobstreet', $apply_configuration['providers'] ?? []) ? 'checked' : '' }}
-                                {{ !$hasJobstreet ? 'disabled' : '' }}>
-                            <span class="group-hover:text-[#fafafa] transition-colors {{ !$hasJobstreet ? 'opacity-40' : '' }}">JobStreet</span>
-                        </label>
-
-                        <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-[#fafafa] select-none group">
-                            {{-- Ditambahkan kembali class: provider-checkbox --}}
-                            <input type="checkbox" name="providers[]" value="glints" class="provider-checkbox h-4 w-4 rounded border-[#262626] bg-[#0a0a0a] text-blue-600 focus:ring-0 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-40 transition"
-                                {{ in_array('glints', $apply_configuration['providers'] ?? []) ? 'checked' : '' }}
-                                {{ !$hasGlints ? 'disabled' : '' }}>
-                            <span class="group-hover:text-[#fafafa] transition-colors {{ !$hasGlints ? 'opacity-40' : '' }}">Glints</span>
-                        </label>
-
-                        @if($isPaused)
-                            <span class="rounded-md border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">Paused</span>
-                        @endif
-                    </div>
-
-                    {{-- GLOBAL TOGGLE AUTO ANSWER --}}
-                    <div class="flex items-center gap-3">
-                        <span class="text-sm text-[#a1a1aa]">Auto Answer <i>(AI Powered)</i></span>
-                        <div class="flex items-center gap-2">
-                            <label class="relative inline-flex cursor-not-allowed items-center opacity-40">
-                                <input type="checkbox" disabled class="peer sr-only">
-                                <div class="w-9 h-5 rounded-full bg-[#1e1e1e] border border-[#333]"></div>
-                                <div class="absolute left-[4px] top-[4px] h-3 w-3 rounded-full bg-[#71717a]"></div>
-                            </label>
-                            <span class="text-xs font-medium text-[#71717a] uppercase tracking-wider">(Belum tersedia)</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- MONITORING PLACES --}}
-                <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
-                    <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-                        <p class="text-xs text-[#a1a1aa]">Current provider</p>
-                        <p id="current-provider" class="mt-1 text-sm font-medium text-[#fafafa]">-</p>
-                    </div>
-                    <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-                        <p class="text-xs text-[#a1a1aa]">Current job</p>
-                        <p id="current-job" class="mt-1 text-sm font-medium text-[#fafafa]">-</p>
-                    </div>
-                    <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-                        <p class="text-xs text-[#a1a1aa]">Current stage</p>
-                        <p id="current-stage" class="mt-1 text-sm font-medium text-[#fafafa]">Waiting</p>
-                    </div>
-                </div>
-
-                <div class="mt-5 rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-                    <div class="flex items-center justify-between text-xs text-[#a1a1aa]">
-                        <span>Progress</span>
-                        <span id="remaining-jobs">Estimated remaining jobs: 0</span>
-                    </div>
-                    <div class="mt-3 h-2 overflow-hidden rounded-full bg-[#1b1b1b]">
-                        <div id="current-progress-bar" class="h-full w-0 rounded-full bg-blue-600 transition-all duration-500"></div>
-                    </div>
-                    <div class="mt-4 flex flex-wrap gap-2">
-                        <span class="progress-step" data-step="applied">Already Applied</span>
-                        <span class="progress-step" data-step="questionnaire">Need Screening</span>
-                        <span class="progress-step" data-step="loading_job">Loading Job</span>
-                        <span class="progress-step" data-step="loading_profile">Loading Profile</span>
-                        <span class="progress-step" data-step="inspecting">Inspecting</span>
-                        <span class="progress-step" data-step="building_payload">Building Payload</span>
-                        <span class="progress-step" data-step="applying">Applying</span>
-                        <span class="progress-step" data-step="success">Success</span>
-                    </div>
-                    <p id="current-log-line" class="mt-4 text-sm text-[#a1a1aa]">No active process</p>
-                </div>
-            </div>
-
-            <div id="activity-section" class="saas-card p-6">
-                <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">Timeline Activity</h2>
-                <p class="mt-1 text-sm text-[#a1a1aa]">Newest events first</p>
-                <div id="activity-timeline" class="custom-scroll mt-5 max-h-[520px] space-y-3 overflow-y-auto pr-1">
-                    <div class="italic text-[#8b949e]">Menunggu aktivitas...</div>
-                </div>
+            <div class="saas-card p-6">
+                <livewire:activity-timeline />
             </div>
         </section>
-
-        {{-- QUEUE TABLE --}}
-        <section id="queue-section" class="saas-card overflow-hidden">
-            <div class="border-b border-[#262626] px-6 py-4">
-                <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">ANTRIAN</h2>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead class="bg-[#0a0a0a]">
-                    <tr class="text-left text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
-                        <th class="px-6 py-3">Provider</th>
-                        <th class="px-6 py-3">Keyword</th>
-                        <th class="px-6 py-3">Status</th>
-                        <th class="px-6 py-3">Attempts</th>
-                        <th class="px-6 py-3">Created</th>
-                        <th class="px-6 py-3">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody id="running-jobs-list" class="divide-y divide-[#262626]">
-                    <tr>
-                        <td colspan="6" class="px-6 py-6 text-sm italic text-[#8b949e]">No active jobs</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        {{-- DEPLOYMENT LOG --}}
-        <section class="saas-card p-6">
-            <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">Deployment Log</h2>
-            <p class="mt-1 text-sm text-[#a1a1aa]">Pantau lamaran melalui konsol</p>
-            <pre id="debug-output" class="custom-scroll mt-4 max-h-72 overflow-y-auto rounded-xl border border-[#262626] bg-[#0a0a0a] p-4 font-mono text-xs text-[#fafafa]">[00:00:00] [IDLE] [SYSTEM] Menunggu event masuk...</pre>
-        </section>
-
-        {{-- PROVIDER SETTINGS --}}
-        <section id="settings-section" class="space-y-4">
-            <h2 class="text-lg font-semibold tracking-tight text-[#fafafa]">Konfigurasi Provider</h2>
-            <div class="saas-card overflow-hidden">
-                <button type="button" class="provider-toggle flex w-full items-center justify-between px-5 py-4 transition hover:bg-[#171717]">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-briefcase text-xs text-[#a1a1aa]"></i>
-                        <span class="text-sm font-medium text-[#fafafa]">JobStreet</span>
-                        @if($hasJobstreet)
-                            <span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">Connected</span>
-                        @else
-                            <span class="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs text-amber-400">Not connected</span>
-                        @endif
-                    </div>
-                    <i class="fas fa-chevron-down text-xs text-[#a1a1aa] transition-transform duration-200"></i>
-                </button>
-                <div class="provider-content hidden border-t border-[#262626] px-5 pb-5 pt-4">
-                    @if($hasJobstreet)
-                        <form action="{{ route('connection.save-config', ['provider' => 'jobstreet']) }}" method="POST" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            @csrf
-                            <div class="space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-[#a1a1aa]">Auto-answer</span>
-                                    <div class="flex items-center gap-2">
-                                        <label for="auto_answer_jobstreet" class="relative inline-flex cursor-pointer items-center">
-                                            <input type="checkbox" name="auto_answer" id="auto_answer_jobstreet" value="1" class="peer sr-only" {{ ($jobstreet_config['auto_answer'] ?? false) ? 'checked' : '' }}>
-                                            <span class="h-5 w-9 rounded-full bg-[#27272a] transition-colors peer-checked:bg-blue-600"></span>
-                                            <span class="absolute left-[2px] top-[2px] h-4 w-4 rounded-full bg-white transition-transform peer-checked:translate-x-4"></span>
-                                        </label>
-                                        <span id="status-text-jobstreet" class="text-xs font-medium {{ ($jobstreet_config['auto_answer'] ?? false) ? 'text-blue-400' : 'text-[#8b949e]' }}">{{ ($jobstreet_config['auto_answer'] ?? false) ? 'On' : 'Off' }}</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Resume</label>
-                                    <select name="resume" class="saas-input mt-1 h-11 w-full rounded-xl px-3 text-sm text-[#fafafa]">
-                                        @if(isset($jobstreet_profile['resumes']))
-                                            @php($selected = $jobstreet_config['resume'] ?? null)
-                                            <option value="">Select</option>
-                                            @foreach($jobstreet_profile['resumes'] as $r)
-                                                <option value="{{ $r['id'] }}" {{ $selected == $r['id'] ? 'selected' : '' }}>{{ $r['fileMetadata']['name'] }}</option>
-                                            @endforeach
-                                        @else
-                                            <option value="">No resumes</option>
-                                        @endif
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Role</label>
-                                    <select name="role" class="saas-input mt-1 h-11 w-full rounded-xl px-3 text-sm text-[#fafafa]">
-                                        @if(isset($jobstreet_profile['roles']))
-                                            @php($selected = $jobstreet_config['role'] ?? null)
-                                            <option value="">Select</option>
-                                            @foreach($jobstreet_profile['roles'] as $r)
-                                                <option value="{{ $r['id'] }}" {{ $selected == $r['id'] ? 'selected' : '' }}>{{ $r['title']['text'] }}</option>
-                                            @endforeach
-                                        @else
-                                            <option value="">No roles</option>
-                                        @endif
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Location</label>
-                                    <input type="text" name="location" placeholder="Indonesia" value="{{ old('location', $jobstreet_config['location'] ?? '') }}" class="saas-input mt-1 h-11 w-full rounded-xl px-3 text-sm text-[#fafafa]">
-                                </div>
-                            </div>
-                            <div class="sm:col-span-2">
-                                <button type="submit" class="h-11 rounded-xl bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-500">Save</button>
-                            </div>
-                        </form>
-                    @else
-                        <div class="py-4 text-center text-sm text-amber-400">Not connected. <a href="{{ route('connection.jobstreet') }}" class="underline">Connect now</a></div>
-                    @endif
-                </div>
-            </div>
-
-            <div class="saas-card overflow-hidden">
-                <button type="button" class="provider-toggle flex w-full items-center justify-between px-5 py-4 transition hover:bg-[#171717]">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-globe text-xs text-[#a1a1aa]"></i>
-                        <span class="text-sm font-medium text-[#fafafa]">Glints</span>
-                        @if($hasGlints)
-                            <span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-400">Connected</span>
-                        @else
-                            <span class="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs text-amber-400">Not connected</span>
-                        @endif
-                    </div>
-                    <i class="fas fa-chevron-down text-xs text-[#a1a1aa] transition-transform duration-200"></i>
-                </button>
-                <div class="provider-content hidden border-t border-[#262626] px-5 pb-5 pt-4">
-                    @if($hasGlints)
-                        <form action="{{ route('connection.save-config', ['provider' => 'glints']) }}" method="POST" class="space-y-4">
-                            @csrf
-{{--                            <div class="flex items-center justify-between">--}}
-{{--                                <span class="text-xs text-[#a1a1aa]">Auto-answer</span>--}}
-{{--                                <div class="pointer-events-none flex items-center gap-2 opacity-40">--}}
-{{--                                    <span class="h-5 w-9 rounded-full bg-[#27272a]"></span>--}}
-{{--                                    <span class="text-xs text-[#a1a1aa]">Off</span>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-                            <div>
-                                <label class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">Locations</label>
-                                <div id="location-tags-container" class="mt-2 flex flex-wrap gap-1.5 empty:hidden"></div>
-                                <div class="relative mt-1">
-                                    <input type="text" id="location-search-input" placeholder="Type location..." autocomplete="off" class="saas-input h-11 w-full rounded-xl px-3 text-sm text-[#fafafa] placeholder:text-[#71717a]">
-                                    <div id="location-loading" class="absolute right-3 top-3 hidden"><i class="fas fa-spinner fa-spin text-xs text-[#a1a1aa]"></i></div>
-                                </div>
-                                <div id="location-hidden-inputs"></div>
-                                <div id="glints-initial-locations" data-ids="{{ json_encode(old('location_ids', $glints_config['location_ids'] ?? [])) }}" data-names="{{ json_encode(old('location_names', $glints_config['location_names'] ?? [])) }}" class="hidden"></div>
-                                <ul id="location-results" class="absolute z-50 mt-1 hidden max-h-44 w-full overflow-y-auto rounded-xl border border-[#262626] bg-[#111111] py-1 shadow-2xl"></ul>
-                            </div>
-                            <button type="submit" class="h-11 rounded-xl bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-500">Save</button>
-                        </form>
-                    @else
-                        <div class="py-4 text-center text-sm text-amber-400">Not connected. <a href="{{ route('connection.glints') }}" class="underline">Connect now</a></div>
-                    @endif
-                </div>
-            </div>
-        </section>
-
-        <div id="debug-panel" class="hidden"></div>
     </div>
 @endsection
 
@@ -836,7 +517,9 @@
         setInterval(fetchApplicationStats, 60000);
         initLocationAutocomplete();
 
-        Pusher.logToConsole = true;
+        Pusher.logToConsole = false; // Set ke false agar konsol browser tetap bersih
+
+        // Inisialisasi koneksi Pusher / Reverb Websocket
         var pusher = new Pusher("{{ env('REVERB_APP_KEY') }}", {
             cluster: "",
             wsHost: "{{ env('REVERB_HOST', '127.0.0.1') }}",
@@ -844,13 +527,33 @@
             forceTLS: false,
             enabledTransports: ['ws'],
             authEndpoint: '/broadcasting/auth',
-            auth: { headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') } }
+            auth: {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            }
         });
+
         var userId = '{{ auth()->id() }}';
         var channel = pusher.subscribe("private-users." + userId);
+
         channel.bind("JobStatus", (data) => {
-            addActivityItem(data);
-            fetchStatus();
+            Livewire.dispatch('job-status-updated', {
+                data: {
+                    status: data.status,
+                    provider: data.provider,
+                    jobId: data.job.id,
+                    jobTitle: data.job.title,
+                    jobCompany: data.job.company
+                }
+            });
+
+            if (typeof fetchStatus === 'function') {
+                fetchStatus();
+            }
+            if (typeof fetchApplicationStats === 'function') {
+                fetchApplicationStats();
+            }
         });
     });
 </script>
