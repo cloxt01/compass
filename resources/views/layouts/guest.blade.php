@@ -8,6 +8,8 @@
     <title>{{ config('app.name', 'Compass') }}</title>
 
     {{-- Font & Icons dari Geist --}}
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/img/icon.svg') }}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap" rel="stylesheet">
