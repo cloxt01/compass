@@ -1,5 +1,10 @@
 @extends('layouts.guest')
 
+@php
+    $tanggal = '2024-06-01';
+    $lastUpdated = date("F d, Y", strtotime($tanggal));;
+@endphp
+
 @section('title', 'Terms of Service')
 
 @section('body-class', 'bg-[#0a0a0a] text-[#fafafa] antialiased')
@@ -25,7 +30,8 @@
             </h1>
 
             <p class="mt-4 text-[#a1a1aa]">
-                Last updated: {{ now()->format('F d, Y') }}
+                Last updated: {{ $lastUpdated  }}
+
             </p>
         </div>
 
