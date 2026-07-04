@@ -1,4 +1,6 @@
-<x-guest-layout>
+@extends('layouts.guest-auth')
+
+@section('content')
     <div class="mx-auto max-w-[440px] space-y-6 pt-12 pb-6">
 
         {{-- CARD CONTAINER --}}
@@ -58,4 +60,5 @@
             </a>
         </p>
     </div>
-</x-guest-layout>
+@endsection
+

@@ -1,4 +1,6 @@
-<x-guest-layout>
+@extends('layouts.guest-auth')
+
+@section('content')
     <div class="mx-auto max-w-[440px] space-y-6 pt-12 pb-6">
 
         {{-- CARD CONTAINER --}}
@@ -14,9 +16,9 @@
 
             {{-- BODY --}}
             <div class="p-6 space-y-4">
-{{--                <div class="text-xs leading-relaxed text-[#a1a1aa]">--}}
-{{--                    {{ __('Lupa Password? Chill, biar kami kirim link reset password ke akunmu') }}--}}
-{{--                </div>--}}
+                {{--                <div class="text-xs leading-relaxed text-[#a1a1aa]">--}}
+                {{--                    {{ __('Lupa Password? Chill, biar kami kirim link reset password ke akunmu') }}--}}
+                {{--                </div>--}}
 
                 <!-- Session Status -->
                 <x-auth-session-status class="mb-4 text-xs text-emerald-400" :status="session('status')" />
@@ -49,4 +51,5 @@
             </a>
         </p>
     </div>
-</x-guest-layout>
+@endsection
+

@@ -1,132 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <x-og-meta />
+@extends('layouts.guest')
 
-    <title>Welcome to Compass</title>
+@section('title', 'Welcome to Compass')
 
-    {{-- Favicon untuk tab browser --}}
-    <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}">
-    <link rel="apple-touch-icon" href="{{ asset('assets/logo.svg') }}">
+@section('body-class', 'bg-[#0a0a0a] text-[#fafafa] overflow-hidden antialiased')
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
-        body { font-family: 'Geist', sans-serif; }
+@section('main-class', 'flex flex-1 flex-col justify-center')
 
-        @keyframes elegant-bounce {
-            0%, 100% {
-                transform: translateY(0);
-                animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-            }
-            50% {
-                transform: translateY(-10px);
-                animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-            }
-        }
+@section('background')
+    <div class="absolute inset-0 z-0 overflow-hidden">
+        <video
+            autoplay
+            muted
+            loop
+            playsinline
+            class="h-full w-full object-cover opacity-50"
+        >
+            <source src="{{ asset('assets/video/background.mp4') }}" type="video/mp4">
+        </video>
 
-        @keyframes fadeInBounce {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            60% {
-                opacity: 1;
-                transform: translateY(-5px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-[#0a0a0a]/40 to-[#0a0a0a] backdrop-blur-[2px]"></div>
+    </div>
+@endsection
 
-        .animate-elegant-bounce {
-            animation: elegant-bounce 2s infinite;
-        }
+@section('content')
+    <section class="mx-auto flex max-w-2xl flex-col items-center px-6 text-center">
 
-        .animate-fade-in-bounce {
-            animation: fadeInBounce 0.8s ease-out forwards;
-        }
-
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-400 { animation-delay: 0.4s; }
-        .delay-600 { animation-delay: 0.6s; }
-    </style>
-</head>
-<body class="bg-[#0a0a0a] text-[#fafafa] overflow-hidden antialiased">
-
-<div class="absolute inset-0 z-0 h-full w-full overflow-hidden">
-    <video
-        autoplay
-        loop
-        muted
-        playsinline
-        class="h-full w-full object-cover opacity-50"
-    >
-        <source src="{{ asset('assets/video/background.mp4') }}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-[#0a0a0a]/40 to-[#0a0a0a] backdrop-blur-[2px]"></div>
-</div>
-
-<main class="relative z-10 flex h-screen flex-col justify-between px-6 py-8 md:px-12">
-
-    <header class="flex items-center justify-between opacity-0 animate-fade-in-bounce">
-        <div class="flex items-center gap-2.5">
-            @include ('partials.logo', ['class' => 'h-8 w-8'])
-            <span class="text-sm font-semibold tracking-wide text-[#fafafa]">{{ config('ui.brand.name', 'Compass') }}</span>
-        </div>
-        <a href="{{ route('login') }}" class="inline-flex h-9 items-center justify-center rounded-md bg-[#1e1e1e] border border-[#333] px-4 text-xs font-semibold text-[#fafafa] hover:bg-[#262626] transition">
-            Sign In
-        </a>
-    </header>
-
-    <section class="mx-auto flex max-w-2xl flex-col items-center text-center">
         <div class="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400 opacity-0 animate-fade-in-bounce animate-elegant-bounce">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <i data-lucide="sparkles" class="h-3.5 w-3.5"></i>
             <span>Next-Gen Enterprise Automation</span>
         </div>
 
-        <h1 class="mt-6 text-4xl font-bold tracking-tight text-[#fafafa] sm:text-6xl bg-gradient-to-b from-[#fafafa] to-[#a1a1aa] bg-clip-text text-transparent leading-tight opacity-0 animate-fade-in-bounce delay-200">
+        <h1 class="mt-6 bg-gradient-to-b from-[#fafafa] to-[#a1a1aa] bg-clip-text text-4xl font-bold leading-tight tracking-tight text-transparent opacity-0 animate-fade-in-bounce delay-200 sm:text-6xl">
             Automate Your Job Application Workflow
         </h1>
 
-        <p class="mt-4 text-sm text-[#a1a1aa] sm:text-base max-w-lg leading-relaxed opacity-0 animate-fade-in-bounce delay-400">
-            Let AI-powered pipelines seek out opportunities, inspect job requirements, and manage deployments smoothly across multiple providers.
+        <p class="mt-4 max-w-lg text-sm leading-relaxed text-[#a1a1aa] opacity-0 animate-fade-in-bounce delay-400 sm:text-base">
+            Let AI-powered pipelines seek out opportunities, inspect job requirements,
+            and manage deployments smoothly across multiple providers.
         </p>
 
         <div class="mt-8 flex flex-wrap items-center justify-center gap-4 opacity-0 animate-fade-in-bounce delay-600">
-            <a href="{{ route('register') }}" class="inline-flex h-11 items-center justify-center rounded-xl bg-[#fafafa] px-6 text-sm font-semibold text-black hover:bg-white transition shadow-lg shadow-white/5 transform hover:-translate-y-0.5">
+
+            <a
+                href="{{ route('register') }}"
+                class="inline-flex h-11 items-center justify-center rounded-xl bg-[#fafafa] px-6 text-sm font-semibold text-black shadow-lg shadow-white/5 transition hover:-translate-y-0.5 hover:bg-white"
+            >
                 Get Started Free
             </a>
-            <a href="#features" class="inline-flex h-11 items-center justify-center rounded-xl border border-[#262626] bg-[#0a0a0a]/60 px-6 text-sm font-semibold text-[#a1a1aa] hover:text-[#fafafa] hover:bg-[#1e1e1e]/80 transition">
+
+            <a
+                href="#features"
+                class="inline-flex h-11 items-center justify-center rounded-xl border border-[#262626] bg-[#0a0a0a]/60 px-6 text-sm font-semibold text-[#a1a1aa] transition hover:bg-[#1e1e1e]/80 hover:text-[#fafafa]"
+            >
                 Learn More
             </a>
+
         </div>
+
     </section>
-
-    <footer class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between text-xs text-[#71717a] opacity-0 animate-fade-in-bounce delay-600">
-        <div>
-            &copy; {{ date('Y') }} {{ config('ui.brand.name', 'Compass') }}. All rights reserved.
-        </div>
-        <div class="flex items-center gap-4">
-            <a href="#" class="hover:text-[#a1a1aa] transition">Terms</a>
-            <a href="#" class="hover:text-[#a1a1aa] transition">Privacy</a>
-            <span class="h-1 w-1 rounded-full bg-[#333]"></span>
-            <span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> All systems operational</span>
-        </div>
-    </footer>
-
-</main>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-    });
-</script>
-</body>
-</html>
+@endsection
