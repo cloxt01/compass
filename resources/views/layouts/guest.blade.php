@@ -143,11 +143,11 @@
 
                 <div class="flex items-center gap-4">
 
-                    <a class="transition hover:text-[#a1a1aa] cursor-pointer" href="{{ route('terms') }}">
+                    <a class="transition hover:text-[#a1a1aa] cursor-pointer {{ request()->routeIs('terms') ? 'text-[#a1a1aa]' : '' }}" href="{{ route('terms') }}">
                         Terms
                     </a>
 
-                    <a class="transition hover:text-[#a1a1aa] cursor-pointer" href="{{ route('privacy') }}">
+                    <a class="transition hover:text-[#a1a1aa] cursor-pointer {{ request()->routeIs('privacy') ? 'text-[#a1a1aa]' : '' }}" href="{{ route('privacy') }}">
                         Privacy
                     </a>
 
