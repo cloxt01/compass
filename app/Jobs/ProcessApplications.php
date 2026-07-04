@@ -68,10 +68,11 @@ class ProcessApplications implements ShouldQueue
         $is_already = ApplicationHelper::alreadyApplied($this->user->id, $this->job_id);
 
         if ($is_already) {
-            Log::info('Already applied : ');
-
-            // 3. GUNAKAN $jobData DI SINI
-            Log::info(json_encode($this->jobData));
+            Log::info('Already applied : ', (array) json_encode($this->jobData));
+            if($is_already === 'success') {
+                JobStatus::dispatch($this->user->id, $this->jobData, $providerName, 'applied');
+                return;
+            }
             JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $is_already);
             return;
         }
