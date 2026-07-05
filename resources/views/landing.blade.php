@@ -45,7 +45,7 @@
                 href="{{ route('register') }}"
                 class="inline-flex h-11 items-center justify-center rounded-xl bg-[#fafafa] px-6 text-sm font-semibold text-black shadow-lg shadow-white/5 transition hover:-translate-y-0.5 hover:bg-white"
             >
-                Get Started Free
+                Get Early Access
             </a>
 
             <a
