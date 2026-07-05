@@ -15,6 +15,12 @@ use Illuminate\Support\Facades\Redis;
 Route::get('/', function () {
     return view('landing');
 });
+Route::get('terms', function () {
+    return view('terms');
+})->name('terms');
+Route::get('privacy', function () {
+    return view('privacy');
+})->name('privacy');
 
 Route::middleware(['auth','verified'])->group(function() {
     Route::get('/user/queue/status', [UserController::class, 'queue_status'])->name('user.queue.status');
