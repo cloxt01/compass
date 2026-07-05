@@ -92,3 +92,7 @@
 .ui-btn-muted:hover {
     background: #172554;
 }
+
+[x-cloak] {
+    display: none !important;
+}

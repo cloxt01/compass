@@ -1,7 +1,13 @@
-import './bootstrap';
-import './sidebar';
-import { createIcons, icons } from 'lucide';
+import './bootstrap'
+import './sidebar'
+
+
+
+import { createIcons, icons } from 'lucide'
 
 createIcons({
-    icons: icons
-});
+    icons,
+})
+import glintsSearchLocation from './alpine/glints-search-location.js'
+Alpine.data('glintsSearchLocation', glintsSearchLocation)
+

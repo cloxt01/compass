@@ -71,6 +71,14 @@
             <i data-lucide="settings" class="w-4 h-4 opacity-70"></i>
             <span>Settings</span>
         </a>
+
+        <div class="px-3 pt-4 pb-2 text-[11px] font-semibold text-[#71717a] uppercase tracking-wider">Product</div>
+
+        <a href="{{ route('products.compass-link') }}"
+           class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ request()->routeIs('products.compass-link') ? 'bg-[#1e1e1e] text-[#fafafa]' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
+            <i data-lucide="settings" class="w-4 h-4 opacity-70"></i>
+            <span>CompassLink</span>
+        </a>
     </nav>
 
     <div class="absolute inset-x-0 bottom-0  bg-[#0a0a0a] p-4 flex items-center gap-3 border-t-1 border-[#262626]">

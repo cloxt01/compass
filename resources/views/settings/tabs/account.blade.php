@@ -3,6 +3,17 @@
     <div class="px-5 py-4 border-b border-[#262626]">
         <h2 class="text-sm font-semibold text-[#fafafa]">Account Settings</h2>
     </div>
+    <div class="px-5 pt-4 space-y-1">
+        <p class="text-sm font-medium text-amber-200">
+            Perhatian
+        </p>
+        
+        <p class="text-sm text-amber-100/70 leading-relaxed">
+            Jika mengganti alamat email, maka kamu harus memverifikasi ulang email barumu.
+            Jika tidak, akunmu akan tersangkut
+        </p>
+
+    </div>
 
     <form action="{{ route('profile.update') }}" method="POST" class="p-5 space-y-4">
         @csrf

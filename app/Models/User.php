@@ -22,17 +22,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'job_id',
-        'job_title',
-        'job_company',
         'apply_configuration',
         'last_apply_configuration',
         'status',
-        'provider',
-        'user_id',
-        'access_token',
-        'cookie',
-        'updated_at',
         'automation_paused',
     ];
 

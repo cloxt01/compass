@@ -2,127 +2,102 @@
 
 namespace App\Console\Commands;
 
-use App\Models\ApplyQueue;
+use App\Jobs\SearchJob;
+use App\Models\Round;
 use App\Models\Schedule;
 use App\Models\User;
-use App\Clients\GlintsAPI;
-use App\Clients\JobstreetAPI;
-use App\Jobs\ProcessApplications;
-use App\Models\SchedulerLog;
-use App\Services\Adapters\GlintsAdapter;
-use App\Services\Adapters\JobstreetAdapter;
-use App\Services\JobDetails;
-use App\Support\ApplicationHelper;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Queue;
-use PHPUnit\Util\PHP\Job;
+use Throwable;
 
 class ApplyScheduler extends Command
 {
     protected $signature = 'app:apply-scheduler';
     protected $description = 'Scheduler auto apply jobs untuk semua user aktif';
 
-    public function handle()
+    public function handle(): int
     {
-        User::with(['glintsAccount', 'jobstreetAccount'])
-            ->where('automation_paused', '!=', 1)
-            ->chunk(50, function ($users) {
+        $startedAt = now();
+        $dispatched = 0;
 
-                foreach ($users as $user) {
-                    $conf = $user->apply_configuration ?? [];
-                    $selectedProviders = $conf['providers'] ?? [];
-
-                    if (empty($conf) || empty($selectedProviders)) {
-                        Log::warning('User ID : '. $user->id. ' belum mengatur konfigurasi');
-                        continue;
+        try {
+            $round = Round::create([
+                'status' => 'pending',
+                'started_at' => $startedAt,
+            ]);
+            User::query()
+                ->where('automation_paused', false)
+                ->where(function ($query) {
+                    $query->has('jobstreetAccount')
+                        ->orHas('glintsAccount');
+                })
+                ->chunkById(50, function ($users) use (&$dispatched, $round) {
+                    foreach ($users as $user) {
+                        SearchJob::dispatch($user->id, $round->id);
+                        $dispatched++;
                     }
+                });
 
-                    $accounts = [
-                        'glints'    => $user->glintsAccount,
-                        'jobstreet' => $user->jobstreetAccount,
-                    ];
+            Schedule::updateOrInsert(
+                [
+                    'signature' => $this->signature,
+                ],
+                [
+                    'last_run'   => $startedAt,
+                    'next_run'   => $startedAt->copy()->addMinutes(5),
+                    'last_status'=> 'success',
+                ]
+            );
 
-                    foreach ($accounts as $provider => $account) {
-                        if ($account && in_array($provider, $selectedProviders)) {
+            $duration = round((microtime(true) - LARAVEL_START) * 1000);
 
-                            try {
-                                $adapter = match ($provider) {
-                                    'glints'    => new GlintsAdapter(new GlintsAPI($account->access_token, $account->cookie)),
-                                    'jobstreet' => new JobstreetAdapter(new JobstreetAPI($account->access_token)),
-                                };
-                            } catch (\UnhandledMatchError $e) {
-                                SchedulerLog::create([
-                                    'message'   => 'Unknown provider: ' . $provider,
-                                    'exception' => $e->getMessage(),
-                                ]);
-                                continue;
-                            }
+            $round->update([
+                'status'            => 'processing',
+                'total_user'        => $dispatched,
+                'total_dispatched'  => $dispatched,
+                'duration_ms'       => $duration,
+                'finished_at'       => now(),
+            ]);
 
-                            $params = match ($provider) {
-                                'jobstreet' => [
-                                    'keyword'  => (string) ($conf['keyword'] ?? ''),
-                                    'pageSize' => (int) ($conf['batch'] ?? 5),
-                                ],
-                                'glints' => [
-                                    'SearchTerm'  => (string) ($conf['keyword'] ?? ''),
-                                    'LocationIds' => (array) $account->getConfig('location_ids', []),
-                                    'pageSize'    => (int) ($conf['batch'] ?? 5),
-                                ]
-                            };
+            Log::info('Apply Scheduler completed', [
+                'round_id'          => $round->id,
+                'users_dispatched'  => $dispatched,
+                'duration_ms'       => $duration,
+                'started_at'        => $startedAt,
+                'finished_at'       => now(),
+            ]);
 
-                            try {
-                                $jobs = $adapter->job()->search($params);
 
-                                $data = match ($provider) {
-                                    'jobstreet' => $jobs['data']['data'] ?? [],
-                                    'glints'    => $jobs['data']['searchJobsV3']['jobsInPage'] ?? [],
-                                };
+            $this->info(sprintf(
+                '[%s] Scheduler selesai | Jobs: %d | Durasi: %ss',
+                $startedAt->toDateTimeString(),
+                $dispatched,
+                $duration
+            ));
 
-                                foreach ($data as $job) {
-                                    $raw['details'] = $job;
-                                    $job = match($provider) {
-                                        'jobstreet' => JobDetails::fromJobstreet($raw),
-                                        'glints' => JobDetails::fromGlints($raw),
-                                    };
-                                    Log::info('Scheduler JOB : ');
-                                    Log::info(json_encode($job));
+            return self::SUCCESS;
 
-                                    $queueId = Queue::connection('database')->push(new ProcessApplications($user, $provider, $job));
+        } catch (Throwable $e) {
 
-                                    ApplyQueue::create([
-                                        'job_id' => $queueId,
-                                        'user_id' => $user->id,
-                                    ]);
-                                }
+            Schedule::updateOrInsert(
+                [
+                    'signature' => $this->signature,
+                ],
+                [
+                    'last_run'    => $startedAt,
+                    'last_status' => 'failed',
+                ]
+            );
 
-                            } catch (\Exception $e) {
-                                Schedule::updateOrInsert(
-                                    [
-                                        'signature' => $this->signature
-                                    ],
-                                    [
-                                        'last_run' => now(),
-                                        'next_run' => now()->addMinutes(10),
-                                        'last_status' => 'failed',
-                                    ]);
-                                Log::error("Scheduler Error untuk User ID {$user->id} di {$provider}: " . $e->getMessage());
-                            }
-                        }
-                    }
-                }
-            });
+            Log::error('Apply Scheduler failed', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ]);
 
-        Schedule::updateOrInsert(
-            [
-                'signature' => $this->signature
-            ],
-            [
-            'last_run' => now(),
-            'next_run' => now()->addMinutes(10),
-            'last_status' => 'success',
-        ]);
-        $this->info('Scheduler auto apply berhasil dijalankan.');
+            $this->error($e->getMessage());
+
+            return self::FAILURE;
+        }
     }
 }

@@ -5,9 +5,12 @@
     <title>@yield('title', config('ui.brand.name'))</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <x-og-meta />
 
+    <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}">
     <link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome-all.min.css') }}" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/bootstrap.js'])
     @stack('styles')
 </head>
 

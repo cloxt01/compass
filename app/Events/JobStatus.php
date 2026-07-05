@@ -37,7 +37,6 @@ class JobStatus implements ShouldBroadcastNow
      */
     public function broadcastWith()
     {
-        Log::info(json_encode($this->jobData));
         return [
             'data' => [
                 'job' => [

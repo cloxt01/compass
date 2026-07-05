@@ -29,13 +29,15 @@ class SettingsController extends Controller
             'password' => ['nullable', 'string', 'min:5'],
         ]);
 
+        if($user->email != $validated['email']) {
+            $user->email_verified_at = null;
+        }
         $user->name = $validated['name'];
         $user->email = $validated['email'];
 
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
-
         $user->save();
 
         return redirect()->back()->with('success', 'Profile updated successfully.');

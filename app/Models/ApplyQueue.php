@@ -13,6 +13,7 @@ class ApplyQueue extends Model
     protected $fillable = [
         'job_id',
         'user_id',
+        'round_id'
     ];
 
 

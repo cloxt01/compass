@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('job_id')->unique();
             $table->unsignedBigInteger('user_id');
-
+            $table->unsignedBigInteger('round_id');
+            $table->foreign('round_id')->references('id')->on('rounds')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
             $table->timestamp('created_at')->useCurrent();

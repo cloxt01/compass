@@ -47,10 +47,11 @@
                         </p>
 
                         <form
-                            method="GET"
+                            method="POST"
                             action="{{ route('api.connection.disconnect', ['provider' => $provider]) }}"
                             class="mt-6">
                             @csrf
+                            @method('DELETE')
 
                             <button
                                 type="submit"

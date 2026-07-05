@@ -31,7 +31,7 @@ class JobInspector
         if(!empty($job['products']['questionnaire'])){
             $issues[] = [
                 'type' => 'questionnaire',
-                'level' => 'soft',
+                'level' => 'hard',
                 'message' => 'Anda harus menjawab pertanyaan untuk melamar pekerjaan ini'
             ];
         }
