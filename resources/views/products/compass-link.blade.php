@@ -1,5 +1,8 @@
 @extends('layouts.app')
-
+@php
+    $repo = "https://github.com/cloxt01/compass-ext";
+    $downloadLink = asset('assets/extension/compass-ext.zip');
+@endphp
 @section('content')
     <div class="w-full bg-[#090909]">
         <div class="mx-auto w-full max-w-[1500px] space-y-8 px-6 py-8 sm:px-8 lg:px-10">
@@ -23,14 +26,14 @@
                         </p>
 
                         <div class="mt-8 flex flex-wrap gap-3">
-                            <a href="{{ asset('assets/extension/compass-ext.zip') }}"
+                            <a href="{{ $downloadLink }}"
                                download
                                target="_blank"
                                class="rounded-lg bg-violet-600 px-6 py-3 text-sm font-medium text-white transition hover:bg-violet-500">
                                 Download ZIP
                             </a>
 
-                            <a href="https://github.com/your-repo"
+                            <a href="{{ $repo }}"
                                target="_blank"
                                class="rounded-lg border border-[#262626] bg-[#111111] px-6 py-3 text-sm text-[#d4d4d8] transition hover:bg-[#181818]">
                                 GitHub
