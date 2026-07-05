@@ -35,7 +35,7 @@ new class extends Component
                 'appliedCount' => 0,
                 'successRate' => 0,
                 'todayDone' => 0,
-                'scheduleId' => null,   // ✅ perbaikan: tidak mengakses $schedule
+                'roundId' => null,
                 'nextRun' => null,
                 'lastRun' => null,
                 'lastStatus' => null,
@@ -76,6 +76,9 @@ new class extends Component
         $schedule = DB::table('schedules')
             ->where('signature', 'app:apply-scheduler')
             ->first();
+        $round = DB::table('rounds')
+            ->latest()
+            ->first();
 
         return [
             'pending' => $pending,
@@ -84,7 +87,7 @@ new class extends Component
             'appliedCount' => $appliedCount,
             'successRate' => $successRate,
             'todayDone' => $todayDone,
-            'scheduleId' => $schedule->id ?? null,
+            'roundId' => $round->id ?? null,
             'nextRun' => $schedule->next_run ?? null,
             'lastRun' => $schedule->last_run ?? null,
             'lastStatus' => $schedule->last_status ?? null,
@@ -102,8 +105,8 @@ new class extends Component
             <div class="flex items-center justify-between">
                 <p class="text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">
                     NEXT ROUND
-                    @if($scheduleId)
-                        <span class="text-[#52525b]">#{{ $scheduleId }}</span>
+                    @if($roundId)
+                        <span class="text-[#52525b]">#{{ $roundId }}</span>
                     @endif
                 </p>
             </div>
