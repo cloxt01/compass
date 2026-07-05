@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\Auth\Provider\JobstreetAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\ConnectionController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
@@ -26,11 +28,15 @@ Route::middleware(['auth','verified'])->group(function() {
     Route::prefix('settings')->group(function() {
         Route::get('/', [SettingsController::class, 'settings'])->name('settings');
     });
+    Route::prefix('products')->group(function() {
+       Route::get('/compass-link', [ProductController::class, 'compass_link'])->name('products.compass-link');
+    });
     Route::prefix('connection')->group(function() {
         Route::get('/connect/jobstreet', fn() => view('connection.jobstreet'))->name('connection.jobstreet');
         Route::get('/connect/glints', fn() => view('connection.glints'))->name('connection.glints');
         Route::post('/{provider}/save-token', [ConnectionController::class, 'save_token'])->name('connection.save-token');
-        Route::get('/{provider}/disconnect', [ConnectionController::class, 'disconnect'])->name('api.connection.disconnect');
+        Route::get('/{provider}/connect', [ConnectionController::class, 'connect'])->name('connection.connect');
+        Route::delete('/{provider}/disconnect', [ConnectionController::class, 'disconnect'])->name('api.connection.disconnect');
         Route::post('/{provider}/save-config', [ConnectionController::class, 'save_config'])->name('connection.save-config');
     });
 

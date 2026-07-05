@@ -51,42 +51,33 @@ class ConnectionController extends Controller {
         return response()->json(['status' => 'started'], 200);
     }
 
-    public function verify_otp(Request $request, $provider){
-        try {
-            $request->validate([
-                'email' => 'required|email',
-                'verification_code' => 'required|string|max:20',
-                'request_id' => 'required|string|max:255'
-            ]);
-            $client = match($provider) {
-                'jobstreet' => new JobstreetToken,
-                // Provider lainn
-                default => throw new UnknownProvider($provider)
-            };
+    public function connect(Request $request, string $provider): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate([
+            'access_token' => 'required|string',
+            'refresh_token' => 'required|string',
+            'expires_in' => 'required|integer',
+        ]);
 
-            $is_verified = $client->verify_otp($request->input('email'), $request->input('verification_code'));
+        $user = auth()->user();
 
-            switch($is_verified){
-                case 'blocked':
-                    return response()->json(['status' => 'failed', 'errors' => [$provider.'_server' => ['Too many requests, please unblock your account in email inbox']]], 429);
-                case 'unverified':
-                    return response()->json(['status' => 'failed', 'data' => 'Invalid OTP'], 200);
-                case 'failed':
-                    return response()->json(['status' => 'failed', 'errors' => ['server' => ['Server error, please try again later.']]], 500);
-                case 'verified':
-                    break;
-            }
-            $this->redis->hset(("otp:". $request->input('request_id')), "otp", $request->input('verification_code'));
-            $this->redis->expire("otp:". $request->input('request_id'), 3600);
+        $account = match ($provider) {
+            'jobstreet' => $user->jobstreetAccount(),
+            'glints' => $user->glintsAccount(),
+            default => abort(404)
+        };
 
-
-            return response()->json(['status' => 'success', 'data' => 'OK'], 200);
-        } catch(\UnknownProvider $e){
-            return response()->json(['status' => 'failed', 'errors' => ['provider' =>[$e->getMessage()]]], 400);
-        } catch(\Exception $e){
-            return response()->json(['status' => 'failed', 'errors' => ['server' => [$e->getMessage()]]], 500);
-        }
-
+        $account->updateOrCreate(
+            [
+                'user_id' => $user->id,
+            ],
+            [
+                'access_token' => $request->input('access_token'),
+                'refresh_token' => $request->input('refresh_token'),
+                'expired_at' => now()->addSeconds((int) $request->input('expires_in')),
+            ]
+        );
+        return redirect()->route('connection.' . $provider)->with('success', 'Connected to ' . ucfirst($provider) . ' successfully.');
     }
 
     public function disconnect(Request $request, $provider){
