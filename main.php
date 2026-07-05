@@ -42,8 +42,10 @@ if(!$token){
 
 $client = new JobstreetAPI($token, $cookie);
 $adapter = new JobstreetAdapter($client);
-$job = $adapter->job();
-var_dump(JobDetails::fromJobstreet($job->details('92727497')));
+$profile = $adapter->loadProfile();
+var_dump($profile);
+//$job = $adapter->job();
+//var_dump(JobDetails::fromJobstreet($job->details('92727497')));
 
 //print_r($job->hiring_question(['jobId' => '403c0949-fc7e-44ba-acfb-c78dac3f5a9b']));
 //$useCase = new ApplyUseCase($adapter, $glintsaccount);

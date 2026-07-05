@@ -60,7 +60,11 @@ class SearchJob implements ShouldQueue
             }
 
             $conf = $user->apply_configuration ?? [];
-            $selectedProviders = $conf['providers'] ?? [];
+
+            $selectedProviders = collect(self::ALLOWED_PROVIDER)
+                ->filter(fn ($provider) => data_get($conf, "{$provider}.enabled", false))
+                ->values()
+                ->all();
 
             if (empty($selectedProviders)) {
                 Log::warning('Belum ada provider yang dipilih.', [
@@ -85,17 +89,20 @@ class SearchJob implements ShouldQueue
                     continue;
                 }
 
+                $providerConfig = $conf[$provider] ?? [];
                 $params = match ($provider) {
+
                     'jobstreet' => [
-                        'keyword' => (string)($conf['keyword'] ?? ''),
-                        'pageSize' => (int)($conf['batch'] ?? 0),
+                        'keyword' => implode(',', $providerConfig['keyword'] ?? []),
+                        'pageSize' => $providerConfig['batch'] ?? 1,
                     ],
+
                     'glints' => [
-                        'SearchTerm' => (string)($conf['keyword'] ?? ''),
-                        'LocationIds' => (array)$user->glintsAccount->getConfig('location_ids', []),
-                        'pageSize' => (int)($conf['batch'] ?? 1),
+                        'SearchTerm' => implode(',', $providerConfig['keyword'] ?? []),
+                        'LocationIds' => $providerConfig['location_ids'] ?? [],
+                        'pageSize' => $providerConfig['batch'] ?? 1,
                     ],
-                    default => throw new \InvalidArgumentException("Unknown provider '{$provider}'"),
+
                 };
                 $jobs = $adapter->job()->search($params);
 

@@ -118,6 +118,7 @@ class JobstreetAPI extends api
         if ($options['cookies']) {
             $out['cookies'] = null;
         }
+        Log::info(json_encode($out));
 
         Log::info("GraphQL operation '$operation' executed with status: " . ($out['ok'] ? 'success' : 'failure') . ", type: " . ($out['type'] ?? 'none') . ", http_code: " . ($out['http_code'] ?? 'none'));
 

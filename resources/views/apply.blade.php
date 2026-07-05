@@ -26,21 +26,24 @@
     <div class="flex flex-col gap-6">
         <livewire:stats-overview />
 
-        <section class="grid grid-cols-1 gap-6 lg:grid-cols-3 ">
+        <section class="grid grid-cols-1 gap-6 lg:grid-cols-2 ">
 
-            <div class="lg:col-span-2 gap-6">
+            <div class="lg:col-span-1 gap-6">
+                <livewire:provider-configuration :accounts="$accounts" :adapters="$adapters" />
                 <livewire:panel-configuration :accounts="$accounts" :adapters="$adapters" />
             </div>
 
             <div class="lg:col-span-1">
                 <livewire:live-monitoring />
+                <div class="saas-card p-6">
+                    <livewire:activity-timeline />
+
+                </div>
             </div>
         </section>
 
         <section class="grid grid-cols-1">
-            <div class="saas-card p-6">
-                <livewire:activity-timeline />
-            </div>
+
         </section>
     </div>
 @endsection

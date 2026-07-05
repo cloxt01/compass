@@ -37,29 +37,6 @@ class JobstreetToken extends api implements PlatformToken
         ];
     }
 
-    public  function verify_otp($email, $code)
-    {
-        $payload = [
-            "client_id" => config('compass.platforms.jobstreet.client_id'),
-            "connection" => "email",
-            "email" => $email,
-            "verification_code" => $code,
-        ];
-
-        $response = $this->post('/passwordless/verify', $payload);
-
-        switch($response['http_code']){
-            case 200:
-                return 'verified';
-            case 400:
-                return 'unverified';
-            case 429:
-                return 'blocked';
-            default:
-                return 'failed';
-        }
-
-    }
     public function refreshToken(string $refreshToken): ?array
     {
         $payload = [

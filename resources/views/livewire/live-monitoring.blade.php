@@ -67,7 +67,7 @@ new class extends Component
 };
 ?>
 
-<div class="saas-card h-full p-6 xl:col-span-2" wire:init="init"
+<div class="saas-card p-6 xl:col-span-2" wire:init="init"
      x-data="{
         isReady: @entangle('isReady'),
         currentProvider: '-',

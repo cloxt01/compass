@@ -55,8 +55,7 @@ class ConnectionController extends Controller {
     {
         $request->validate([
             'access_token' => 'required|string',
-            'refresh_token' => 'required|string',
-            'expires_in' => 'required|integer',
+            'refresh_token' => 'required|string'
         ]);
 
         $user = auth()->user();
@@ -74,7 +73,7 @@ class ConnectionController extends Controller {
             [
                 'access_token' => $request->input('access_token'),
                 'refresh_token' => $request->input('refresh_token'),
-                'expired_at' => now()->addSeconds((int) $request->input('expires_in')),
+                'expired_at' => now()->addSeconds(3600),
             ]
         );
         return redirect()->route('connection.' . $provider)->with('success', 'Connected to ' . ucfirst($provider) . ' successfully.');

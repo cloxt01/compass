@@ -19,7 +19,7 @@ Route::get('/request/{id}', [RequestController::class, 'request_info'])->name('a
 // Panel API (requires authentication token)
 // --------------------
 // routes/web.php
-Route::middleware(['web','auth','token'])->group(function () {
+Route::middleware(['web','auth'])->group(function () {
     Route::prefix('/apply')->group(function () {
         Route::post('/save', [ApplyController::class, 'save'])->name('apply.save');
 //    Route::post('/apply/push', [ApplyController::class, 'push'])->name('apply.push');

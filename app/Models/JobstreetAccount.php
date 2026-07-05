@@ -13,13 +13,13 @@ class JobstreetAccount extends Model implements PlatformAccount
         'user_id',
         'access_token',
         'refresh_token',
-        'expires_at',
+        'expired_at',
         'status',
         'apply_configuration',
 
     ];
     protected $casts = [
-        'expires_at' => 'datetime',
+        'expired_at' => 'datetime',
         'apply_configuration' => 'array',
     ];
 
@@ -28,12 +28,11 @@ class JobstreetAccount extends Model implements PlatformAccount
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    public function isExpired(int $bufferSeconds = 60): bool
+    public function isExpired(int $bufferSeconds = 300): bool
     {
-        if (!$this->expired_at instanceof Carbon) {
+        if(!$this->expired_at){
             return true;
         }
-
         return now()->addSeconds($bufferSeconds)->greaterThanOrEqualTo($this->expired_at);
     }
     public function updateToken(array $token)
@@ -43,20 +42,14 @@ class JobstreetAccount extends Model implements PlatformAccount
         }
         $this->access_token = $token['access_token'];
         $this->refresh_token = $token['refresh_token'];
-        $this->expires_at = now()->addSeconds($token['expires_in'] - 60);
+        $this->expired_at = now()->addSeconds(3600);
         $this->save();
     }
-    public function refreshToken(): bool
-    {
-
-        $token = (new JobstreetToken())->refreshToken($this->refresh_token);
-        if (!$token || !isset($token['access_token'])) {
-            $this->status = 'reauth_required';
-            $this->save();
-            return false;
+    public function updateStatus (string $status): bool {
+        if($this->status != $status){
+            $this->status  = $status;
         }
-        $this->updateToken($token);
-        return true;
+        return $this->save() ?? false;
     }
     public function saveConfig(string $key, $value): bool {
         $configs = $this->apply_configuration ?? [];
