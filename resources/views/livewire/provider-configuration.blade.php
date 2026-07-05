@@ -452,7 +452,7 @@ new class extends Component
                     </ul>
 
                     <p class="mt-4 border-t border-[#262626] pt-3 text-[11px] leading-relaxed text-zinc-500 sm:text-xs">
-                        Fitur ini tidak menjamin Anda mendapatkan pekerjaan, namun memperbesar peluang untuk dilirik recruiter. Dengan menggunakan fitur ini, Anda menyetujui dan menerima segala risiko yang mungkin timbul (termasuk risiko pembatasan akun oleh provider).
+                        Fitur ini tidak menjamin Anda mendapatkan pekerjaan, hanya memperbesar peluang. Dengan menggunakan fitur ini, Anda menyetujui dan menerima segala risiko yang mungkin timbul (termasuk risiko pembatasan akun oleh provider).
                     </p>
                 </div>
         </div>
