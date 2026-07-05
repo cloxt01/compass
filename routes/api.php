@@ -28,7 +28,6 @@ Route::middleware(['web','auth'])->group(function () {
     });
     Route::prefix('/settings')->group(function () {
         Route::put('/profile/update', [SettingsController::class, 'upsert_user'])->name('profile.update');
-
         Route::post('/profile/toggle-automation', [SettingsController::class, 'toggle_automation'])->name('profile.toggle-automation');
     });
 
@@ -39,6 +38,7 @@ Route::middleware(['web','auth'])->group(function () {
 // External account connection API
 // --------------------
 Route::post('/{provider}/search-location', [\App\Http\Controllers\Api\Glints\api::class, 'searchLocation'])->name('api.search.location');
+
 Route::prefix('connection')->group(function() {
     Route::post('/{provider}/search-location', [ConnectionController::class, 'locationInfo'])->name('api.connection.locationInfo');
     Route::post('/{provider}/login', [ConnectionController::class, 'login'])->name('api.connection.login');

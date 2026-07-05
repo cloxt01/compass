@@ -13,6 +13,8 @@ use App\Services\Adapters\JobstreetAdapter;
 use App\Clients\JobstreetAPI;
 use App\Services\JobDetails;
 use App\Support\DataHelper;
+use App\Services\Glints\API as GlintsService;
+use App\Http\Controllers\Api\Glints\api as GlintsApiService;
 
 $user = User::find(1);
 $jobstreetaccount = $user->jobstreetAccount;
@@ -32,7 +34,6 @@ if(!$glintsaccount){
 
 $cookie = $jobstreetaccount->cookie;
 $token = $jobstreetaccount->access_token;
-
 if(!$cookie){
     echo("cookie not found\n");
 }
@@ -40,10 +41,16 @@ if(!$token){
     echo("token not found\n");
 }
 
-$client = new JobstreetAPI($token, $cookie);
-$adapter = new JobstreetAdapter($client);
-$profile = $adapter->loadProfile();
-var_dump($profile);
+$jobstreet_client = new JobstreetAPI($token, $cookie);
+$jobstreet_adapter = new JobstreetAdapter($jobstreet_client);
+$glints_client = new GlintsAPI($glintsaccount->access_token, $glintsaccount->cookie);
+$glints_service = new GlintsService($glints_client);
+//$glintsApi = new GlintsApiService($glints_client);
+//
+//$profile = $jobstreet_adapter->loadProfile();
+//var_dump($profile);
+$data= $glints_service->search_location('Lebak');
+var_dump($data);
 //$job = $adapter->job();
 //var_dump(JobDetails::fromJobstreet($job->details('92727497')));
 

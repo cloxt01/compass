@@ -9,15 +9,17 @@ use Illuminate\Support\Facades\Log;
 
 class api
 {
-    private $provider;
+    private \App\Services\Glints\API $service;
 
-    public function __construct(protected GlintsAPI $client){}
+    public function __construct(protected GlintsAPI $client){
+        $this->service = new \App\Services\Glints\API($client);
+    }
 
     public function searchLocation(Request $request){
         $request->validate([
             'keyword' => 'string|required'
         ]);
-        $response = (new \App\Services\Glints\API($this->client))->search_location($request->keyword);
+        $response = $this->service->search_location($request->keyword);
 
         Log::info(json_encode($response));
         if($response['ok']){

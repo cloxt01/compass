@@ -108,7 +108,7 @@ new class extends Component
                         wire:click="resume"
                         wire:loading.attr="disabled"
                         wire:target="resume"
-                        class="h-9 w-full cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+                        class="h-9 w-full cursor-pointer rounded-md bg-green-700 px-5 text-sm font-semibold text-[#fff] transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
                         Resume
                     </button>
                 @else
@@ -116,7 +116,7 @@ new class extends Component
                         wire:click="stop"
                         wire:loading.attr="disabled"
                         wire:target="stop"
-                        class="h-9 w-full cursor-pointer rounded-md bg-white/85 px-5 text-sm font-semibold text-[#222] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+                        class="h-9 w-full cursor-pointer rounded-md bg-red-700 px-5 text-sm font-semibold text-[#fff] transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
                         Stop
                     </button>
                 @endif

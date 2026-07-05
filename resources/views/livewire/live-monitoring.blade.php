@@ -67,41 +67,35 @@ new class extends Component
 };
 ?>
 
-<div class="saas-card p-6 xl:col-span-2" wire:init="init"
+<div class="saas-card p-4 sm:p-5 xl:col-span-2 relative overflow-hidden" wire:init="init"
      x-data="{
         isReady: @entangle('isReady'),
         currentProvider: '-',
         currentJob: '-',
         currentStage: 'waiting',
-        lastRawStatus: null, // <-- Tambahan: Menyimpan status asli terakhir untuk validasi duplikat
+        lastRawStatus: null,
         remainingJobs: 0,
         logLine: 'No active process',
         steps: @js($steps),
         eventQueue: [],
         isProcessingQueue: false,
 
-        // Mengatur persentase progress bar secara dinamis di frontend
         get progressPercent() {
             let idx = this.steps.indexOf(this.currentStage);
             return idx !== -1 ? Math.round(((idx + 1) / this.steps.length) * 100) : 0;
         },
 
-        // Mengantre event yang masuk berbarengan dari Pusher
         queueEvent(e) {
             let data = e.detail[0] || e.detail;
 
-            // --- LOGIKA ANTI DUPLIKAT ---
-            // 1. Cek dengan event terakhir di dalam antrean (jika antrean tidak kosong)
             let lastInQueue = this.eventQueue.length > 0 ? this.eventQueue[this.eventQueue.length - 1] : null;
             if (lastInQueue && lastInQueue.jobId === data.jobId && lastInQueue.status === data.status) {
-                return; // Abaikan event, ini duplikat beruntun
+                return;
             }
 
-            // 2. Cek dengan event yang SEDANG tampil di layar saat ini
             if (this.currentJob === data.jobId && this.lastRawStatus === data.status) {
-                return; // Abaikan event, layar sudah menampilkan ini
+                return;
             }
-            // ----------------------------
 
             this.eventQueue.push(data);
 
@@ -110,7 +104,6 @@ new class extends Component
             }
         },
 
-        // Memproses langkah secara instan tanpa delay
         async processNextEvent() {
             if (this.eventQueue.length === 0) {
                 this.isProcessingQueue = false;
@@ -120,17 +113,15 @@ new class extends Component
             this.isProcessingQueue = true;
             let data = this.eventQueue.shift();
 
-            // Render ke layar
             if (data.provider) this.currentProvider = data.provider;
             if (data.jobId) this.currentJob = data.jobId;
-            if (data.status) this.lastRawStatus = data.status; // Simpan status aslinya untuk validasi
+            if (data.status) this.lastRawStatus = data.status;
 
             if (data.mapped) {
                 if (data.mapped.step) this.currentStage = data.mapped.step;
                 this.logLine = data.mapped.description;
             }
 
-            // Langsung lanjut ke event berikutnya (Delay dihapus)
             this.processNextEvent();
         }
      }"
@@ -138,60 +129,100 @@ new class extends Component
      @update-remaining-jobs.window="remainingJobs = $event.detail[0].pending">
 
     {{-- SKELETON LOADING VIEW --}}
-    <div x-show="!isReady" class="space-y-5">
-        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div x-show="!isReady" class="space-y-4">
+        <div class="flex flex-col gap-1 border-b border-[#262626] pb-4">
+            <div class="h-4 w-32 rounded bg-[#222] animate-pulse"></div>
+            <div class="mt-1.5 h-3 w-52 rounded bg-[#1c1c1e] animate-pulse"></div>
+        </div>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
             @foreach(range(1, 3) as $i)
-                <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-                    <div class="h-3 w-20 rounded-lg bg-[#222] animate-pulse"></div>
-                    <div class="mt-2 h-4 w-28 rounded-lg bg-[#1c1c1e] animate-pulse"></div>
+                <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-3.5">
+                    <div class="h-2.5 w-16 rounded bg-[#222] animate-pulse"></div>
+                    <div class="mt-2 h-4 w-24 rounded bg-[#1c1c1e] animate-pulse"></div>
                 </div>
             @endforeach
         </div>
-        <div class="mt-5 rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-            <div class="h-2 w-full rounded-full bg-[#222] animate-pulse"></div>
-            <div class="mt-4 h-4 w-2/3 rounded-lg bg-[#1c1c1e] animate-pulse"></div>
+        <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4 space-y-3">
+            <div class="flex justify-between">
+                <div class="h-2.5 w-12 rounded bg-[#222] animate-pulse"></div>
+                <div class="h-2.5 w-24 rounded bg-[#222] animate-pulse"></div>
+            </div>
+            <div class="h-1.5 w-full rounded-full bg-[#222] animate-pulse"></div>
         </div>
     </div>
 
     {{-- REAL DATA AUTOMATION VIEW --}}
-    <div x-show="isReady" x-cloak class="space-y-5">
-        <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-                <p class="text-xs text-[#a1a1aa]">Current provider</p>
-                <p class="mt-1 text-sm font-medium text-[#fafafa]" x-text="currentProvider"></p>
-            </div>
-            <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-                <p class="text-xs text-[#a1a1aa]">Current job</p>
-                <p class="mt-1 text-sm font-medium text-[#fafafa]" x-text="currentJob"></p>
-            </div>
-            <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-                <p class="text-xs text-[#a1a1aa]">Current stage</p>
-                <p class="mt-1 text-sm font-medium text-[#fafafa]" x-text="currentStage.replace('_', ' ').toUpperCase()"></p>
+    <div x-show="isReady" x-cloak class="space-y-4 sm:space-y-5">
+
+        {{-- CARD COMPONENT HEADER --}}
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#262626] pb-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500 sm:h-2 sm:w-2"></span>
+                    </span>
+                    <h2 class="text-sm font-semibold tracking-tight text-[#fafafa] sm:text-base">Live Monitoring</h2>
+                </div>
+                <p class="mt-0.5 text-[10px] text-[#a1a1aa] sm:text-xs">Pantau proses pengiriman lamaran otomatis secara real-time</p>
             </div>
         </div>
 
-        <div class="mt-5 rounded-xl border border-[#262626] bg-[#0a0a0a] p-4">
-            <div class="flex items-center justify-between text-xs text-[#a1a1aa]">
-                <span>Progress</span>
-                <span>Estimated remaining jobs: <span x-text="remainingJobs"></span></span>
+        {{-- GRID METRICS STATS (Dioptimalkan agar tidak pecah/meluap) --}}
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {{-- PROVIDER --}}
+            <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-3.5 transition-colors duration-200 hover:border-zinc-800 flex flex-col justify-between min-w-0">
+                <p class="text-[10px] font-medium uppercase tracking-wider text-zinc-500">Active Provider</p>
+                <p class="mt-1 text-xs font-semibold tracking-tight text-[#fafafa] font-mono capitalize truncate" x-text="currentProvider"></p>
             </div>
-            <div class="mt-3 h-2 overflow-hidden rounded-full bg-[#1b1b1b]">
-                <div class="h-full rounded-full bg-blue-600 transition-all duration-500" :style="'width: ' + progressPercent + '%'"></div>
+            {{-- JOB ID --}}
+            <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-3.5 transition-colors duration-200 hover:border-zinc-800 flex flex-col justify-between min-w-0">
+                <p class="text-[10px] font-medium uppercase tracking-wider text-zinc-500">Current Job Title</p>
+                <p class="mt-1 text-xs font-semibold tracking-tight text-[#fafafa] font-mono line-clamp-2 min-h-[2rem]" x-text="currentJob"></p>
+            </div>
+            {{-- STAGE --}}
+            <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-3.5 transition-colors duration-200 hover:border-blue-900/30 flex flex-col justify-between min-w-0">
+                <p class="text-[10px] font-medium uppercase tracking-wider text-zinc-500">Current Stage</p>
+                <p class="mt-1 text-xs font-semibold tracking-tight text-blue-400 font-mono truncate" x-text="currentStage.replace('_', ' ').toUpperCase()"></p>
+            </div>
+        </div>
+
+        {{-- LOG & PROGRESS BOX --}}
+        <div class="rounded-xl border border-[#262626] bg-[#0a0a0a] p-4 space-y-3.5">
+
+            {{-- PROGRESS TRACK --}}
+            <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-[11px] font-mono">
+                    <span class="text-zinc-400">Task Completion Rate</span>
+                    <span class="text-blue-400 font-bold" x-text="progressPercent + '%'"></span>
+                </div>
+                <div class="h-1.5 w-full overflow-hidden rounded-full bg-[#141414] border border-zinc-900">
+                    <div class="h-full rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.5)] transition-all duration-500 ease-out"
+                         :style="'width: ' + progressPercent + '%'"></div>
+                </div>
             </div>
 
-            {{-- BADGES STEP LOOPING --}}
-            <div class="mt-4 flex flex-wrap gap-2">
-                <template x-for="step in steps" :key="step">
-                    <span
-                        class="rounded-full border px-3 py-1 text-[11px] font-medium capitalize tracking-wide transition-colors duration-200"
-                        :class="step === currentStage
-                            ? 'border-blue-500 bg-blue-500/20 text-[#fafafa]'
-                            : 'border-[#262626] bg-[#0a0a0a] text-[#a1a1aa]'"
-                        x-text="step.replace('_', ' ')">
-                    </span>
-                </template>
+            {{-- WORKFLOW PROCESS BADGES --}}
+            <div class="pt-2 border-t border-zinc-900/60">
+                <div class="flex flex-wrap gap-1">
+                    <template x-for="step in steps" :key="step">
+                        <span
+                            class="rounded-md border px-2 py-0.5 text-[10px] font-mono tracking-wide transition-all duration-200"
+                            :class="step === currentStage
+                                ? 'border-blue-500/30 bg-blue-500/10 text-blue-400 font-medium'
+                                : 'border-[#262626]/60 bg-[#070708] text-zinc-600'"
+                            x-text="step.replace('_', ' ').toLowerCase()">
+                        </span>
+                    </template>
+                </div>
             </div>
-            <p class="mt-4 text-sm text-[#a1a1aa]" x-text="logLine"></p>
+
+            {{-- LOG LINE CONSOLE --}}
+            <div class="mt-1 rounded-lg bg-[#050505] border border-zinc-900 p-2.5 flex items-start gap-2.5">
+                <span class="text-[11px] font-mono text-zinc-600 select-none">&gt;_</span>
+                <p class="text-[11px] font-mono text-zinc-300 leading-normal tracking-wide flex-1" x-text="logLine"></p>
+            </div>
+
         </div>
     </div>
 </div>

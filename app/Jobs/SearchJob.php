@@ -21,6 +21,7 @@ class SearchJob implements ShouldQueue
     protected int $round_id;
 
     private const ALLOWED_PROVIDER = ['glints', 'jobstreet'];
+
     /**
      * Create a new job instance.
      */
@@ -36,6 +37,7 @@ class SearchJob implements ShouldQueue
             (new WithoutOverlapping("search-user-{$this->user_id}"))->expireAfter(300),
         ];
     }
+
     /**
      * Execute the job.
      */
@@ -44,7 +46,6 @@ class SearchJob implements ShouldQueue
         $hasSuccess = false;
 
         try {
-
             $user = User::find($this->user_id);
             if (! $user) {
                 Log::warning('User tidak ditemukan.', [
@@ -53,7 +54,6 @@ class SearchJob implements ShouldQueue
                 ]);
 
                 Round::whereKey($this->round_id)->increment('total_failed');
-
                 $this->checkRoundCompleted();
 
                 return;
@@ -61,74 +61,75 @@ class SearchJob implements ShouldQueue
 
             $conf = $user->apply_configuration ?? [];
 
-            $selectedProviders = collect(self::ALLOWED_PROVIDER)
-                ->filter(fn ($provider) => data_get($conf, "{$provider}.enabled", false))
-                ->values()
-                ->all();
+            foreach (self::ALLOWED_PROVIDER as $provider) {
+                $providerConfig = $conf[$provider] ?? [];
 
-            if (empty($selectedProviders)) {
-                Log::warning('Belum ada provider yang dipilih.', [
-                    'user_id' => $user->id,
-                    'round_id' => $this->round_id,
-                ]);
-                Round::whereKey($this->round_id)->increment('total_failed');
-
-                $this->checkRoundCompleted();
-                return;
-            }
-
-            foreach ($selectedProviders as $provider) {
-                if(!in_array($provider, self::ALLOWED_PROVIDER, true)) {
-                    Log::error("User ID : {$user->id}, Provider tidak dikenali '{$provider}'");
+                if (!($providerConfig['enabled'] ?? false)) {
                     continue;
                 }
 
                 $adapter = PlatformFactory::make($provider, $user);
+
                 if (!$adapter) {
-                    Log::warning("User ID : {$user->id}, Belum menghubungkan provider '{$provider}'");
+                    Log::warning("User {$user->id}: provider {$provider} belum terhubung.");
                     continue;
                 }
 
-                $providerConfig = $conf[$provider] ?? [];
-                $params = match ($provider) {
+                // Ambil daftar kata kunci
+                $keywords = $providerConfig['keyword'] ?? [];
 
+                if (!is_array($keywords) || empty($keywords)) {
+                    Log::warning("User {$user->id}: {$provider} tidak memiliki keyword.");
+                    continue;
+                }
+
+                // Rotasi keyword tunggal berdasarkan round_id (menggunakan modulus)
+                $keywordCount = count($keywords);
+                $keyword = $keywords[($this->round_id - 1) % $keywordCount];
+
+                // Parameter request API, typo =g> sudah diperbaiki ke =>
+                $params = match ($provider) {
                     'jobstreet' => [
-                        'keyword' => implode(',', $providerConfig['keyword'] ?? []),
+                        'keyword'  => $keyword,
                         'pageSize' => $providerConfig['batch'] ?? 1,
                     ],
 
                     'glints' => [
-                        'SearchTerm' => implode(',', $providerConfig['keyword'] ?? []),
+                        'SearchTerm'  => $keyword,
                         'LocationIds' => $providerConfig['location_ids'] ?? [],
-                        'pageSize' => $providerConfig['batch'] ?? 1,
+                        'pageSize'    => $providerConfig['batch'] ?? 1,
                     ],
 
+                    default => [],
                 };
+
                 $jobs = $adapter->job()->search($params);
 
-                $ok = $jobs['ok'] ?? false;
-                if(!$ok || !isset($jobs['data'])) {
-                    Log::warning("User ID : {$user->id}, Provider tidak menampilkan data {$provider}.");
+                if (!($jobs['ok'] ?? false)) {
+                    Log::warning("User {$user->id}: search {$provider} gagal menggunakan keyword '{$keyword}'.");
                     continue;
                 }
 
                 $data = match ($provider) {
                     'jobstreet' => $jobs['data']['data'] ?? [],
-                    'glints' => $jobs['data']['searchJobsV3']['jobsInPage'] ?? [],
+                    'glints'    => $jobs['data']['searchJobsV3']['jobsInPage'] ?? [],
+                    default     => [],
                 };
 
-                if(empty($data)) {
-                    Log::warning("User ID : {$user->id}, Tidak ada job yang ditemukan untuk provider '{$provider}'");
+                if (empty($data)) {
+                    Log::info("User {$user->id}: {$provider} tidak menemukan lowongan untuk keyword '{$keyword}'.");
                     continue;
                 }
 
                 foreach ($data as $details) {
-                    $payload = [
-                        'details' => $details,
-                    ];
                     $job = match ($provider) {
-                        'jobstreet' => JobDetails::fromJobstreet($payload),
-                        'glints'    => JobDetails::fromGlints($payload),
+                        'jobstreet' => JobDetails::fromJobstreet([
+                            'details' => $details,
+                        ]),
+
+                        'glints' => JobDetails::fromGlints([
+                            'details' => $details,
+                        ]),
                     };
 
                     ApplicationQueue::dispatch(
@@ -138,6 +139,7 @@ class SearchJob implements ShouldQueue
                         $this->round_id,
                     );
                 }
+
                 $hasSuccess = true;
             }
 
@@ -147,7 +149,6 @@ class SearchJob implements ShouldQueue
                 Round::whereKey($this->round_id)->increment('total_failed');
             }
             $this->checkRoundCompleted();
-
 
         } catch (Throwable $e) {
             if (! $hasSuccess) {
@@ -166,8 +167,8 @@ class SearchJob implements ShouldQueue
 
             throw $e;
         }
-
     }
+
     private function checkRoundCompleted(): void
     {
         Round::query()
