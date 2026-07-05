@@ -4,48 +4,59 @@
 @section('titleNavbar', 'Apply')
 
 @section('content')
-    <div class="flex flex-col gap-6 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
+    {{-- MAIN LAYOUT GRID --}}
+    <section
+        x-data="{
+        leftHeight: null,
+        sync() {
+            if (window.innerWidth >= 1280) {
+                this.leftHeight = this.$refs.leftCol.offsetHeight;
+            } else {
+                this.leftHeight = null;
+            }
+        }
+    }"
+        x-init="
+        sync();
+        new ResizeObserver(() => sync()).observe($refs.leftCol);
+        window.addEventListener('resize', () => sync());
+    "
+        class="grid grid-cols-1 gap-6 xl:grid-cols-3 items-start w-full"
+    >
 
-        {{-- MAIN LAYOUT GRID --}}
-        <section class="grid grid-cols-1 gap-6 xl:grid-cols-3 items-start xl:items-stretch w-full">
+        {{-- COLUMN LEFT: STATS, PANEL & PROVIDER CONFIGURATION (2/3 Width) --}}
+        <div x-ref="leftCol" class="xl:col-span-2 flex flex-col gap-6 w-full">
 
-            {{-- COLUMN LEFT: STATS, PANEL & PROVIDER CONFIGURATION (2/3 Width) --}}
-            <div class="xl:col-span-2 flex flex-col gap-6 h-full w-full">
+            <div class="w-full">
+                <livewire:stats-overview />
+            </div>
 
-                {{-- PERBAIKAN: STATS OVERVIEW SEKARANG SEJAJAR DENGAN PANEL --}}
-                <div class="w-full">
-                    <livewire:stats-overview />
-                </div>
+            <div class="w-full">
+                <livewire:panel-configuration :accounts="$accounts" :adapters="$adapters" />
+            </div>
 
-                {{-- Panel Kontrol --}}
-                <div class="w-full">
-                    <livewire:panel-configuration :accounts="$accounts" :adapters="$adapters" />
-                </div>
+            <div class="w-full">
+                <livewire:provider-configuration :accounts="$accounts" :adapters="$adapters" />
+            </div>
+        </div>
 
-                {{-- Konfigurasi Detail Provider (Mengisi sisa ruang ke bawah) --}}
-                <div class="flex-1 w-full flex flex-col">
-                    <livewire:provider-configuration :accounts="$accounts" :adapters="$adapters" />
+        {{-- COLUMN RIGHT: LIVE MONITORING & ACTIVITY TIMELINE (1/3 Width) --}}
+        <div
+            class="xl:col-span-1 flex flex-col gap-6 w-full overflow-hidden"
+            :style="leftHeight ? `height: ${leftHeight}px` : ''"
+        >
+            <div class="w-full">
+                <livewire:live-monitoring />
+            </div>
+
+            <div class="saas-card p-5 flex flex-col flex-1 min-h-0 overflow-hidden w-full">
+                <div class="flex-1 min-h-0 overflow-y-auto pr-1 custom-scroll space-y-1">
+                    <livewire:activity-timeline />
                 </div>
             </div>
 
-            {{-- COLUMN RIGHT: LIVE MONITORING & ACTIVITY TIMELINE (1/3 Width) --}}
-            <div class="xl:col-span-1 flex flex-col gap-6 h-full w-full">
-
-                {{-- Live Monitoring Console --}}
-                <div class="w-full">
-                    <livewire:live-monitoring />
-                </div>
-
-                {{-- Activity Timeline Card --}}
-                <div class="saas-card p-5 flex flex-col flex-1 h-0 overflow-hidden w-full">
-                    <div class="flex-1 overflow-y-auto pr-1 custom-scroll space-y-1">
-                        <livewire:activity-timeline />
-                    </div>
-                </div>
-
-            </div>
-        </section>
-    </div>
+        </div>
+    </section>
 @endsection
 @push('styles')
     <link rel="preconnect" href="https://fonts.googleapis.com">
