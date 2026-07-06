@@ -109,8 +109,12 @@ class GlintsJob extends GlintsAdapter
             Log::info("Job search params tidak tervalidasi: ". json_encode($params));
             return [];
         }
+        $response = $this->client->graphql('searchJobsV3', $params, ['isv2' => true]);
 
-        return $this->client->graphql('searchJobsV3', $params, ['isv2' => true]) ?? [];
+        if(!$response['ok'] || !isset($response['data']['searchJobsV3']['jobsInPage'])){
+            return [];
+        }
+        return $response['data']['searchJobsV3']['jobsInPage'];
     }
 
     public function details(string $jobId): array

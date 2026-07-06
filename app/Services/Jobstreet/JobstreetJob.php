@@ -50,21 +50,12 @@ class JobstreetJob extends JobstreetAdapter
             'pageSize' => (int)($params['pageSize'] ?? 32),
             'locale' => 'id-ID'
         ];
-        // $searchParams = [
-        //     'eventcapturesessionid' => null,              // kosong = null, bukan string kosong
-        //     'include'               => 'seogptTargeting,relatedsearches',
-        //     'keywords'              => 'Developer',
-        //     'locale'                => 'id-ID',
-        //     'page'                  => 1,                 // integer
-        //     'pagesize'              => 10,                // jangan bunuh hasil sendiri
-        //     'sitekey'               => 'ID-Main',
-        //     'source'                => 'FE_SERP',
-        //     'sourcesystem'          => 'houston',
-        //     'userid'                => null,              // anonymous, tapi eksplisit
-        //     'usersessionid'         => null,              // sama
-        //     'where'                 => 'Banten',
-        // ];
-        return $this->client->get($path, $params) ?? [];
+        $response = $this->client->get($path, $params);
+
+        if(!$response['status'] !== "success" || !isset($response['data']['data'])){
+            return [];
+        }
+        return $response['data']['data'];
     }
 
     public function details(string $jobId): array

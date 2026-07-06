@@ -105,25 +105,12 @@ class SearchJob implements ShouldQueue
 
                 $jobs = $adapter->job()->search($params);
 
-                if (!($jobs['ok'] ?? false)) {
-                    Log::warning("User {$user->id}: search {$provider} gagal menggunakan keyword '{$keyword}'.");
-                    Log::info("Data : ", $jobs);
-
-                    continue;
-                }
-
-                $data = match ($provider) {
-                    'jobstreet' => $jobs['data']['data'] ?? [],
-                    'glints'    => $jobs['data']['searchJobsV3']['jobsInPage'] ?? [],
-                    default     => [],
-                };
-
-                if (empty($data)) {
+                if (empty($jobs)) {
                     Log::info("User {$user->id}: {$provider} tidak menemukan lowongan untuk keyword '{$keyword}'.");
                     continue;
                 }
 
-                foreach ($data as $details) {
+                foreach ($jobs as $details) {
                     $job = match ($provider) {
                         'jobstreet' => JobDetails::fromJobstreet([
                             'details' => $details,
