@@ -107,6 +107,8 @@ class SearchJob implements ShouldQueue
 
                 if (!($jobs['ok'] ?? false)) {
                     Log::warning("User {$user->id}: search {$provider} gagal menggunakan keyword '{$keyword}'.");
+                    Log::info("Data : ", $jobs);
+
                     continue;
                 }
 
