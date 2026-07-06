@@ -140,17 +140,19 @@ class GlintsJob extends GlintsAdapter
         $this->client->headers['Referer'] = 'https://glints.com/id/opportunities/jobs/engineering/'.$jobId.'/apply?utm_referrer=fyp&traceInfo='.$config['traceInfo'];
         $resp = $this->client->post($path, $payload);
 
-        print_r("Host : ".$this->client->host.$path);
-        print_r("\nHeaders :". json_encode($this->client->headers));
-        print_r("\nPayload : ".json_encode($payload));
-        print_r("\nResponse : ".json_encode($resp));
+//        print_r("Host : ".$this->client->host.$path);
+//        print_r("\nHeaders :". json_encode($this->client->headers));
+//        print_r("\nPayload : ".json_encode($payload));
+//        print_r("\nResponse : ".json_encode($resp));
 
         Log::info('Job Apply: '.json_encode([
             'jobId' => $jobId,
             'payload' => $payload,
             'response' => $resp
         ]));
-        if($resp['status'] === 'success' && $resp['data']['data']['status'] === 'NEW'){
+        if(
+            isset($resp['data']['data']['applicationId']) && !empty($resp['data']['data']['applicationId'])
+        ){
             return true;
         } else {
             Log::error("Gagal melamar pekerjaan: " . json_encode($resp));
