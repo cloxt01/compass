@@ -14,8 +14,9 @@ class JobDetails
             'metadata' => [
                 'id' => $raw['details']['job']['id'] ?? 'Unknown',
                 'title' => $raw['details']['job']['title'] ?? 'Unknown',
-                'advertiser' => $raw['details']['job']['advertiser']['name'] ?? 'Unknown',
-                'company' => $raw['details']['companyProfile']['name'] ?? 'Unknown',
+                'company' => $raw['details']['job']['advertiser']['name'] ?? 'Unknown',
+//                'advertiser' => $raw['details']['job']['advertiser']['name'] ?? 'Unknown',
+//                'company' => $raw['details']['companyProfile']['name'] ?? 'Unknown',
                 'location' => $raw['details']['job']['location']['label'] ?? 'Unknown'
             ] ?? [],
             'eligibility' => [

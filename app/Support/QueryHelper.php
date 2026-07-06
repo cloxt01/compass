@@ -46,6 +46,8 @@ class QueryHelper {
                 "countryCode" => "ID",
                 "timezone" => "Asia/Jakarta",
                 "enableGetCandidateJobMatch" => false,
+                "enableJdvBadge" => true,
+                "enableClickToReveal" => true,
                 "connection" => "WEB",
                 "visitorId" => self::generateUUID()
             ],

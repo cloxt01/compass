@@ -111,17 +111,17 @@ class SearchJob implements ShouldQueue
                     continue;
                 }
 
-                foreach ($jobs as $details) {
-                    $job = match ($provider) {
-                        'jobstreet' => JobDetails::fromJobstreet([
-                            'details' => $details,
-                        ]),
+                foreach ($jobs as $job) {
+                    if(!isset($job['id']) || empty($job['id'])) {
+                        Log::warning("User {$user->id}: {$provider} job tidak memiliki ID.", [
+                            'job' => $job,
+                        ]);
+                        continue;
+                    }
 
-                        'glints' => JobDetails::fromGlints([
-                            'details' => $details,
-                        ]),
-                    };
+                    $job = $adapter->job()->loadJob($job['id']);
 
+                    Log::info("Job : ", $job);
                     ApplicationQueue::dispatch(
                         $user,
                         $provider,

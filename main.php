@@ -48,9 +48,17 @@ $glints_service = new GlintsService($glints_client);
 //$glintsApi = new GlintsApiService($glints_client);
 //
 //$profile = $jobstreet_adapter->loadProfile();
+$jobs = $jobstreet_adapter->job()->search([
+    [
+        'keyword'  => "Teknisi",
+        'pageSize' => 1,
+    ]
+]);
+print_r(json_encode($jobs));
+
 //var_dump($profile);
-$data= $glints_service->search_location('Lebak');
-var_dump($data);
+//$data= $glints_service->search_location('Lebak');
+//var_dump($data);
 //$job = $adapter->job();
 //var_dump(JobDetails::fromJobstreet($job->details('92727497')));
 

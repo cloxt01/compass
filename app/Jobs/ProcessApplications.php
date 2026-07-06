@@ -37,8 +37,8 @@ class ProcessApplications implements ShouldQueue
 
         // 2. SIMPAN KE VARIABEL BARU
         $this->jobData = $job;
-
         $this->job_id = $job['metadata']['id'] ?? '';
+        Log::info($this->job_id);
     }
 
     public function handle()

@@ -50,7 +50,10 @@ class JobstreetJob extends JobstreetAdapter
             'pageSize' => (int)($params['pageSize'] ?? 32),
             'locale' => 'id-ID'
         ];
+        Log::info("Params Search (Jobstreet): ". json_encode($params));
         $response = $this->client->get($path, $params);
+
+        Log::info('searchData : '. json_encode($response));
 
 
         if($response['status'] !== "success" || !isset($response['data']['data'])){
