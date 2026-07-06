@@ -54,6 +54,7 @@ class JobstreetJob extends JobstreetAdapter
 
 
         if($response['status'] !== "success" || !isset($response['data']['data'])){
+            Log::warning("Jobstreet search tidak menampilkan data: " . json_encode($response));
             return [];
         }
 
