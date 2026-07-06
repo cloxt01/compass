@@ -52,9 +52,11 @@ class JobstreetJob extends JobstreetAdapter
         ];
         $response = $this->client->get($path, $params);
 
-        if(!$response['status'] !== "success" || !isset($response['data']['data'])){
+
+        if($response['status'] !== "success" || !isset($response['data']['data'])){
             return [];
         }
+
         return $response['data']['data'];
     }
 
