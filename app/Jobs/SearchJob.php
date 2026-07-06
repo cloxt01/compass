@@ -107,7 +107,7 @@ class SearchJob implements ShouldQueue
 
                 if (empty($jobs)) {
                     Log::info("User {$user->id}: {$provider} tidak menemukan lowongan untuk keyword '{$keyword}'.");
-                    log::info("Data : ");
+                    log::info("Data : ", $jobs);
                     continue;
                 }
 
