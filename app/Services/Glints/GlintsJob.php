@@ -151,7 +151,7 @@ class GlintsJob extends GlintsAdapter
             'response' => $resp
         ]));
         if(
-            isset($resp['data']['data']['applicationId']) && !empty($resp['data']['data']['applicationId'])
+            (isset($resp['data']['data']['applicationId']) || isset($resp['data']['data']['id'])) && (!empty($resp['data']['data']['applicationId']) || !empty($resp['data']['data']['id']))
         ){
             return true;
         } else {

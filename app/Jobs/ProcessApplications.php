@@ -94,7 +94,7 @@ class ProcessApplications implements ShouldQueue
                 'status' => $result['status']
             ]);
 
-            Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result ? "Ya" : "Tidak"));
+            Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result['success'] ? "Ya" : "Tidak"));
         } catch (CantApply $e) {
             Log::info($e->getMessage());
         } catch (\Exception $e) {

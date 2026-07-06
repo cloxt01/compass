@@ -27,6 +27,7 @@ class ProviderTokenObserver
             $token = $this->service->refreshToken($account->refresh_token);
             if (!$token) {
                 Log::warning("Failed to refresh token for account {$account->id}. Please check the refresh token.");
+                $account->delete();
                 return;
             }
             $account->updateToken($token);

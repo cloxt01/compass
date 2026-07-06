@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'token' => \App\Http\Middleware\RefreshToken::class,
         ]);
+        $middleware->append(\App\Http\Middleware\TrafficLogger::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
