@@ -1,10 +1,8 @@
 <?php
 namespace App\Models;
 
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use App\Services\Token\JobstreetToken;
 use App\Infrastructure\Contracts\PlatformAccount;
+use Illuminate\Database\Eloquent\Model;
 
 class JobstreetAccount extends Model implements PlatformAccount
 {

@@ -6,3 +6,11 @@ use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('app:apply-scheduler')
     ->everyFiveMinutes();
+Schedule::command('billing:renew')
+    ->everyTenMinutes();
+
+Schedule::command('billing:grace')
+    ->hourly();
+
+Schedule::command('billing:expired')
+    ->hourly();

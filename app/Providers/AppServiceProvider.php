@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 
+use App\Contracts\PaymentGateway;
+use App\Gateways\MidtransGateway;
 use App\Models\GlintsAccount;
 use App\Models\JobstreetAccount;
 use App\Observers\ProviderAccountObserver;
@@ -20,7 +22,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            PaymentGateway::class,
+            MidtransGateway::class
+        );
     }
 
     /**

@@ -5,9 +5,12 @@ namespace App\Jobs;
 use App\Clients\GlintsAPI;
 use App\Events\JobStatus;
 use App\Models\User;
+use App\Services\Billing\SubscriptionService;
+use App\Services\Billing\UsageService;
 use App\Support\ApplicationHelper;
 use App\Support\ProviderHelper;
 use Illuminate\Queue\SerializesModels;
+use App\Models\Subscription;
 use App\Clients\Application\UseCase\ApplyUseCase;
 use App\Exceptions\CantApply;
 use Illuminate\Bus\Queueable;
@@ -29,9 +32,14 @@ class ProcessApplications implements ShouldQueue
 
     protected string $job_id;
     protected string $provider;
+    private UsageService $usageService;
 
     public function __construct(User $user, string $provider, array $job)
     {
+        $this->usageService = new UsageService(
+            new SubscriptionService()
+        );
+
         $this->user = $user;
         $this->provider = $provider;
 
@@ -83,6 +91,15 @@ class ProcessApplications implements ShouldQueue
         try {
             $result = (new ApplyUseCase($adapter, $account))->apply($this->job_id);
 
+
+            $subscription = $this->user
+                ->subscriptions()
+                ->where('status', 'active')
+                ->first();
+
+            if ($subscription) {
+                $this->usageService->increment($subscription);
+            }
             // 5. GUNAKAN $jobData DI SINI
             JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $result['status']);
 

@@ -2,18 +2,11 @@
 
 namespace App\Services\Token;
 
-use App\Clients\api;
 use App\Clients\GlintsAPI;
-use App\Support\DataHelper;
+use App\Infrastructure\Contracts\PlatformToken;
 use App\Support\QueryHelper;
 use App\Support\RequestHelper;
-use App\Exceptions\UnknownOperation;
-use App\Models\JobstreetAccount;
-
-use App\Infrastructure\Contracts\PlatformToken;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Infrastructure\Contracts\PlatformAccount;
 
 class GlintsToken extends GlintsAPI implements PlatformToken
 {

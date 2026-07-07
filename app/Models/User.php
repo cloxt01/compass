@@ -65,6 +65,13 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Application::class, 'user_id');
     }
+    public function isAutomationPaused(): bool {
+        return $this->automation_paused;
+    }
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class, 'user_id');
+    }
 
     public function sendPasswordResetNotification($token)
     {

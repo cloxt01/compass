@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Infrastructure\Contracts\PlatformAccount;
-use App\Services\Token\GlintsToken;
 use Illuminate\Database\Eloquent\Model;
 
 class GlintsAccount extends Model implements PlatformAccount

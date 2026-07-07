@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\Auth\Provider\JobstreetAuthController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\ConnectionController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
@@ -37,6 +38,59 @@ Route::middleware(['auth','verified'])->group(function() {
     Route::prefix('products')->group(function() {
        Route::get('/compass-link', [ProductController::class, 'compass_link'])->name('products.compass-link');
     });
+
+
+    Route::prefix('payment')->group(function() {
+        Route::post(
+            '/subscribe',
+            [PaymentController::class, 'subscribe']
+        )->name('payment.subscribe');
+    });
+
+
+    Route::prefix('billing')->group(function() {
+        Route::get(
+            '/',
+            [BillingController::class, 'index']
+        )->name('billing');
+
+        Route::get(
+            '/subscription',
+            [BillingController::class, 'subscription']
+        )->name('billing.subscription');
+
+        Route::get(
+            '/invoices',
+            [BillingController::class, 'invoices']
+        )->name('billing.invoices');
+
+        Route::get('/invoices/{invoice}/pay', [PaymentController::class, 'pay'])
+            ->name('billing.pay');
+        Route::get('/invoices/{invoice}', [BillingController::class, 'show'])
+            ->name('billing.invoice.show');
+
+
+
+        Route::get(
+            '/payments',
+            [BillingController::class, 'payments']
+        )->name('billing.payments');
+
+        Route::get(
+            '/packages',
+            [BillingController::class, 'packages']
+        )->name('billing.packages');
+
+        Route::post(
+            '/subscription/autorenew',
+            [BillingController::class, 'toggleAutoRenew']
+        )->name('billing.subscription.autorenew');
+
+        Route::post(
+            '/subscription/cancel',
+            [BillingController::class, 'cancelSubscription']
+        )->name('billing.subscription.cancel');
+    });
     Route::prefix('connection')->group(function() {
         Route::get('/connect/jobstreet', fn() => view('connection.jobstreet'))->name('connection.jobstreet');
         Route::get('/connect/glints', fn() => view('connection.glints'))->name('connection.glints');
@@ -49,3 +103,4 @@ Route::middleware(['auth','verified'])->group(function() {
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/webhook.php';

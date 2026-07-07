@@ -3,15 +3,8 @@
 namespace App\Services\Token;
 
 use App\Clients\api;
-use App\Support\DataHelper;
-use App\Support\QueryHelper;
-use App\Exceptions\UnknownOperation;
-use App\Models\JobstreetAccount;
-
 use App\Infrastructure\Contracts\PlatformToken;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use App\Infrastructure\Contracts\PlatformAccount;
+use App\Support\QueryHelper;
 
 class JobstreetToken extends api implements PlatformToken
 {

@@ -5,15 +5,15 @@ namespace App\Services\Adapters;
 use App\Clients\GlintsAPI;
 use App\Infrastructure\Contracts\PlatformAdapter;
 use App\Infrastructure\Glints\GlintsPayloadBuilder;
-
-// Adapters
-use App\Services\Glints\GlintsProfile;
 use App\Services\Glints\GlintsJob;
-
-// Services
+use App\Services\Glints\GlintsProfile;
+use App\Services\JobDetails;
 use App\Services\JobInspector;
 use App\Services\ProfileDetails;
-use App\Services\JobDetails;
+
+// Adapters
+
+// Services
 
 class GlintsAdapter implements PlatformAdapter {
 
