@@ -20,7 +20,7 @@
                     @csrf
 
                     <div>
-                        <label for="email" class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">{{ __('Email Address') }}</label>
+                        <label for="email" class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">{{ __('Alamat Email') }}</label>
                         <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
                                class="saas-input h-11 w-full rounded-xl px-4 text-sm text-[#fafafa] placeholder:text-[#71717a]" placeholder="name@example.com" />
                         <x-input-error :messages="$errors->get('email')" class="mt-1 text-xs text-red-400" />
@@ -31,7 +31,7 @@
                             <label for="password" class="block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">{{ __('Password') }}</label>
                             @if (Route::has('password.request'))
                                 <a class="text-xs text-[#a1a1aa] hover:text-[#fafafa] transition" href="{{ route('password.request') }}">
-                                    {{ __('Forgot password?') }}
+                                    {{ __('Lupa password?') }}
                                 </a>
                             @endif
                         </div>
@@ -44,14 +44,14 @@
                         <label for="remember_me" class="inline-flex items-center gap-2 text-sm text-[#a1a1aa] cursor-pointer">
                             <input id="remember_me" type="checkbox" name="remember"
                                    class="h-4 w-4 rounded border-[#3f3f3f] bg-[#0a0a0a] text-blue-600 focus:ring-0 cursor-pointer">
-                            <span class="text-xs">{{ __('Remember me') }}</span>
+                            <span class="text-xs">{{ __('Ingat Saya') }}</span>
                         </label>
                     </div>
 
                     {{-- SUBMIT BUTTON --}}
                     <div class="pt-2">
                         <button type="submit" class="h-11 w-full cursor-pointer rounded-xl bg-white/85 text-sm font-semibold text-black transition hover:bg-white">
-                            {{ __('Log in') }}
+                            {{ __('Masuk') }}
                         </button>
                     </div>
                 </form>

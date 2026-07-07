@@ -5,7 +5,7 @@
     $lastUpdated = date("F d, Y", strtotime($tanggal));;
 @endphp
 
-@section('title', 'Terms of Service')
+@section('title', 'Syarat & Ketentuan Layanan')
 
 @section('body-class', 'bg-[#0a0a0a] text-[#fafafa] antialiased')
 
@@ -26,11 +26,11 @@
             </div>
 
             <h1 class="mt-6 text-5xl font-bold">
-                Terms of Service
+                Syarat & Ketentuan Layanan
             </h1>
 
             <p class="mt-4 text-[#a1a1aa]">
-                Last updated: {{ $lastUpdated  }}
+                Terakhir diperbarui: {{ $lastUpdated  }}
 
             </p>
         </div>
@@ -38,42 +38,42 @@
         <div class="mt-16 space-y-10 rounded-3xl border border-[#262626] bg-[#111111]/80 p-10 backdrop-blur">
 
             <section>
-                <h2 class="text-xl font-semibold">1. Acceptance</h2>
+                <h2 class="text-xl font-semibold">1. Persetujuan</h2>
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    By accessing or using Compass, you agree to be bound by these Terms.
+                    Dengan mengakses atau menggunakan Compass, Anda menyetujui untuk terikat dengan Ketentuan ini.
                 </p>
             </section>
 
             <section>
-                <h2 class="text-xl font-semibold">2. Accounts</h2>
+                <h2 class="text-xl font-semibold">2. Akun</h2>
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    You are responsible for maintaining the security of your account and credentials.
+                    Anda bertanggung jawab untuk menjaga keamanan akun dan kredensial Anda.
                 </p>
             </section>
 
             <section>
-                <h2 class="text-xl font-semibold">3. Automation</h2>
+                <h2 class="text-xl font-semibold">3. Otomatisasi</h2>
 
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    Compass automates job application workflows based on your own configuration.
-                    You remain responsible for reviewing how automation is used and complying with
-                    the policies of third-party job platforms.
+                    Compass mengotomatiskan alur lamaran pekerjaan berdasarkan konfigurasi Anda sendiri.
+                    Anda tetap bertanggung jawab untuk meninjau bagaimana otomatisasi digunakan dan mematuhi
+                    kebijakan platform lowongan kerja pihak ketiga.
                 </p>
             </section>
 
             <section>
-                <h2 class="text-xl font-semibold">4. Availability</h2>
+                <h2 class="text-xl font-semibold">4. Ketersediaan Layanan</h2>
 
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    We strive to provide reliable service but cannot guarantee uninterrupted availability.
+                    Kami berupaya memberikan layanan yang andal tetapi tidak dapat menjamin ketersediaan tanpa gangguan.
                 </p>
             </section>
 
             <section>
-                <h2 class="text-xl font-semibold">5. Termination</h2>
+                <h2 class="text-xl font-semibold">5. Penghentian</h2>
 
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    We may suspend or terminate accounts that abuse the platform or violate these Terms.
+                    Kami dapat menangguhkan atau menghentikan akun yang menyalahgunakan platform atau melanggar Ketentuan ini.
                 </p>
             </section>
 

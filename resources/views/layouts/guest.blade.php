@@ -117,7 +117,7 @@
                         href="{{ route('login') }}"
                         class="inline-flex h-9 items-center justify-center rounded-md border border-[#333] bg-[#1e1e1e] px-4 text-xs font-semibold hover:bg-[#262626] transition"
                     >
-                        Sign In
+                        Masuk
                     </a>
                 @endguest
 
@@ -144,11 +144,11 @@
                 <div class="flex items-center gap-4">
 
                     <a class="transition hover:text-[#a1a1aa] cursor-pointer {{ request()->routeIs('terms') ? 'text-[#a1a1aa]' : '' }}" href="{{ route('terms') }}">
-                        Terms
+                        Syarat & Ketentuan
                     </a>
 
                     <a class="transition hover:text-[#a1a1aa] cursor-pointer {{ request()->routeIs('privacy') ? 'text-[#a1a1aa]' : '' }}" href="{{ route('privacy') }}">
-                        Privacy
+                        Privasi
                     </a>
 
                     <span class="h-1 w-1 rounded-full bg-[#333]"></span>

@@ -4,7 +4,7 @@
     $tanggal = '2024-06-01';
     $lastUpdated = date("F d, Y", strtotime($tanggal));;
 @endphp
-@section('title', 'Privacy Policy')
+@section('title', 'Kebijakan Privasi')
 
 @section('body-class', 'bg-[#0a0a0a] text-[#fafafa] antialiased')
 
@@ -26,11 +26,11 @@
             </div>
 
             <h1 class="mt-6 text-5xl font-bold">
-                Privacy Policy
+                Kebijakan Privasi
             </h1>
 
             <p class="mt-4 text-[#a1a1aa]">
-                Last updated: {{ $lastUpdated  }}
+                Terakhir diperbarui: {{ $lastUpdated  }}
             </p>
 
         </div>
@@ -38,45 +38,45 @@
         <div class="mt-16 space-y-10 rounded-3xl border border-[#262626] bg-[#111111]/80 p-10 backdrop-blur">
 
             <section>
-                <h2 class="text-xl font-semibold">Information We Collect</h2>
+                <h2 class="text-xl font-semibold">Informasi yang Kami Kumpulkan</h2>
 
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    We collect account information, application preferences, connected provider credentials,
-                    and activity required to operate Compass.
+                    Kami mengumpulkan informasi akun, preferensi lamaran, kredensial penyedia yang terhubung,
+                    dan aktivitas yang diperlukan untuk mengoperasikan Compass.
                 </p>
             </section>
 
             <section>
-                <h2 class="text-xl font-semibold">How We Use Information</h2>
+                <h2 class="text-xl font-semibold">Bagaimana Kami Menggunakan Informasi</h2>
 
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    Your information is used solely to provide automation features, improve reliability,
-                    and maintain platform security.
+                    Informasi Anda digunakan semata-mata untuk menyediakan fitur otomatisasi, meningkatkan keandalan,
+                    dan menjaga keamanan platform.
                 </p>
             </section>
 
             <section>
-                <h2 class="text-xl font-semibold">Data Security</h2>
+                <h2 class="text-xl font-semibold">Keamanan Data</h2>
 
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    We implement reasonable technical and organizational safeguards to protect your information.
+                    Kami menerapkan perlindungan teknis dan organisasi yang wajar untuk melindungi informasi Anda.
                 </p>
             </section>
 
             <section>
-                <h2 class="text-xl font-semibold">Third-Party Services</h2>
+                <h2 class="text-xl font-semibold">Layanan Pihak Ketiga</h2>
 
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    Compass integrates with external job platforms. Their handling of your data is governed
-                    by their own privacy policies.
+                    Compass terintegrasi dengan platform lowongan kerja eksternal. Penanganan data Anda oleh mereka diatur
+                    oleh kebijakan privasi masing-masing.
                 </p>
             </section>
 
             <section>
-                <h2 class="text-xl font-semibold">Contact</h2>
+                <h2 class="text-xl font-semibold">Kontak</h2>
 
                 <p class="mt-3 text-[#a1a1aa] leading-8">
-                    Questions regarding this Privacy Policy may be submitted through our support channels.
+                    Pertanyaan mengenai Kebijakan Privasi ini dapat diajukan melalui saluran dukungan kami.
                 </p>
             </section>
 
