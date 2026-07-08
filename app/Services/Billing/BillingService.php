@@ -13,7 +13,8 @@ class BillingService
     public function __construct(
         protected SubscriptionService $subscriptionService,
         protected InvoiceService $invoiceService,
-        protected PaymentService $paymentService
+        protected PaymentService $paymentService,
+        protected UsageService $usageService,
     ) {
     }
 
@@ -29,6 +30,7 @@ class BillingService
 
             $subscription = $this->subscriptionService
                 ->create($user, $package);
+            $usage = $this->usageService->create($subscription);
 
             $invoice = $this->invoiceService
                 ->generate($subscription);
@@ -93,7 +95,7 @@ class BillingService
             });
     }
 
-    public function processGrace(): void
+    public function grace(): void
     {
         Invoice::query()
 
@@ -119,9 +121,7 @@ class BillingService
                         $invoice
                             ->subscription
                             ->update([
-
                                 'status' => 'grace',
-
                             ]);
 
                     });
@@ -130,7 +130,7 @@ class BillingService
 
             });
     }
-    public function processExpired(): void
+    public function expired(): void
     {
         Invoice::query()
 
@@ -162,4 +162,6 @@ class BillingService
 
             });
     }
+
+
 }

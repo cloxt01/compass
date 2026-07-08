@@ -4,12 +4,22 @@ namespace App\Services\Billing;
 
 use App\Models\Subscription;
 use App\Models\SubscriptionUsage;
+use App\Models\User;
 
 class UsageService
 {
     public function __construct(
         protected SubscriptionService $subscriptionService
     ) {}
+
+    public function create(Subscription $subscription)
+    {
+        return SubscriptionUsage::create([
+            'subscription_id' => $subscription->id,
+            'date' => today(),
+            'apply_count' => 0,
+        ]);
+    }
 
     public function canApply(
         Subscription $subscription

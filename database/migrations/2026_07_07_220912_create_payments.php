@@ -36,7 +36,7 @@ return new class extends Migration
                 'cancelled',
                 'refund',
             ])->default('pending');
-
+            $table->string('redirect_url')->nullable();
             $table->index('status');
             $table->dateTime('paid_at')->nullable();
             $table->timestamps();

@@ -13,8 +13,8 @@ class BillingController extends Controller
     {
         $user = $request->user();
 
-        $subscription = Subscription::with('package')
-            ->where('user_id', $user->id)
+        $subscription = $user
+            ->subscriptions()
             ->whereIn('status', [
                 'active',
                 'grace'
@@ -84,7 +84,7 @@ class BillingController extends Controller
             403
         );
 
-        return view('billing.invoices-show', [
+        return view('billing.invoice-show', [
             'invoice' => $invoice->load([
                 'subscription.package',
                 'payments',

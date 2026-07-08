@@ -41,7 +41,9 @@ class MidtransGateway implements PaymentGateway
                 'gross_amount' => $payment->amount,
 
             ],
-
+            'callbacks' => [
+                'finish' => route('payment.finish'),
+            ],
             'customer_details' => [
 
                 'first_name' => $user->name,

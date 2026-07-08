@@ -21,9 +21,9 @@
     <section class="mx-auto max-w-4xl px-6 py-20">
 
         <div class="text-center">
-            <div class="inline-flex rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-1 text-xs font-medium text-blue-400">
-                Legal
-            </div>
+{{--            <div class="inline-flex rounded-full border border-blue-500/20 bg-blue-500/10 px-4 py-1 text-xs font-medium text-blue-400">--}}
+{{--                Legal--}}
+{{--            </div>--}}
 
             <h1 class="mt-6 text-5xl font-bold">
                 Syarat & Ketentuan Layanan

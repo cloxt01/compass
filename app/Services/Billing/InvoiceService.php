@@ -19,7 +19,6 @@ class InvoiceService
                 'subscription_id' => $subscription->id,
                 'invoice_number'  => $this->nextNumber(),
                 'status'          => 'pending',
-
                 'subtotal' => $subscription->package_price,
                 'discount' => 0,
                 'tax'       => 0,

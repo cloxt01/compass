@@ -35,6 +35,7 @@ class Invoice extends Model
     {
         return [
             'due_date' => 'date',
+            'paid_at' => 'datetime',
         ];
     }
 

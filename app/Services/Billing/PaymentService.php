@@ -5,6 +5,7 @@ namespace App\Services\Billing;
 use App\Contracts\PaymentGateway;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Notifications\BillingNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -36,6 +37,7 @@ class PaymentService
             $payment->update([
                 'gateway_transaction_id' => $response['transaction_id'],
                 'method'                 => $response['method'],
+                'redirect_url'            => $response['redirect_url'],
             ]);
 
             return [
@@ -124,6 +126,7 @@ class PaymentService
                 'status' => 'paid',
                 'paid_at' => now(),
             ]);
+            $invoice->subscription->user->notify(new BillingNotification($invoice));
 
             $subscription = $invoice->subscription;
 

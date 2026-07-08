@@ -43,7 +43,7 @@
                  class="mt-1 flex flex-col gap-0.5 pl-9 transition-all duration-300 ease-in-out {{ request()->routeIs('billing.*') ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0 overflow-hidden' }}">
 
                 <a href="{{ route('billing') }}"
-                   class="flex items-center rounded-md px-3 py-2 text-xs {{ request()->routeIs('billing.index') ? 'bg-[#1e1e1e] text-[#fafafa]' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
+                   class="flex items-center rounded-md px-3 py-2 text-xs {{ request()->routeIs('billing') ? 'bg-[#1e1e1e] text-[#fafafa]' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
                     <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 mr-2"></i>
                     Overview
                 </a>

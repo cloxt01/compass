@@ -16,10 +16,17 @@ class Payment extends Model
         'amount',
         'status',
         'paid_at',
+        'redirect_url',
     ];
 
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+    protected function casts(): array
+    {
+        return [
+            'paid_at' => 'datetime'
+        ];
     }
 }

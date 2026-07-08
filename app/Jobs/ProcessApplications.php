@@ -94,12 +94,22 @@ class ProcessApplications implements ShouldQueue
 
             $subscription = $this->user
                 ->subscriptions()
-                ->where('status', 'active')
+                ->whereIn('status', [
+                    'active',
+                    'grace'
+                ])
+                ->latest('started_at')
                 ->first();
 
+            $usage = $subscription->usages->first();;
+
+            Log::info("Usage (ApplyCount before) : ". $usage->apply_count);
             if ($subscription) {
+                Log::warning('Langganan aktif tidak ditemukan, User ID : '. $this->user->id);
                 $this->usageService->increment($subscription);
             }
+            Log::info("Usage (ApplyCount after) : ". $usage->apply_count);
+
             // 5. GUNAKAN $jobData DI SINI
             JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $result['status']);
 

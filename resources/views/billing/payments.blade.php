@@ -30,13 +30,7 @@
                         Invoice
                     </th>
 
-                    <th class="px-6 py-4">
-                        Gateway
-                    </th>
 
-                    <th class="px-6 py-4">
-                        Method
-                    </th>
 
                     <th class="px-6 py-4">
                         Amount
@@ -76,13 +70,13 @@
 
                         </td>
 
-                        <td class="px-6 py-4 text-zinc-300 uppercase">
-                            {{ $payment->gateway }}
-                        </td>
+{{--                        <td class="px-6 py-4 text-zinc-300 uppercase">--}}
+{{--                            {{ $payment->gateway }}--}}
+{{--                        </td>--}}
 
-                        <td class="px-6 py-4 text-zinc-300">
-                            {{ ucfirst($payment->method) }}
-                        </td>
+{{--                        <td class="px-6 py-4 text-zinc-300">--}}
+{{--                            {{ ucfirst($payment->method) }}--}}
+{{--                        </td>--}}
 
                         <td class="px-6 py-4 text-white">
 
@@ -111,8 +105,7 @@
                         </td>
 
                         <td class="px-6 py-4 text-zinc-400">
-
-                            {{ optional($payment->paid_at)?->format('d M Y H:i') ?? '-' }}
+                            {{ optional($payment->paid_at)?->format('d-m-Y H:i:s') ?? '-' }}
 
                         </td>
 

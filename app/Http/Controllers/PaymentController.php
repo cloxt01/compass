@@ -67,4 +67,17 @@ class PaymentController extends Controller
             'payment' => $payment,
         ]);
     }
+
+    public function finish(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:invoices,invoice_number',
+            'status_code' => 'required|integer',
+            'transaction_status' => 'required|string',
+        ]);
+        $invoice = Invoice::where('invoice_number', $request->order_id)->firstOrFail();
+
+
+        return view('billing.payment-finish', compact('invoice'));
+    }
 }

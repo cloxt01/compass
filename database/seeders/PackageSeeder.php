@@ -14,48 +14,42 @@ class PackageSeeder extends Seeder
             [
                 'code' => 'STARTER',
                 'name' => 'Starter',
-                'price' => 49000,
+                'price' => 15000,
                 'duration_days' => 30,
                 'daily_limit' => 50,
                 'monthly_limit' => 1500,
                 'features' => [
                     '50 Apply / Hari',
                     '1.500 Apply / Bulan',
-                    'Auto Apply',
-                    'Email Support',
+                    'Auto Apply'
                 ],
             ],
 
             [
-                'code' => 'PRO',
+                'code' => 'PROFESSIONAL',
                 'name' => 'Professional',
-                'price' => 99000,
+                'price' => 45000,
                 'duration_days' => 30,
-                'daily_limit' => 250,
-                'monthly_limit' => 7500,
+                'daily_limit' => 200,
+                'monthly_limit' => 6000,
                 'features' => [
                     '250 Apply / Hari',
-                    '7.500 Apply / Bulan',
-                    'Priority Queue',
-                    'Email Support',
-                    'Telegram Notification',
+                    '6.000 Apply / Bulan',
+                    'Auto Apply'
                 ],
             ],
 
             [
-                'code' => 'BUSINESS',
-                'name' => 'Business',
-                'price' => 199000,
+                'code' => 'PREMIUM',
+                'name' => 'Premium',
+                'price' => 150000,
                 'duration_days' => 30,
                 'daily_limit' => 1000,
                 'monthly_limit' => 30000,
                 'features' => [
                     '1.000 Apply / Hari',
                     '30.000 Apply / Bulan',
-                    'Priority Queue',
-                    'API Access',
-                    'Telegram Notification',
-                    'Priority Support',
+                    'Priority Queue'
                 ],
             ],
 

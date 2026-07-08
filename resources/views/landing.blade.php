@@ -33,12 +33,11 @@
         </div>
 
         <h1 class="mt-6 bg-gradient-to-b from-[#fafafa] to-[#a1a1aa] bg-clip-text text-4xl font-bold leading-tight tracking-tight text-transparent opacity-0 animate-fade-in-bounce delay-200 sm:text-6xl">
-            Otomatiskan Alur Lamaran Pekerjaan Anda
+            Cari kerja tanpa ribet.
         </h1>
 
         <p class="mt-4 max-w-lg text-sm leading-relaxed text-[#a1a1aa] opacity-0 animate-fade-in-bounce delay-400 sm:text-base">
-            Biarkan AI mencari peluang, memeriksa persyaratan pekerjaan,
-            dan mengelola penerapan dengan lancar di berbagai penyedia.
+            Compass membantu mencari lowongan yang sesuai dan mengirim lamaran secara otomatis. Kamu tidak perlu membuka platform pekerjaan berkali-kali setiap hari.
         </p>
 
         <div class="mt-8 flex flex-wrap items-center justify-center gap-4 opacity-0 animate-fade-in-bounce delay-600">
@@ -47,7 +46,7 @@
                 href="{{ route('register') }}"
                 class="inline-flex h-11 items-center justify-center rounded-xl bg-[#fafafa] px-6 text-sm font-semibold text-black shadow-lg shadow-white/5 transition hover:-translate-y-0.5 hover:bg-white"
             >
-                Dapatkan Akses Awal
+                Mulai Gratis
             </a>
 
             <a
@@ -148,3 +147,33 @@
 
     </section>
 @endsection
+
+@push('styles')
+    <style>
+    @keyframes fadeInBounce {
+    0% {
+    opacity: 0;
+    transform: translateY(20px);
+    }
+
+    60% {
+    opacity: 1;
+    transform: translateY(-5px);
+    }
+
+    100% {
+    opacity: 1;
+    transform: translateY(0);
+    }
+    }
+
+    .animate-fade-in-bounce {
+    animation: fadeInBounce .8s ease-out forwards;
+    }
+
+    .delay-200 { animation-delay: .2s; }
+    .delay-400 { animation-delay: .4s; }
+    .delay-600 { animation-delay: .6s; }
+    </style>
+
+@endpush
