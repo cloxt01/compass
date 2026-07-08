@@ -7,7 +7,7 @@
         <p class="text-sm font-medium text-amber-200">
             Perhatian
         </p>
-        
+
         <p class="text-sm text-amber-100/70 leading-relaxed">
             Jika mengganti alamat email, maka kamu harus memverifikasi ulang email barumu.
             Jika tidak, akunmu akan tersangkut
@@ -15,7 +15,7 @@
 
     </div>
 
-    <form action="{{ route('profile.update') }}" method="POST" class="p-5 space-y-4">
+    <form action="{{ route('settings.profile.update') }}" method="POST" class="p-5 space-y-4">
         @csrf
         @method('PUT')
 
