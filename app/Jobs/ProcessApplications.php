@@ -26,9 +26,10 @@ class ProcessApplications implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    // 1. UBAH NAMANYA DI SINI
     public array $jobData;
     public User $user;
+
+    public int $user_id;
 
     protected string $job_id;
     protected string $provider;
@@ -41,6 +42,8 @@ class ProcessApplications implements ShouldQueue
         );
 
         $this->user = $user;
+        $this->user_id = $this->user->id;
+
         $this->provider = $provider;
 
         // 2. SIMPAN KE VARIABEL BARU
@@ -49,8 +52,17 @@ class ProcessApplications implements ShouldQueue
         Log::info($this->job_id);
     }
 
+    public function middleware(): array
+    {
+        return [
+            new Middleware\CheckSubscription(),
+            new Middleware\CheckProvider()
+        ];
+    }
     public function handle()
     {
+        // Untuk middleware
+
         if ($this->user->automation_paused) {
             Log::warning('Automation paused');
             return;
@@ -95,17 +107,16 @@ class ProcessApplications implements ShouldQueue
 
 
             $subscription = $this->user
-                ->getLastActive();
-
-            $usage = $subscription->usages->first();;
-            Log::info("Usage (ApplyCount before) : ". $usage->apply_count);
-
-
+                ->getLastActiveSubscription();
             if (!$subscription) {
                 Log::warning('Langganan aktif tidak ditemukan, User ID : '. $this->user->id);
-                $this->usageService->increment($subscription);
             }
 
+            $usage = $subscription->usages()->whereDate('date', today())->first();
+            Log::info("Usage (ApplyCount before) : ". $usage->apply_count);
+
+            $this->usageService->increment($subscription);
+            $usage->refresh();
             Log::info("Usage (ApplyCount after) : ". $usage->apply_count);
 
             JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $result['status']);

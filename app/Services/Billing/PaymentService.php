@@ -2,7 +2,7 @@
 
 namespace App\Services\Billing;
 
-use App\Contracts\PaymentGateway;
+use App\Infrastructure\Contracts\PaymentGateway;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Notifications\BillingNotification;

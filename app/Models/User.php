@@ -73,7 +73,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Subscription::class, 'user_id');
     }
 
-    public function getLastActive(): ?Subscription
+    public function getLastActiveSubscription(): ?Subscription
     {
         return $this->subscriptions()->whereIn('status', ['active', 'grace'])
             ->latest('started_at')

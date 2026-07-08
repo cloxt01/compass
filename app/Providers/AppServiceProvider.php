@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 
-use App\Contracts\PaymentGateway;
+use App\Infrastructure\Contracts\PaymentGateway;
 use App\Gateways\MidtransGateway;
 use App\Models\GlintsAccount;
 use App\Models\JobstreetAccount;

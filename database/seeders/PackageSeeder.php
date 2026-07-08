@@ -10,7 +10,19 @@ class PackageSeeder extends Seeder
     public function run(): void
     {
         $packages = [
-
+            [
+                'code' => 'FREE',
+                'name' => 'Free',
+                'price' => 0,
+                'duration_days' => 999999,
+                'daily_limit' => 10,
+                'monthly_limit' => 300,
+                'features' => [
+                    '10 Apply / Hari',
+                    '1.500 Apply / Bulan',
+                    'Auto Apply'
+                ],
+            ],
             [
                 'code' => 'STARTER',
                 'name' => 'Starter',

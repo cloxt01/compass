@@ -14,11 +14,19 @@ class CheckSubscription
             Log::warnig("User ID : " . $job->user_id . " tidak ditemukan, tidak dapat cek subscription (CheckSubscription middleware)");
             return;
         }
-        $subscription = $user->getLastActive();
+        $subscription = $user->getLastActiveSubscription();
         if (!$subscription) {
             Log::warning('User ID : ' . $user->id. ', dilewati karena tidak memiliki subscription aktif');
             return;
         }
+
+        $limit = $subscription->isLimit();
+
+        if($limit){
+            Log::warning('User ID : ' . $user->id. ', dilewati karena limit tercapai.');
+            return;
+        }
+
         return $next($job);
     }
 }

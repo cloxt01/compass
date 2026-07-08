@@ -2,7 +2,7 @@
 
 namespace App\Gateways;
 
-use App\Contracts\PaymentGateway;
+use App\Infrastructure\Contracts\PaymentGateway;
 use App\Models\Payment;
 use Midtrans\Config;
 use Midtrans\Snap;

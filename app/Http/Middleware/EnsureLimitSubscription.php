@@ -6,21 +6,19 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureActiveSubscription
+class EnsureLimitSubscription
 {
     public function handle(
         Request $request,
         Closure $next
     ): Response
     {
-        $subscription = $request->user()
-            ->getLastActiveSubscription();
+        $limit = $request->user()
+            ->getLastActiveSubscription()?->isLimit();
 
-        if (!$subscription || !in_array($subscription->status, [
-            'active', 'grace'
-            ])) {
+        if ($limit) {
             return response()->json([
-                'message' => 'Pastikan anda memiliki langganan aktif.'
+                'message' => 'Penggunaan sudah mencapai batas limit.'
             ], 403);
         }
 

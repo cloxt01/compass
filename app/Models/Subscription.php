@@ -36,7 +36,7 @@ class Subscription extends Model
     public function usages()
     {
         return $this->hasMany(
-            SubscriptionUsage::class
+            SubscriptionUsage::class, "subscription_id"
         );
     }
     protected function casts(): array
@@ -47,6 +47,24 @@ class Subscription extends Model
             'expires_at' => 'datetime',
             'next_billing_at' => 'datetime',
         ];
+    }
+
+    public function isLimit(): bool
+    {
+        $package = $this->package;
+
+        $monthlyUsage = $this->usages()
+            ->whereYear('date', date('Y'))
+            ->whereMonth('date', date('m'))
+            ->sum('apply_count');
+        $dailyUsage = $this->usages()
+            ->where('date', today())
+            ->sum('apply_count');
+
+        if($monthlyUsage >= $package->monthly_limit || $dailyUsage >= $package->daily_limit){
+            return true;
+        }
+        return false;
     }
 
 }
