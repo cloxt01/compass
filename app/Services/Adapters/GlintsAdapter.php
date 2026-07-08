@@ -4,11 +4,11 @@ namespace App\Services\Adapters;
 
 use App\Clients\GlintsAPI;
 use App\Infrastructure\Contracts\PlatformAdapter;
-use App\Infrastructure\Glints\GlintsPayloadBuilder;
 use App\Services\Glints\GlintsJob;
 use App\Services\Glints\GlintsProfile;
 use App\Services\JobDetails;
 use App\Services\JobInspector;
+use App\Services\Payload\GlintsPayloadBuilder;
 use App\Services\ProfileDetails;
 
 // Adapters

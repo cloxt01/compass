@@ -1,17 +1,14 @@
 <?php
 
-namespace App\Infrastructure\Jobstreet;
+namespace App\Services\Payload;
 
 
-use Illuminate\Support\Facades\Log;
+use App\Infrastructure\Contracts\PlatformPayloadBuilder;
 use App\Support\QuestionnaireParser;
 
-use App\Exceptions\JobNotFound;
-use App\Exceptions\ResumeNotFound;
 
-
-
-class JobstreetPayloadBuilder {
+class JobstreetPayloadBuilder implements PlatformPayloadBuilder
+{
 
     public function __construct(){
     }
@@ -45,14 +42,12 @@ class JobstreetPayloadBuilder {
         $profile_visibility2 = $profile['profile_visibility']['2'] ?? [];
 
 
-        // Tambahkan informasi pekerjaan
         $payload = [
             "jobId" => $details['metadata']['id'],
             "jobTitle" => $details['metadata']['title'],
             "companyName" => $details['metadata']['company']
         ];
 
-        // Tambahkan informasi resume terakhir
         $payload += [
             "resume" => [
                 "id" => $resume['id'],
@@ -60,7 +55,6 @@ class JobstreetPayloadBuilder {
             ]
         ];
 
-        // Tambahkan informasi pengalaman kerja jika tersedia
         if(!empty($roles)){
             $payload += [
                 "roles" => [
@@ -83,7 +77,6 @@ class JobstreetPayloadBuilder {
             }
         }
 
-        // Tambahkan visibilitas profil dan jawaban kuesioner
         $payload += [
             "profileVisibility2" => $profile_visibility2,
             "questionnaireAnswers" => QuestionnaireParser::prepareAndAnswerFromGraphQL($details['products']['questionnaire'])

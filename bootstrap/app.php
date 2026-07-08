@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(
             except: [
                 'payment/webhook',
+                'api/*'
             ],
         );
         $middleware->append(\App\Http\Middleware\TrafficLogger::class);

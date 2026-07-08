@@ -4,11 +4,11 @@ namespace App\Services\Adapters;
 
 use App\Clients\JobstreetAPI;
 use App\Infrastructure\Contracts\PlatformAdapter;
-use App\Infrastructure\Jobstreet\JobstreetPayloadBuilder;
 use App\Services\JobDetails;
 use App\Services\JobInspector;
 use App\Services\Jobstreet\JobstreetJob;
 use App\Services\Jobstreet\JobstreetProfile;
+use App\Services\Payload\JobstreetPayloadBuilder;
 use App\Services\ProfileDetails;
 
 // Adapters

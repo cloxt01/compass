@@ -1,19 +1,16 @@
 <?php
 
-namespace App\Infrastructure\Glints;
+namespace App\Services\Payload;
 
-class GlintsPayloadBuilder
+use App\Infrastructure\Contracts\PlatformPayloadBuilder;
+
+class GlintsPayloadBuilder implements PlatformPayloadBuilder
 {
     public function __construct()
     {}
 
-    public function build(array $details, array $profile, array $config)
+    public function build(array $details, array $profile, array $config): array
     {
-//        print_r($details);
-//        print_r($profile);
-//        print_r($config);
-
-        print_r($config);
 
         return [
             'data' => [
