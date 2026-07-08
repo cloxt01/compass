@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use phpDocumentor\Reflection\Types\This;
 
 class Subscription extends Model
 {
@@ -47,4 +48,5 @@ class Subscription extends Model
             'next_billing_at' => 'datetime',
         ];
     }
+
 }

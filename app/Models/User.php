@@ -73,6 +73,18 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Subscription::class, 'user_id');
     }
 
+    public function getLastActive(): ?Subscription
+    {
+        return $this->subscriptions()->whereIn('status', ['active', 'grace'])
+            ->latest('started_at')
+            ->first();
+    }
+    public function isAnyConnectedProvider(): bool
+    {
+        return ($this->glintsAccount ?? false) || ($this->jobstreetAccount ?? false);
+    }
+
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomResetPassword($token));

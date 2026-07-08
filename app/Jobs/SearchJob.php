@@ -9,15 +9,17 @@ use App\Services\Queue\ApplicationQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Throwable;
 
 class SearchJob implements ShouldQueue
 {
     use Queueable;
 
-    protected int $user_id;
-    protected int $round_id;
+    // ID Model
+    public int $user_id;
+    public int $round_id;
+
+
 
     private const ALLOWED_PROVIDER = ['glints', 'jobstreet'];
 
@@ -26,14 +28,17 @@ class SearchJob implements ShouldQueue
      */
     public function __construct(int $user_id, int $round_id)
     {
+        // Id Model
         $this->user_id = $user_id;
         $this->round_id = $round_id;
+
     }
 
     public function middleware(): array
     {
         return [
-            (new WithoutOverlapping("search-user-{$this->user_id}"))->expireAfter(300),
+            new Middleware\CheckSubscription(),
+            new Middleware\CheckProvider()
         ];
     }
 
