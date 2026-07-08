@@ -57,8 +57,20 @@ class ApplyUseCase {
             $result['issues'] = $inspector['issues'];
             return $result;
         }
+        $data = [
+            'job' => $job,
+            'profile' => $profile,
+            'config' => $config
+        ];
+
+
+        if(!$data['job'] || !$data['profile'] || !$data['config']){
+            Log::warning('Ada data yang kosong : '. json_encode($data));
+        }
+
         JobStatus::dispatch($this->user_id, $job, ProviderHelper::who($this->account), 'build_payload');
-        $payload = $this->adapter->buildPayload($job, $profile, $config);
+        $payload = $this->adapter->buildPayload($data);
+
 
         JobStatus::dispatch($this->user_id, $job, ProviderHelper::who($this->account), 'apply');
 

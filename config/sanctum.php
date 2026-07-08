@@ -9,9 +9,9 @@ return [
     | Stateful Domains
     |--------------------------------------------------------------------------
     |
-    | Requests from the following domains / hosts will receive stateful API
+    | Requests from the following domains / hosts will receive stateful GlintsHelper
     | authentication cookies. Typically, these should include your local
-    | and production domains which access your API via a frontend SPA.
+    | and production domains which access your GlintsHelper via a frontend SPA.
     |
     */
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\Jobstreet;
+namespace App\Services\Platform\Jobstreet;
 
-use Illuminate\Support\Facades\Log;
 use App\Clients\JobstreetAPI;
 use App\Services\Adapters\JobstreetAdapter;
+use Illuminate\Support\Facades\Log;
 
 class JobstreetJob extends JobstreetAdapter
 {

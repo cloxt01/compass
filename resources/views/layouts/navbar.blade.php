@@ -107,7 +107,7 @@
                 btn.disabled = true;
                 applyState(nextPaused);
 
-                fetch('{{ route("profile.toggle-automation") }}', {
+                fetch('{{ route("settings.toggle-automation") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

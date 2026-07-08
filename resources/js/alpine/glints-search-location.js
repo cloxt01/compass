@@ -35,7 +35,7 @@ export default () => ({
 
             const json = await response.json();
 
-            // console.log('API Response:', json);
+            // console.log('GlintsHelper Response:', json);
 
             this.results = json.ok
                 ? (json.data?.searchHierarchicalLocations ?? [])

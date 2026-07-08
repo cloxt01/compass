@@ -4,12 +4,9 @@ namespace App\Services\Adapters;
 
 use App\Clients\GlintsAPI;
 use App\Infrastructure\Contracts\PlatformAdapter;
-use App\Services\Glints\GlintsJob;
-use App\Services\Glints\GlintsProfile;
-use App\Services\JobDetails;
-use App\Services\JobInspector;
-use App\Services\Payload\GlintsPayloadBuilder;
-use App\Services\ProfileDetails;
+use App\Infrastructure\Factory\PlatformFactory;
+use App\Services\Platform\Glints\GlintsJob;
+use App\Services\Platform\Glints\GlintsProfile;
 
 // Adapters
 
@@ -17,11 +14,13 @@ use App\Services\ProfileDetails;
 
 class GlintsAdapter implements PlatformAdapter {
 
-    protected $builder;
+    const PROVIDER_NAME = 'Glints';
+    const PROVIDER_CODE = 'glints';
+
+
     public function __construct(
         protected GlintsAPI $client
     ){
-        $this->builder = new GlintsPayloadBuilder();
     }
 
     protected function profile():GlintsProfile {
@@ -33,25 +32,24 @@ class GlintsAdapter implements PlatformAdapter {
 
     public function loadJob(string $jobId): array {
         $raw = $this->job()->details($jobId);
-        return JobDetails::fromGlints($raw);
+        return PlatformFactory::job_reader(self::PROVIDER_CODE, $raw);
     }
 
     public function loadProfile(): array
     {
         $raw = $this->profile()->load();
-        return ProfileDetails::fromGlints($raw);
+        return PlatformFactory::profile_reader(self::PROVIDER_CODE, $raw);
     }
 
 
-    public function buildPayload(array $jobDetails, array $profileDetails, array $config=[]): array
+    public function buildPayload($data): array
     {
-
-        return $this->builder->build($jobDetails, $profileDetails, $config);
+        return PlatformFactory::build_payload(self::PROVIDER_CODE, $data);
     }
 
     public function canApply(array $details): array
     {
-        return JobInspector::fromGlints($details);
+        return PlatformFactory::job_inspector(self::PROVIDER_CODE, $details);
     }
     public function generateTraceInfo(): string {
         return bin2hex(random_bytes(16));

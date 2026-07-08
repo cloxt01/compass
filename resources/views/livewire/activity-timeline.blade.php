@@ -132,6 +132,7 @@ new class extends Component
                                 $dotColor = match($activity['status']) {
                                     'success' => 'bg-emerald-400',
                                     'applied' => 'bg-violet-400',
+                                    'resume' => 'bg-yellow-400',
                                     'questionnaire' => 'bg-amber-400',
                                     'linkout' => 'bg-blue-400',
                                     'error' => 'bg-rose-500',
@@ -140,6 +141,7 @@ new class extends Component
                                     default => 'bg-[#555]',
                                 };
                                 $statusLabel = match($activity['status']) {
+                                    'resume' => 'Butuh Resume',
                                     'success' => 'Sukses Melamar',
                                     'applied' => 'Sudah Dilamar',
                                     'questionnaire' => 'Butuh Screening',

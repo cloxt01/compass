@@ -4,17 +4,13 @@ $app = require_once __DIR__ . '/bootstrap/app.php';
 
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
-use App\Clients\Application\UseCase\ApplyUseCase;
+
 use App\Clients\GlintsAPI;
+use App\Clients\JobstreetAPI;
 use App\Models\User;
-use App\Models\JobstreetAccount;
 use App\Services\Adapters\GlintsAdapter;
 use App\Services\Adapters\JobstreetAdapter;
-use App\Clients\JobstreetAPI;
-use App\Services\JobDetails;
-use App\Support\DataHelper;
-use App\Services\Glints\API as GlintsService;
-use App\Http\Controllers\Api\Glints\api as GlintsApiService;
+use App\Services\Platform\Glints\GlintsHelper as GlintsService;
 
 $user = User::find(1);
 $jobstreetaccount = $user->jobstreetAccount;
@@ -32,8 +28,8 @@ if(!$glintsaccount){
 //// print_r($account->access_token);
 //print_r($client);
 
-$cookie = $jobstreetaccount->cookie;
-$token = $jobstreetaccount->access_token;
+$cookie = $jobstreetaccount->cookie ?? '';
+$token = $jobstreetaccount->access_token ?? '';
 if(!$cookie){
     echo("cookie not found\n");
 }
@@ -43,20 +39,23 @@ if(!$token){
 
 $jobstreet_client = new JobstreetAPI($token, $cookie);
 $jobstreet_adapter = new JobstreetAdapter($jobstreet_client);
-$glints_client = new GlintsAPI($glintsaccount->access_token, $glintsaccount->cookie);
+$glints_client = new GlintsAPI($glintsaccount->access_token ?? '', $glintsaccount->cookie ?? '');
+$glints_adapter = new GlintsAdapter($glints_client);
+
 $glints_service = new GlintsService($glints_client);
 //$glintsApi = new GlintsApiService($glints_client);
 //
 //$profile = $jobstreet_adapter->loadProfile();
-$jobs = $jobstreet_adapter->job()->search([
-    [
-        'keyword'  => "Teknisi",
-        'pageSize' => 1,
-    ]
-]);
-print_r(json_encode($jobs));
+//$jobs = $jobstreet_adapter->job()->search([
+//    [
+//        'keyword'  => "Teknisi",
+//        'pageSize' => 1,
+//    ]
+//]);
+$profile_glints = $glints_adapter->loadProfile();
+//print_r(json_encode($jobs));
 
-//var_dump($profile);
+var_dump($profile_glints);
 //$data= $glints_service->search_location('Lebak');
 //var_dump($data);
 //$job = $adapter->job();

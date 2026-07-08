@@ -45,7 +45,7 @@
                     const isChecked = this.checked;
                     applyProfileState(isChecked);
 
-                    fetch('{{ route("profile.toggle-automation") }}', {
+                    fetch('{{ route("settings.toggle-automation") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Infrastructure\Factory\PlatformFactory;
 use App\Models\Round;
 use App\Models\User;
-use App\Services\JobDetails;
 use App\Services\Queue\ApplicationQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -87,7 +86,7 @@ class SearchJob implements ShouldQueue
                 $keywordCount = count($keywords);
                 $keyword = $keywords[($this->round_id - 1) % $keywordCount];
 
-                // Parameter request API, typo =g> sudah diperbaiki ke =>
+                // Parameter request GlintsHelper, typo =g> sudah diperbaiki ke =>
                 $params = match ($provider) {
                     'jobstreet' => [
                         'keyword'  => $keyword,
@@ -120,6 +119,13 @@ class SearchJob implements ShouldQueue
                     }
 
                     $job = $adapter->job()->loadJob($job['id']);
+
+                    if(!$job || empty($job)) {
+                        Log::warning("User {$user->id}: {$provider} job tidak memiliki detail.", [
+                            'job' => $job,
+                        ]);
+                        continue;
+                    }
 
                     Log::info("Job : ", $job);
                     ApplicationQueue::dispatch(

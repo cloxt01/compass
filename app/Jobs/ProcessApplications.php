@@ -61,17 +61,19 @@ class ProcessApplications implements ShouldQueue
             'jobstreet' => $this->user->jobstreetAccount,
         };
 
+
         if (!$account) {
             Log::error("Account tidak ditemukan untuk provider: {$this->provider}");
             return;
         }
+        $providerName = ProviderHelper::who($account);
+
 
         $adapter = match ($this->provider) {
             'glints' => new GlintsAdapter(new GlintsAPI($account->access_token, $account->cookie)),
             'jobstreet' => new JobstreetAdapter(new JobstreetAPI($account->access_token)),
         };
 
-        $providerName = ProviderHelper::who($account);
 
         $is_already = ApplicationHelper::alreadyApplied($this->user->id, $this->job_id);
 
@@ -110,7 +112,6 @@ class ProcessApplications implements ShouldQueue
             }
             Log::info("Usage (ApplyCount after) : ". $usage->apply_count);
 
-            // 5. GUNAKAN $jobData DI SINI
             JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $result['status']);
 
             $this->user->applications()->create([
@@ -123,7 +124,11 @@ class ProcessApplications implements ShouldQueue
 
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result['success'] ? "Ya" : "Tidak"));
         } catch (CantApply $e) {
-            Log::info($e->getMessage());
+            if($e->getCode() === 409) {
+                JobStatus::dispatch($this->user->id, $this->jobData, $providerName, "resume");
+            }
+            Log::warning("Code : ". $e->getCode());
+            Log::warning($e->getMessage());
         } catch (\Exception $e) {
             Log::error("Error: " . $e->getMessage());
             throw $e;

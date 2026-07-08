@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Jobstreet;
+namespace App\Services\Platform\Jobstreet;
 
 use App\Clients\JobstreetAPI;
 use App\Services\Adapters\JobstreetAdapter;
@@ -21,8 +21,8 @@ class JobstreetProfile extends JobstreetAdapter
         if ($this->data === null) {
             $review = $this->client->graphql('ReviewPage', [], ['debug' => true])['data']['data']['viewer'] ?? [];
             $document = $this->client->graphql('DocumentsQuery', [], ['debug' => true])['data']['data']['viewer'] ?? [];
-            
-            
+
+
             $this->data = array_merge(["review" => $review], ["document" => $document]);
         }
         return $this->data ?? [];
@@ -80,5 +80,5 @@ class JobstreetProfile extends JobstreetAdapter
         return $this->load()['data']['viewer']['referenceChecks'] ?? [];
     }
 
-    
+
 }

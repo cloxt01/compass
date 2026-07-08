@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Glints;
+namespace App\Services\Platform\Glints;
 
 use App\Clients\GlintsAPI;
 use App\Services\Adapters\GlintsAdapter;

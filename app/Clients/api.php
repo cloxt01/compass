@@ -21,7 +21,7 @@ class api
     }
 
     /**
-     * Set the base URL for API requests.
+     * Set the base URL for GlintsHelper requests.
      */
     public function setHost(string $host): self
     {
@@ -163,6 +163,7 @@ class api
 
             if (!$response->isSuccess()) {
                 $body = $response->body();
+
                 try {
                     $body = $response->json();
                 } catch (\JsonException $e) {

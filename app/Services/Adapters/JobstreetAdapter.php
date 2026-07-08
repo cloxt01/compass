@@ -4,12 +4,9 @@ namespace App\Services\Adapters;
 
 use App\Clients\JobstreetAPI;
 use App\Infrastructure\Contracts\PlatformAdapter;
-use App\Services\JobDetails;
-use App\Services\JobInspector;
-use App\Services\Jobstreet\JobstreetJob;
-use App\Services\Jobstreet\JobstreetProfile;
-use App\Services\Payload\JobstreetPayloadBuilder;
-use App\Services\ProfileDetails;
+use App\Infrastructure\Factory\PlatformFactory;
+use App\Services\Platform\Jobstreet\JobstreetJob;
+use App\Services\Platform\Jobstreet\JobstreetProfile;
 
 // Adapters
 
@@ -17,10 +14,11 @@ use App\Services\ProfileDetails;
 
 class JobstreetAdapter implements PlatformAdapter {
 
-    protected $builder;
+    const PROVIDER_NAME = 'Jobstreet';
+    const PROVIDER_CODE = 'jobstreet';
+
     public function __construct(protected JobstreetAPI $client){
         $this->client = $client;
-        $this->builder = new JobstreetPayloadBuilder();
     }
 
     protected function profile():JobstreetProfile {
@@ -32,25 +30,24 @@ class JobstreetAdapter implements PlatformAdapter {
 
     public function loadJob(string $jobId): array {
         $raw = $this->job()->details($jobId);
-        return JobDetails::fromJobstreet($raw);
+        return PlatformFactory::job_reader(self::PROVIDER_CODE, $raw);
     }
 
     public function loadProfile(): array
     {
         $raw = $this->profile()->load();
-        return ProfileDetails::fromJobstreet($raw);
+        return PlatformFactory::profile_reader(self::PROVIDER_CODE, $raw);
     }
 
 
-    public function buildPayload(array $jobDetails, array $profileDetails, array $config=[]): array
+    public function buildPayload($data): array
     {
-
-        return $this->builder->build($jobDetails, $profileDetails, $config);
+        return PlatformFactory::build_payload(self::PROVIDER_CODE, $data);
     }
 
     public function canApply(array $details): array
     {
-        return JobInspector::fromJobstreet($details);
+        return PlatformFactory::job_inspector(self::PROVIDER_CODE, $details);
     }
     public function generateTraceInfo(): string {
         return '';

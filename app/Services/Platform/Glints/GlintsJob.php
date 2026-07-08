@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Services\Glints;
+namespace App\Services\Platform\Glints;
 
-use App\Models\GlintsAccount;
-use App\Services\JobQuestion;
+use App\Clients\GlintsAPI;
+use App\Infrastructure\Factory\PlatformFactory;
+use App\Services\Adapters\GlintsAdapter;
 use App\Support\DataHelper;
 use Illuminate\Support\Facades\Log;
-use App\Clients\GlintsAPI;
-use App\Services\Adapters\GlintsAdapter;
 
 class GlintsJob extends GlintsAdapter
 {
@@ -38,7 +37,6 @@ class GlintsJob extends GlintsAdapter
                 'url' => "https://id.jobstreet.com/id/job/" . $job['node']['job']['id']
             ];
         }
-        Log::info("Fetched applied jobs for user: " . count($data) . " jobs found.");
         return $data;
     }
     public function hiring_question(array $params = []): array
@@ -48,11 +46,10 @@ class GlintsJob extends GlintsAdapter
         }
         $result = $this->client->graphql('jobHiringQuestion', $params);
         if (!isset($result) || !is_array($result)) {
-            Log::info("Job Hiring Question returned an error : ". json_encode($result));
+            Log::warning("Job Hiring Question returned an error : ". json_encode($result));
             return [];
         }
-        Log::info("Job Hiring Question result: " . json_encode($result));
-        return JobQuestion::fromGlints($result) ?: [];
+        return PlatformFactory::job_question(self::PROVIDER_CODE, $result);
     }
 
     /*

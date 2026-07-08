@@ -121,7 +121,6 @@ class JobstreetAPI extends api
 
         Log::info("GraphQL ($operation) : ".json_encode($out));
 //        Log::info("GraphQL operation '$operation' executed with status: " . ($out['ok'] ? 'success' : 'failure') . ", type: " . ($out['type'] ?? 'none') . ", http_code: " . ($out['http_code'] ?? 'none'));
-
         return $out;
 
         // Note: The original try‑catch blocks for RequestException, UnknownOperation, etc.

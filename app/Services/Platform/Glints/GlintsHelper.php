@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services\Glints;
+namespace App\Services\Platform\Glints;
 
 use App\Clients\GlintsAPI;
 
-class API
+class GlintsHelper
 {
     public array $data;
     public function __construct(protected GlintsAPI $client){

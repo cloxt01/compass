@@ -7,7 +7,7 @@ new class extends Component
 {
     public $isReady = false;
 
-    public $steps = ['expired','applied', 'questionnaire', 'loading_job', 'loading_profile', 'inspecting', 'building_payload', 'applying', 'success'];
+    public $steps = ['resume', 'expired','applied', 'questionnaire', 'loading_job', 'loading_profile', 'inspecting', 'building_payload', 'applying', 'success'];
 
     public $statusMap = [
         'start'           => ['step' => 'loading_job',       'description' => 'Memulai proses lamaran'],
@@ -17,6 +17,7 @@ new class extends Component
         'inspect'         => ['step' => 'inspecting',        'description' => 'Memeriksa apakah dapat dilamar'],
         'build_payload'   => ['step' => 'building_payload',  'description' => 'Membangun payload lamaran'],
         'apply'           => ['step' => 'applying',          'description' => 'Mengirim lamaran'],
+        'resume'         => ['step' => 'resume',           'description' => 'Dilewati, pelamar tidak memiliki resume'],
         'questionnaire'   => ['step' => 'questionnaire',     'description' => 'Dilewati, perlu menjawab pertanyaan screening'],
         'expired'         => ['step' => 'expired',           'description' => 'Dilewati, posisi ini sudah tidak tersedia'],
         'applied'         => ['step' => 'applied',           'description' => 'Dilewati, posisi ini sudah pernah dilamar sebelumnya'],
