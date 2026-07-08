@@ -18,7 +18,7 @@ class EnsureAutomationEnabled
 
         if (!$user->isAutomationPaused()) {
             return response()->json([
-                'message' => 'Automation paused.'
+                'message' => 'Harap aktifkan automation terlebih dahulu.'
             ], 403);
         }
 

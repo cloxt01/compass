@@ -14,7 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'token' => \App\Http\Middleware\RefreshToken::class,
             'subscription' => \App\Http\Middleware\EnsureActiveSubscription::class,
             'automation' => \App\Http\Middleware\EnsureAutomationEnabled::class,
         ]);

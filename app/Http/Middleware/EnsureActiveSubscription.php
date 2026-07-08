@@ -18,18 +18,11 @@ class EnsureActiveSubscription
             ->latest()
             ->first();
 
-        if (!$subscription) {
+        if (!$subscription || !in_array($subscription->status, [
+            'active', 'grace'
+            ])) {
             return response()->json([
-                'message' => 'Subscription not found.'
-            ], 403);
-        }
-
-         if (in_array($subscription->status, [
-            'active',
-            'grace',
-        ])) {
-            return response()->json([
-                'message' => 'Subscription is not active.'
+                'message' => 'Pastikan anda memiliki langganan aktif.'
             ], 403);
         }
 
