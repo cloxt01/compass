@@ -19,6 +19,16 @@ class Payment extends Model
         'redirect_url',
     ];
 
+    const STATUS_PAID = 'paid';
+    const STATUS_PENDING = 'pending';
+    const STATUS_FAILED = 'failed';
+    const STATUS_EXPIRED = 'expired';
+    const STATUS_CANCELLED = 'cancelled';
+    const STATUS_REFUND = 'refund';
+
+
+
+
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);

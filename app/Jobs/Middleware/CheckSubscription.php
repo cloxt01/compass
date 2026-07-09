@@ -23,6 +23,9 @@ class CheckSubscription
         $limit = $subscription->isLimit();
 
         if($limit){
+            if($subscription->package->code == 'FREE'){
+                $user->pauseAutomation();
+            }
             Log::warning('User ID : ' . $user->id. ', dilewati karena limit tercapai.');
             return;
         }

@@ -21,6 +21,13 @@ class Invoice extends Model
         'paid_at',
     ];
 
+    const STATUS_DRAFT = 'draft';
+    const STATUS_PAID = 'paid';
+    const STATUS_PENDING = 'pending';
+    const STATUS_OVERDUE = 'overdue';
+
+    const STATUS_CANCELLED = 'cancelled';
+
     public function subscription(): BelongsTo
     {
         return $this->belongsTo(Subscription::class);

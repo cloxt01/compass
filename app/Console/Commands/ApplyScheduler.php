@@ -26,11 +26,6 @@ class ApplyScheduler extends Command
                 'started_at' => $startedAt,
             ]);
             User::query()
-                ->where('automation_paused', false)
-                ->where(function ($query) {
-                    $query->has('jobstreetAccount')
-                        ->orHas('glintsAccount');
-                })
                 ->chunkById(50, function ($users) use (&$dispatched, $round) {
                     foreach ($users as $user) {
                         SearchJob::dispatch($user->id, $round->id);

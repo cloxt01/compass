@@ -69,6 +69,7 @@ class SearchJob implements ShouldQueue
                 $providerConfig = $conf[$provider] ?? [];
 
                 if (!($providerConfig['enabled'] ?? false)) {
+                    Log::warning("User ID : $this->user_id, provider [$provider] dilewati karena tidak aktif.");
                     continue;
                 }
 

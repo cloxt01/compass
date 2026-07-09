@@ -19,6 +19,12 @@ class Subscription extends Model
         'auto_renew',
     ];
 
+    const STATUS_ACTIVE = 'active';
+    const STATUS_PENDING = 'pending';
+    const STATUS_GRACE = 'grace';
+    const STATUS_EXPIRED = 'expired';
+    const STATUS_CANCELLED = 'cancelled';
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

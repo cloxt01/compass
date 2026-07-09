@@ -14,12 +14,12 @@ class PackageSeeder extends Seeder
                 'code' => 'FREE',
                 'name' => 'Free',
                 'price' => 0,
-                'duration_days' => 999999,
+                'duration_days' => 0,
                 'daily_limit' => 10,
-                'monthly_limit' => 300,
+                'monthly_limit' => 100,
                 'features' => [
                     '10 Apply / Hari',
-                    '1.500 Apply / Bulan',
+                    '100 Apply / Bulan',
                     'Auto Apply'
                 ],
             ],
@@ -29,7 +29,7 @@ class PackageSeeder extends Seeder
                 'price' => 15000,
                 'duration_days' => 30,
                 'daily_limit' => 50,
-                'monthly_limit' => 1500,
+                'monthly_limit' => 1000,
                 'features' => [
                     '50 Apply / Hari',
                     '1.500 Apply / Bulan',
@@ -45,8 +45,8 @@ class PackageSeeder extends Seeder
                 'daily_limit' => 200,
                 'monthly_limit' => 6000,
                 'features' => [
-                    '250 Apply / Hari',
-                    '6.000 Apply / Bulan',
+                    '100 Apply / Hari',
+                    '3.000 Apply / Bulan',
                     'Auto Apply'
                 ],
             ],
@@ -54,7 +54,7 @@ class PackageSeeder extends Seeder
             [
                 'code' => 'PREMIUM',
                 'name' => 'Premium',
-                'price' => 150000,
+                'price' => 99000,
                 'duration_days' => 30,
                 'daily_limit' => 1000,
                 'monthly_limit' => 30000,

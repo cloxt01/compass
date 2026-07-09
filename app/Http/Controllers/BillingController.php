@@ -13,14 +13,7 @@ class BillingController extends Controller
     {
         $user = $request->user();
 
-        $subscription = $user
-            ->subscriptions()
-            ->whereIn('status', [
-                'active',
-                'grace'
-            ])
-            ->latest()
-            ->first();
+        $subscription = $user->getLastActiveSubscription();
 
         $latestInvoice = null;
 
@@ -124,13 +117,7 @@ class BillingController extends Controller
             ->orderBy('price')
             ->get();
 
-        $subscription = Subscription::where(
-            'user_id',
-            $request->user()->id
-        )->whereIn('status', [
-            'active',
-            'grace'
-        ])->latest()->first();
+        $subscription = auth()->user()->getLastActiveSubscription();
 
         return view('billing.packages', [
             'packages' => $packages,
@@ -140,14 +127,7 @@ class BillingController extends Controller
 
     public function subscription(Request $request)
     {
-        $subscription = Subscription::with('package')
-            ->where('user_id', $request->user()->id)
-            ->whereIn('status', [
-                'active',
-                'grace'
-            ])
-            ->latest()
-            ->first();
+        $subscription = auth()->user()->getLastActiveSubscription();
 
         return view('billing.subscription', [
             'subscription' => $subscription,
@@ -156,17 +136,14 @@ class BillingController extends Controller
 
     public function toggleAutoRenew(Request $request)
     {
-        $subscription = Subscription::where(
-            'user_id',
-            $request->user()->id
-        )
-            ->whereIn('status', [
-                'active',
-                'grace'
-            ])
-            ->latest()
-            ->firstOrFail();
+        $subscription = auth()->user()->getLastActiveSubscription();
 
+        if(!$subscription) {
+            return back()->with(
+                'error',
+                'Auto renew gagal diperbarui, tidak ada subscription aktif'
+            );
+        }
         $subscription->update([
             'auto_renew' => ! $subscription->auto_renew,
         ]);
@@ -179,20 +156,18 @@ class BillingController extends Controller
 
     public function cancelSubscription(Request $request)
     {
-        $subscription = Subscription::where(
-            'user_id',
-            $request->user()->id
-        )
-            ->whereIn('status', [
-                'active',
-                'grace'
-            ])
-            ->latest()
-            ->firstOrFail();
+        $subscription = auth()->user()->getLastActiveSubscription();
+
+        if(!$subscription) {
+            return back()->with(
+                'error',
+                'Auto renew gagal diperbarui, tidak ada subscription aktif'
+            );
+        }
 
         $subscription->update([
             'auto_renew' => false,
-            'status' => 'cancelled',
+            'status' => Subscription::STATUS_CANCELLED,
         ]);
 
         return redirect()

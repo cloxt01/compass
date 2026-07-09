@@ -61,7 +61,7 @@ class InvoiceService
     public function markPaid(Invoice $invoice): Invoice
     {
         $invoice->update([
-            'status' => 'paid',
+            'status' => Invoice::STATUS_PAID,
             'paid_at' => now(),
         ]);
 
@@ -74,7 +74,7 @@ class InvoiceService
     public function cancel(Invoice $invoice): Invoice
     {
         $invoice->update([
-            'status' => 'cancelled',
+            'status' => Invoice::STATUS_CANCELLED,
         ]);
 
         return $invoice->fresh();
@@ -86,7 +86,7 @@ class InvoiceService
     public function overdue(Invoice $invoice): Invoice
     {
         $invoice->update([
-            'status' => 'overdue',
+            'status' => Invoice::STATUS_OVERDUE,
         ]);
 
         return $invoice->fresh();

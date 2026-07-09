@@ -5,6 +5,7 @@ namespace App\Services\Billing;
 use App\Infrastructure\Contracts\PaymentGateway;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\Subscription;
 use App\Notifications\BillingNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -29,7 +30,7 @@ class PaymentService
                 'method' => '',
                 'reference' => $invoice->invoice_number,
                 'amount' => $invoice->total,
-                'status' => 'pending',
+                'status' => Payment::STATUS_PENDING,
             ]);
 
             $response = $this->gateway->charge($payment);
@@ -74,7 +75,7 @@ class PaymentService
         Log::info('Payment exists', [
             'exists' => Payment::where('reference', $payload['order_id'] ?? '')->exists(),
         ]);
-        if ($payment->status === 'paid') {
+        if ($payment->status === Payment::STATUS_PAID) {
             return;
         }
 
@@ -116,14 +117,14 @@ class PaymentService
         DB::transaction(function () use ($payment) {
 
             $payment->update([
-                'status' => 'paid',
+                'status' => Payment::STATUS_PAID,
                 'paid_at' => now(),
             ]);
 
             $invoice = $payment->invoice;
 
             $invoice->update([
-                'status' => 'paid',
+                'status' => Invoice::STATUS_PAID,
                 'paid_at' => now(),
             ]);
             $invoice->subscription->user->notify(new BillingNotification($invoice));
@@ -131,7 +132,7 @@ class PaymentService
             $subscription = $invoice->subscription;
 
             $subscription->update([
-                'status' => 'active',
+                'status' => Subscription::STATUS_ACTIVE,
             ]);
         });
     }
@@ -139,21 +140,21 @@ class PaymentService
     public function failed(Payment $payment): void
     {
         $payment->update([
-            'status' => 'failed',
+            'status' => Payment::STATUS_FAILED,
         ]);
     }
 
     public function expired(Payment $payment): void
     {
         $payment->update([
-            'status' => 'expired',
+            'status' => Payment::STATUS_EXPIRED,
         ]);
     }
 
     public function cancelled(Payment $payment): void
     {
         $payment->update([
-            'status' => 'cancelled',
+            'status' => Payment::STATUS_CANCELLED,
         ]);
     }
 
@@ -162,7 +163,7 @@ class PaymentService
         $this->gateway->refund($payment);
 
         $payment->update([
-            'status' => 'refund',
+            'status' => Payment::STATUS_REFUND,
         ]);
     }
 

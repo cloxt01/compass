@@ -13,10 +13,7 @@ class SubscriptionService
      */
     public function current(User $user): ?Subscription
     {
-        return Subscription::where('user_id', $user->id)
-            ->whereIn('status', ['active', 'grace'])
-            ->latest('expires_at')
-            ->first();
+        return $user->getLastActiveSubscription();
     }
 
     /**
@@ -49,7 +46,7 @@ class SubscriptionService
         return Subscription::create([
             'user_id'         => $user->id,
             'package_id'      => $package->id,
-            'status'          => 'pending',
+            'status'          => Subscription::STATUS_PENDING,
             'package_price'   => $package->price,
             'started_at'      => now(),
             'expires_at'      => now()->addDays($package->duration_days),
@@ -64,7 +61,7 @@ class SubscriptionService
     public function activate(Subscription $subscription): Subscription
     {
         $subscription->update([
-            'status' => 'active',
+            'status' => Subscription::STATUS_ACTIVE,
         ]);
 
         return $subscription->fresh();
@@ -76,7 +73,7 @@ class SubscriptionService
     public function grace(Subscription $subscription): void
     {
         $subscription->update([
-            'status' => 'grace',
+            'status' => Subscription::STATUS_GRACE,
         ]);
     }
 
@@ -86,7 +83,7 @@ class SubscriptionService
     public function expire(Subscription $subscription): void
     {
         $subscription->update([
-            'status' => 'expired',
+            'status' => Subscription::STATUS_EXPIRED,
         ]);
     }
 
@@ -96,7 +93,7 @@ class SubscriptionService
     public function cancel(Subscription $subscription): void
     {
         $subscription->update([
-            'status' => 'cancelled',
+            'status' => Subscription::STATUS_CANCELLED,
             'auto_renew' => false,
         ]);
     }
@@ -107,7 +104,7 @@ class SubscriptionService
     public function renew(Subscription $subscription): Subscription
     {
         $subscription->update([
-            'status'          => 'active',
+            'status'          => Subscription::STATUS_ACTIVE,
             'started_at'      => now(),
             'expires_at'      => now()->addDays(
                 $subscription->package->duration_days

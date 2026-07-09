@@ -114,14 +114,14 @@ class BillingService
 
                         $invoice->update([
 
-                            'status' => 'overdue',
+                            'status' => Invoice::STATUS_OVERDUE,
 
                         ]);
 
                         $invoice
                             ->subscription
                             ->update([
-                                'status' => 'grace',
+                                'status' => Subscription::STATUS_GRACE,
                             ]);
 
                     });
@@ -152,7 +152,7 @@ class BillingService
                             ->subscription
                             ->update([
 
-                                'status' => 'expired',
+                                'status' => Subscription::STATUS_EXPIRED,
 
                             ]);
 

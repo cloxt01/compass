@@ -75,7 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getLastActiveSubscription(): ?Subscription
     {
-        return $this->subscriptions()->whereIn('status', ['active', 'grace'])
+        return $this->subscriptions()->whereIn('status', [Subscription::STATUS_ACTIVE, Subscription::STATUS_GRACE])
             ->latest('started_at')
             ->first();
     }
@@ -84,6 +84,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return ($this->glintsAccount ?? false) || ($this->jobstreetAccount ?? false);
     }
 
+    public function pauseAutomation(): bool
+    {
+        $this->automation_paused = true;
+        return $this->save();
+    }
 
     public function sendPasswordResetNotification($token)
     {
