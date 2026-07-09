@@ -62,6 +62,8 @@ class BillingService
 
             ->where('status', 'active')
 
+            ->whereNotIn('package_id', Package::where('code', Package::CODE_FREE)->pluck('id'))
+
             ->where('auto_renew', true)
 
             ->where('next_billing_at', '<=', now())
@@ -104,6 +106,9 @@ class BillingService
                 'overdue',
             ])
 
+            ->whereHas('subscription', function ($query) {
+                $query->whereNotIn('package_id', Package::where('code', Package::CODE_FREE)->pluck('id'));
+            })
             ->whereDate('due_date', '<', today())
 
             ->chunkById(100, function ($invoices) {
@@ -111,6 +116,7 @@ class BillingService
                 foreach ($invoices as $invoice) {
 
                     DB::transaction(function () use ($invoice) {
+
 
                         $invoice->update([
 
@@ -136,6 +142,9 @@ class BillingService
 
             ->where('status', 'overdue')
 
+            ->whereHas('subscription', function ($query) {
+                $query->whereNotIn('package_id', Package::where('code', Package::CODE_FREE)->pluck('id'));
+            })
             ->whereDate(
                 'due_date',
                 '<=',

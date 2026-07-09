@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Package extends Model
 {
+    const CODE_FREE = 'FREE';
+
     protected $fillable = [
         'code',
         'name',
