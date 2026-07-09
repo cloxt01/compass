@@ -112,15 +112,17 @@ class ProcessApplications implements ShouldQueue
                 Log::warning('Langganan aktif tidak ditemukan, User ID : '. $this->user->id);
             }
 
+            // Usage Subscription
             $usage = $subscription->usages()->whereDate('date', today())->first();
-            Log::info("Usage (ApplyCount before) : ". $usage->apply_count);
+            Log::info("Usage [B] : ". $usage->apply_count. " , Result [{$result['status']} : ");
+            if(in_array($result['status'], ['success', 'applied'])) {
+                $this->usageService->increment($subscription);
+                $usage->refresh();
+            }
+            Log::info("Usage [A] : ". $usage->apply_count. " , Result [{$result['status']} : ");
 
-            $this->usageService->increment($subscription);
-            $usage->refresh();
-            Log::info("Usage (ApplyCount after) : ". $usage->apply_count);
-
+            // Record Application
             JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $result['status']);
-
             $this->user->applications()->create([
                 'job_id' => $result['job']['job_id'] ?? $this->job_id,
                 'job_title' => $result['job']['job_title'] ?? 'Unknown',
