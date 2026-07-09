@@ -26,6 +26,7 @@ class ApplyScheduler extends Command
                 'started_at' => $startedAt,
             ]);
             User::query()
+                ->where('automation_paused', false)
                 ->chunkById(50, function ($users) use (&$dispatched, $round) {
                     foreach ($users as $user) {
                         SearchJob::dispatch($user->id, $round->id);
