@@ -207,63 +207,32 @@
     @unless(View::hasSection('hide-footer'))
 
         <footer class="px-6 py-6 md:px-12">
-
             <div class="mx-auto flex max-w-7xl flex-col gap-4 text-xs text-[#71717a] sm:flex-row sm:items-center sm:justify-between">
 
-
-
-                <div>
-
-                    © {{ date('Y') }}
-
-                    {{ config('ui.brand.name', 'Compass') }}.
-
-                    All rights reserved.
-
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <div>
+                        © {{ date('Y') }} {{ config('ui.brand.name', 'Compass') }}. All rights reserved.
+                    </div>
+                    <a href="https://wa.me/6285863409811" class="hover:text-[#a1a1aa] transition">
+                        • Telp: 0858-6340-9811
+                    </a>
                 </div>
-
-
 
                 <div class="flex items-center gap-4">
-
-
-
                     <a class="transition hover:text-[#a1a1aa] cursor-pointer {{ request()->routeIs('terms') ? 'text-[#a1a1aa]' : '' }}" href="{{ route('terms') }}">
-
                         Syarat & Ketentuan
-
                     </a>
-
-
-
                     <a class="transition hover:text-[#a1a1aa] cursor-pointer {{ request()->routeIs('privacy') ? 'text-[#a1a1aa]' : '' }}" href="{{ route('privacy') }}">
-
                         Privasi
-
                     </a>
-
-
-
                     <span class="h-1 w-1 rounded-full bg-[#333]"></span>
-
-
-
                     <span class="flex items-center gap-1.5">
-
-                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-
-                            All systems operational
-
-                        </span>
-
-
-
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                All systems operational
+            </span>
                 </div>
 
-
-
             </div>
-
         </footer>
 
     @endunless
