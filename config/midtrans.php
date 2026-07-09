@@ -6,7 +6,7 @@ return [
 
     'client_key' => env('MIDTRANS_CLIENT_KEY'),
 
-    'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
+    'is_production' => ((bool) env('MIDTRANS_IS_PRODUCTION', false) ?? false),
 
     'is_sanitized' => true,
 
