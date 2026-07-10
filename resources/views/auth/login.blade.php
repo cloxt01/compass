@@ -7,17 +7,22 @@
         <div class="saas-card overflow-hidden">
 
             {{-- HEADER --}}
+
             <div class="border-b border-[#262626] px-6 py-5">
                 <h1 class="text-lg font-semibold tracking-tight text-[#fafafa]">Masuk ke akun</h1>
                 <p class="mt-1 text-sm text-[#a1a1aa]">Kelola automasi job application kamu dari satu dashboard.</p>
             </div>
 
+
             {{-- BODY --}}
-            <div class="p-6">
-                <x-auth-session-status class="mb-4 text-xs text-emerald-400" :status="session('status')" />
+            <div class="p-6 flex flex-col gap-5">
+
+                <x-auth-session-status class="my-4 text-xs text-emerald-400" :status="session('status')" />
 
                 <form method="POST" action="{{ route('login') }}" class="space-y-4">
                     @csrf
+
+
 
                     <div>
                         <label for="email" class="mb-2 block text-xs uppercase tracking-[0.14em] text-[#a1a1aa]">{{ __('Alamat Email') }}</label>
@@ -46,6 +51,17 @@
                                    class="h-4 w-4 rounded border-[#3f3f3f] bg-[#0a0a0a] text-blue-600 focus:ring-0 cursor-pointer">
                             <span class="text-xs">{{ __('Ingat Saya') }}</span>
                         </label>
+                    </div>
+
+                    @error('captcha')
+                    <div class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                        {{ $message }}
+                    </div>
+                    @enderror
+
+                    <div
+                        class="cf-turnstile mt-4"
+                        data-sitekey="{{ config('services.turnstile.site_key') }}">
                     </div>
 
                     {{-- SUBMIT BUTTON --}}

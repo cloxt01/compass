@@ -10,6 +10,7 @@
     {{-- Font & Icons dari Geist --}}
     <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}">
 
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap" rel="stylesheet">
@@ -65,5 +66,10 @@
     </div>
 </footer>
 
+<script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+    async
+    defer>
+</script>
 </body>
 </html>

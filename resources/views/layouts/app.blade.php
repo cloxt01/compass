@@ -6,9 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <x-og-meta />
-
     <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}">
     <link rel="stylesheet" href="{{ asset('assets/fonts/fontawesome-all.min.css') }}" />
+
+    <script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async
+        defer>
+    </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/bootstrap.js'])
     @stack('styles')
@@ -33,6 +38,7 @@
                     {{ session('error') }}
                 </div>
             @endif
+
             @if ($errors->any())
                 <div class="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
                     <ul class="space-y-0.5">
