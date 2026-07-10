@@ -4,7 +4,7 @@
 
     'description' => 'Lamar banyak lowongan lebih cepat, kelola status lamaran, dan pantau proses rekrutmen dalam satu tempat.',
 
-    'image' => asset('assets/img/favicon-32x32.png'),
+    'image' => asset('assets/img/icon-hd.png'),
 
 ])
 
