@@ -50,7 +50,6 @@ class SettingsController extends Controller
         ]);
         $user = auth()->user();
 
-
         $user->automation_paused = $request->automation_paused;
         $user->save();
 

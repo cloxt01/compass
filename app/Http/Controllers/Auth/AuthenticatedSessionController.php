@@ -25,13 +25,14 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $verified = CloudflareTurnstile::verify($request);
-        if(!$verified){
-            return back()->withErrors([
-                'captcha' => 'Verifikasi keamanan gagal'
-            ])->onlyInput('email');
+        if(config('app.env') !== 'local') {
+            $verified = CloudflareTurnstile::verify($request);
+            if(!$verified){
+                return back()->withErrors([
+                    'captcha' => 'Verifikasi keamanan gagal'
+                ])->onlyInput('email');
+            }
         }
-
         $request->authenticate();
 
         $request->session()->regenerate();
