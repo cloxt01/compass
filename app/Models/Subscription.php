@@ -73,4 +73,9 @@ class Subscription extends Model
         return false;
     }
 
+    public function isFree(): bool
+    {
+        return $this->package->code === Package::CODE_FREE;
+    }
+
 }

@@ -62,7 +62,9 @@ class BillingService
 
             ->where('status', 'active')
 
-            ->whereNotIn('package_id', Package::where('code', Package::CODE_FREE)->pluck('id'))
+            ->whereHas('package', function ($query) {
+                $query->where('code', '!=', Package::CODE_FREE);
+            })
 
             ->where('auto_renew', true)
 
@@ -107,7 +109,9 @@ class BillingService
             ])
 
             ->whereHas('subscription', function ($query) {
-                $query->whereNotIn('package_id', Package::where('code', Package::CODE_FREE)->pluck('id'));
+                $query->whereHas('package', function ($query) {
+                    $query->where('code', '!=', Package::CODE_FREE);
+                });
             })
             ->whereDate('due_date', '<', today())
 
@@ -143,7 +147,9 @@ class BillingService
             ->where('status', 'overdue')
 
             ->whereHas('subscription', function ($query) {
-                $query->whereNotIn('package_id', Package::where('code', Package::CODE_FREE)->pluck('id'));
+                $query->whereHas('package', function ($query) {
+                    $query->where('code', '!=', Package::CODE_FREE);
+                });
             })
             ->whereDate(
                 'due_date',
