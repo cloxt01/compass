@@ -40,30 +40,37 @@ new class extends Component
     #[On('job-status-updated')]
     public function appendActivity($payload = []): void
     {
-        $data = $payload['data'] ?? $payload;
+        $items = $payload['batch'] ?? [$payload['data'] ?? $payload];
 
-        if (empty($data['status'])) {
-            return;
-        }
-
-        foreach ($this->activities as $activity) {
-            if (
-                $activity['job_id'] === ($data['jobId'] ?? '')
-                && $activity['status'] === $data['status']
-            ) {
-                return;
+        foreach ($items as $data) {
+            if (empty($data['status'])) {
+                continue;
             }
-        }
 
-        array_unshift($this->activities, [
-            'id'          => uniqid(),
-            'job_id'      => $data['jobId'] ?? md5($data['jobTitle'] ?? ''),
-            'status'      => $data['status'],
-            'provider'    => $data['provider'] ?? '-',
-            'job_title'   => $data['jobTitle'] ?? 'Unknown',
-            'job_company' => $data['jobCompany'] ?? 'Unknown',
-            'created_at'  => now()->toIso8601String(),
-        ]);
+            $isDuplicate = false;
+            foreach ($this->activities as $activity) {
+                if (
+                    $activity['job_id'] === ($data['jobId'] ?? '')
+                    && $activity['status'] === $data['status']
+                ) {
+                    $isDuplicate = true;
+                    break;
+                }
+            }
+            if ($isDuplicate) {
+                continue;
+            }
+
+            array_unshift($this->activities, [
+                'id'          => uniqid(),
+                'job_id'      => $data['jobId'] ?? md5($data['jobTitle'] ?? ''),
+                'status'      => $data['status'],
+                'provider'    => $data['provider'] ?? '-',
+                'job_title'   => $data['jobTitle'] ?? 'Unknown',
+                'job_company' => $data['jobCompany'] ?? 'Unknown',
+                'created_at'  => now()->toIso8601String(),
+            ]);
+        }
 
         $this->activities = array_slice($this->activities, 0, $this->limit);
     }

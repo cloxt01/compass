@@ -31,34 +31,30 @@ new class extends Component
     }
 
     #[On('job-status-updated')]
-    public function onJobStatus($payload = null, $status = null, $provider = null, $job_id = null, $job_title = null)
+    public function onJobStatus($payload = null)
     {
-        // Ekstrak isi pembungkus 'data' dari JS payload
-        if (is_array($payload) && isset($payload['data'])) {
-            $innerData = $payload['data'];
-            $status    = $innerData['status'] ?? $status;
-            $provider  = $innerData['provider'] ?? $provider;
-            $job_id    = $innerData['jobId'] ?? ($innerData['job_id'] ?? $job_id);
-            $job_title = $innerData['jobTitle'] ?? ($innerData['job_title'] ?? $job_title);
-        } elseif (is_array($payload)) {
-            // Fallback jika dikirim tanpa wrapper 'data'
-            $status    = $payload['status'] ?? $status;
-            $provider  = $payload['provider'] ?? $provider;
-            $job_id    = $payload['jobId'] ?? ($payload['job_id'] ?? $job_id);
-            $job_title = $payload['jobTitle'] ?? ($payload['job_title'] ?? $job_title);
+        $items = $payload['batch'] ?? [$payload['data'] ?? $payload];
+
+        foreach ($items as $data) {
+            $status    = $data['status'] ?? null;
+            if (!$status) {
+                continue;
+            }
+
+            $provider  = $data['provider'] ?? '-';
+            $job_id    = $data['jobId'] ?? null;
+            $job_title = $data['jobTitle'] ?? null;
+
+            $mappedData = $this->statusMap[$status] ?? null;
+            $displayJob = $job_title ?? ($job_id ? substr($job_id, 0, 12) . '...' : '-');
+
+            $this->dispatch('animate-status-step', [
+                'status'   => $status,
+                'provider' => $provider,
+                'jobId'    => $displayJob,
+                'mapped'   => $mappedData
+            ]);
         }
-
-        $mappedData = $this->statusMap[$status] ?? null;
-
-        // Utamakan jobTitle agar yang muncul di UI berupa nama posisi (bukan UUID)
-        $displayJob = $job_title ?? ($job_id ? substr($job_id, 0, 12) . '...' : '-');
-
-        $this->dispatch('animate-status-step', [
-            'status'   => $status,
-            'provider' => $provider ?? '-',
-            'jobId'    => $displayJob,
-            'mapped'   => $mappedData
-        ]);
     }
 
     #[On('queue-status-refreshed')]
