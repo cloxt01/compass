@@ -1,7 +1,11 @@
 @props([
-    'title' => 'Compass - Automation Job Workflow',
-    'description' => 'Automate your job application workflow with CompassBot. Streamline your job search process, track applications, and enhance your productivity.',
-    'image' => asset('assets/og-default.jpg'),
+
+    'title' => 'Compass • Cari Kerja Lebih Mudah',
+
+    'description' => 'Lamar banyak lowongan lebih cepat, kelola status lamaran, dan pantau proses rekrutmen dalam satu tempat.',
+
+    'image' => asset('assets/img/favicon-32x32.png'),
+
 ])
 
 <title>{{ $title }}</title>
@@ -9,6 +13,9 @@
 
 {{-- Open Graph --}}
 <meta property="og:type" content="website">
+<meta property="og:image" content="{{ $image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:url" content="{{ url()->current() }}">
 <meta property="og:title" content="{{ $title }}">
 <meta property="og:description" content="{{ $description }}">
