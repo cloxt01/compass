@@ -15,7 +15,8 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        $free = Package::where('code', 'FREE')->first();
+        $free = Package::where('code', '=', Package::CODE_FREE)->first();
+
 
         $subscription = app(SubscriptionService::class)
             ->create($user, $free);

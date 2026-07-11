@@ -25,7 +25,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        if(config('app.env') !== 'local') {
+        if(!in_array(config('app.env'), ['local', 'testing'])) {
             $verified = CloudflareTurnstile::verify($request);
             if(!$verified){
                 return back()->withErrors([

@@ -6,25 +6,78 @@
 
 ## Documentation
 
-### Tech Stack & Infrastructure
+### Infrastructure
 * **Engine:** Laravel 12+ (PHP 8.2)
-* **Server:** Railway
-* **Database:** Redis + MySQL
-* **Process Manager:** Laravel Queues + BullMQ
-* **Worker:** Node Worker + Laravel Worker 
+* **Server:** Linux
+* **Database:** MySQL
+* **Web Server:** Nginx
 
-`/dashboard`
-<img width="1919" height="898" alt="image" src="https://github.com/user-attachments/assets/84b83d17-ef80-4c38-bcba-279977942726" />
+### Installation & Setup
+
+1. Clone the repository
+```bash
+git clone https://github.com/cloxt01/compass
+cd compass
+```
+
+2. Install dependencies
+```bash
+composer install
+```
+
+4. Install Node.js dependencies & build assets
+```bash
+npm install
+npm run build
+```
+
+3. Copy the `.env.example` file to `.env`
+```bash
+cp .env.example .env
+```
+
+4. Generate application key
+```bash
+php artisan key:generate
+```
+jika ingin menggunakan testing (pest)
+```bash
+php artisan key:generate --env=testing
+```
+5. Create a new MySQL database for the application
+```mysql
+CREATE DATABASE compass
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+CREATE DATABASE compass_testing
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
+6. Configure your database settings in the `.env` file
 
 
-`/apply`
-<img width="1919" height="901" alt="image" src="https://github.com/user-attachments/assets/eeb9458e-61fc-45ab-8c26-1d2ebdd603ad" />
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=
+DB_PORT=3306
+DB_DATABASE=
+```
 
+7. Run migrations and seed the database
+```bash
+php artisan migrate --seed
+```
 
-CA Cert (Wajib)
-install di https://curl.se/ca/cacert.pem
+- jika memakai testing unit
+```bash
+php artisan migrate:fresh --env=testing --seed
+```
 
-curl.cainfo = "path file"
-openssl.cainfo = "path file"
+8. Start the development server
+```bash
+php artisan serve
+```
 
-php artisan livewire:publish --assets
+### Apply
+1. Open your web browser and navigate to `http://127.0.0.1:8000`.

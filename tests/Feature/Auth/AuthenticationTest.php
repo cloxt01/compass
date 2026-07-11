@@ -1,11 +1,13 @@
 <?php
 
 use App\Models\User;
+use App\Models\Package;
+
 
 test('login screen can be rendered', function () {
-    $response = $this->get('/login');
 
-    $response->assertStatus(200);
+    $response = $this->get(route('login', absolute: false));
+    $response->assertOk();
 });
 
 test('users can authenticate using the login screen', function () {
@@ -15,6 +17,7 @@ test('users can authenticate using the login screen', function () {
         'email' => $user->email,
         'password' => 'password',
     ]);
+
 
     $this->assertAuthenticated();
     $response->assertRedirect(route('dashboard', absolute: false));
@@ -28,6 +31,7 @@ test('users can not authenticate with invalid password', function () {
         'password' => 'wrong-password',
     ]);
 
+
     $this->assertGuest();
 });
 
@@ -36,6 +40,7 @@ test('users can logout', function () {
 
     $response = $this->actingAs($user)->post('/logout');
 
+
     $this->assertGuest();
-    $response->assertRedirect('/');
+    $response->assertRedirect('/login');
 });
