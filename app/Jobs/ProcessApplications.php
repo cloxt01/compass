@@ -113,12 +113,14 @@ class ProcessApplications implements ShouldQueue
 
             // Usage Subscription
             $usage = $subscription->usages()->whereDate('date', today())->first();
-            Log::info("Usage [B] : ". $usage->apply_count. " , Result [{$result['status']} : ");
+            $apply_count = $usage->apply_count ?? 0;
+
+            Log::info("Usage [B] : ". $apply_count . " , Result [{$result['status']} : ");
             if(in_array($result['status'], ['success', 'applied'])) {
                 $this->usageService->increment($subscription);
                 $usage->refresh();
             }
-            Log::info("Usage [A] : ". $usage->apply_count. " , Result [{$result['status']} : ");
+            Log::info("Usage [A] : ". $apply_count ?? 0 . " , Result [{$result['status']} : ");
 
             // Record Application
             JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $result['status']);
