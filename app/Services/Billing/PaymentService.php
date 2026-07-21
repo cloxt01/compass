@@ -3,6 +3,7 @@
 namespace App\Services\Billing;
 
 use App\Infrastructure\Contracts\PaymentGateway;
+use App\Infrastructure\Factory\PaymentGatewayFactory;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Subscription;
@@ -12,9 +13,12 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentService
 {
+    protected PaymentGateway $gateway;
+
     public function __construct(
-        protected PaymentGateway $gateway
+        protected PaymentGatewayFactory $factory
     ) {
+        $this->gateway = $this->factory->make();
     }
 
     /**
@@ -26,8 +30,8 @@ class PaymentService
 
             $payment = Payment::create([
                 'invoice_id' => $invoice->id,
-                'gateway' => $this->gateway->name(),
-                'method' => '',
+                'gateway' => (string) $this->gateway->name(),
+                'method' => 'QRIS',
                 'reference' => $invoice->invoice_number,
                 'amount' => $invoice->total,
                 'status' => Payment::STATUS_PENDING,
@@ -43,7 +47,7 @@ class PaymentService
 
             return [
 
-                'snap_token' => $response['snap_token'],
+                'snap_token' => $response['token'] ?? $response['snap_token'] ?? null,
                 'payment' => $payment->fresh(),
                 'redirect_url' => $response['redirect_url'],
             ];
@@ -55,7 +59,7 @@ class PaymentService
      */
     public function callback(array $payload): void
     {
-        Log::info('Midtrans webhook', $payload);
+        Log::info($this->gateway->name().' webhook', $payload);
 
         if (!$this->gateway->verify($payload)) {
             abort(403);

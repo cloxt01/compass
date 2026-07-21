@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Services\Adapters;
+namespace App\Services\Adapters\Provider;
 
 use App\Clients\GlintsAPI;
-use App\Infrastructure\Contracts\PlatformAdapter;
+use App\Infrastructure\Contracts\Platform\PlatformAdapter;
 use App\Infrastructure\Factory\PlatformFactory;
+use App\Services\Adapters\AI\AIAdapter;
 use App\Services\Platform\Glints\GlintsJob;
 use App\Services\Platform\Glints\GlintsProfile;
 
@@ -23,6 +24,9 @@ class GlintsAdapter implements PlatformAdapter {
     ){
     }
 
+    protected function ai(): AIAdapter {
+        return new AIAdapter();
+    }
     protected function profile():GlintsProfile {
         return new GlintsProfile($this->client);
     }
@@ -39,6 +43,11 @@ class GlintsAdapter implements PlatformAdapter {
     {
         $raw = $this->profile()->load();
         return PlatformFactory::profile_reader(self::PROVIDER_CODE, $raw);
+    }
+
+    public function answerQuestion(array $profile, array $question): array
+    {
+        return $this->ai()->autoAnswer(self::PROVIDER_CODE, $profile, $question);
     }
 
 

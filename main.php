@@ -8,8 +8,8 @@ $kernel->bootstrap();
 use App\Clients\GlintsAPI;
 use App\Clients\JobstreetAPI;
 use App\Models\User;
-use App\Services\Adapters\GlintsAdapter;
-use App\Services\Adapters\JobstreetAdapter;
+use App\Services\Adapters\Provider\GlintsAdapter;
+use App\Services\Adapters\Provider\JobstreetAdapter;
 use App\Services\Platform\Glints\GlintsHelper as GlintsService;
 
 $user = User::find(1);
@@ -52,10 +52,10 @@ $glints_service = new GlintsService($glints_client);
 //        'pageSize' => 1,
 //    ]
 //]);
-$profile_glints = $glints_adapter->loadProfile();
+$profile_glints = $glints_adapter->loadJob('2be91bcf-83bb-4a13-b4e7-a002eeb983f6');
 //print_r(json_encode($jobs));
 
-var_dump($profile_glints);
+print_r(json_encode($profile_glints));
 //$data= $glints_service->search_location('Lebak');
 //var_dump($data);
 //$job = $adapter->job();

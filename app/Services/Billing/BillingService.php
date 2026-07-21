@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\Package;
 use App\Models\User;
 use App\Models\Subscription;
+use App\Infrastructure\Factory\PaymentGatewayFactory;
 use Illuminate\Support\Facades\DB;
 
 class BillingService
@@ -14,8 +15,10 @@ class BillingService
         protected SubscriptionService $subscriptionService,
         protected InvoiceService $invoiceService,
         protected PaymentService $paymentService,
+        // protected PaymentGatewayFactory $factory,
         protected UsageService $usageService,
     ) {
+        // $this->gateway = $this->factory->make();
     }
 
     public function subscribe(

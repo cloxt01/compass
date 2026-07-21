@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\Adapters;
+namespace App\Services\Adapters\Provider;
 
 use App\Clients\JobstreetAPI;
-use App\Infrastructure\Contracts\PlatformAdapter;
+use App\Infrastructure\Contracts\Platform\PlatformAdapter;
 use App\Infrastructure\Factory\PlatformFactory;
 use App\Services\Platform\Jobstreet\JobstreetJob;
 use App\Services\Platform\Jobstreet\JobstreetProfile;

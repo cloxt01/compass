@@ -5,10 +5,12 @@ namespace App\Infrastructure\Factory;
 use App\Clients\GlintsAPI;
 use App\Clients\JobstreetAPI;
 use App\Exceptions\CantApply;
-use App\Infrastructure\Contracts\PlatformAdapter;
+use App\Infrastructure\Contracts\Platform\PlatformAdapter;
 use App\Models\User;
-use App\Services\Adapters\GlintsAdapter;
-use App\Services\Adapters\JobstreetAdapter;
+use App\Services\Adapters\Provider\GlintsAdapter;
+use App\Services\Adapters\Provider\JobstreetAdapter;
+use App\Support\ProviderHelper;
+use App\Support\QuestionNormalizer;
 use App\Support\QuestionnaireParser;
 use Illuminate\Support\Facades\Log;
 
@@ -150,17 +152,34 @@ class PlatformFactory
             case 'glints':
                 foreach ($questions['predefinedQuestions'] as $question) {
                     $result['predefinedQuestions'][] = [
-                        'name' => $question['name'],
-                        'type' => $question['type'],
-                        'required' => $question['required']
+                        'name'     => $question['name'],
+                        'type'     => $question['type'],
+                        'required' => $question['required'],
+                        'value'    => $question['value'] ?? null
                     ];
                 }
-                foreach ($questions['employerScreeningQuestions'] as $question) {
+
+                foreach ($questions['employerScreeningQuestions'] as $employerQuestion) {
+                    $subQuestions = [];
+
+                    foreach ($employerQuestion['questions'] as $subQ) {
+                        $subQuestions[] = [
+                            'id'        => $subQ['id'],
+                            'sub_label' => $subQ['subLabel'],
+                            'options'   => array_map(function ($option) {
+                                return [
+                                    'value'        => $option['value'],
+                                    'mapped_value' => $option['mappedValue']
+                                ];
+                            }, $subQ['responseOptions'] ?? [])
+                        ];
+                    }
+
                     $result['employerScreeningQuestions'][] = [
-                        'name' => $question['name'],
-                        'label' => $question['label'],
-                        'type' => $question['questionType'],
-                        'options' => $question['questions'][0]['responseOptions'] ?? [],
+                        'name'          => $employerQuestion['name'],
+                        'label'         => $employerQuestion['label'],
+                        'type'          => $employerQuestion['questionType'],
+                        'sub_questions' => $subQuestions
                     ];
                 }
                 break;

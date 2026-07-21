@@ -4,7 +4,7 @@ namespace App\Services\Platform\Glints;
 
 use App\Clients\GlintsAPI;
 use App\Infrastructure\Factory\PlatformFactory;
-use App\Services\Adapters\GlintsAdapter;
+use App\Services\Adapters\Provider\GlintsAdapter;
 use App\Support\DataHelper;
 use Illuminate\Support\Facades\Log;
 

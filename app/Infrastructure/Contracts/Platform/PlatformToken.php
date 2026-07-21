@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Contracts;
+namespace App\Infrastructure\Contracts\Platform;
 
 interface PlatformToken
 {

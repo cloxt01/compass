@@ -16,11 +16,10 @@ class PackageSeeder extends Seeder
                 'price' => 0,
                 'duration_days' => 0,
                 'daily_limit' => 10,
-                'monthly_limit' => 100,
+                'monthly_limit' => 50,
                 'features' => [
-                    '10 Apply / Hari',
-                    '100 Apply / Bulan',
-                    'Auto Apply'
+                    '5 Apply / Hari',
+                    '50 Apply / Bulan'
                 ],
             ],
             [
@@ -31,23 +30,24 @@ class PackageSeeder extends Seeder
                 'daily_limit' => 50,
                 'monthly_limit' => 1000,
                 'features' => [
-                    '50 Apply / Hari',
-                    '1.500 Apply / Bulan',
+                    '10 Apply / Hari',
+                    '200 Apply / Bulan',
                     'Auto Apply'
                 ],
             ],
 
             [
-                'code' => 'PROFESSIONAL',
-                'name' => 'Professional',
+                'code' => 'PRO',
+                'name' => 'Pro',
                 'price' => 45000,
                 'duration_days' => 30,
-                'daily_limit' => 200,
-                'monthly_limit' => 6000,
+                'daily_limit' => 50,
+                'monthly_limit' => 1000,
                 'features' => [
-                    '100 Apply / Hari',
-                    '3.000 Apply / Bulan',
-                    'Auto Apply'
+                    '500 Apply / Hari',
+                    '1.000 Apply / Bulan',
+                    'Auto Apply',
+                    'AI Auto Answer'
                 ],
             ],
 
@@ -56,12 +56,15 @@ class PackageSeeder extends Seeder
                 'name' => 'Premium',
                 'price' => 99000,
                 'duration_days' => 30,
-                'daily_limit' => 1000,
-                'monthly_limit' => 30000,
+                'daily_limit' => 100,
+                'monthly_limit' => 2000,
                 'features' => [
-                    '1.000 Apply / Hari',
-                    '30.000 Apply / Bulan',
-                    'Priority Queue'
+                    '1.00 Apply / Hari',
+                    '2.000 Apply / Bulan',
+                    'Auto Apply',
+                    'AI Auto Answer',
+                    'Priority Queue',
+                    'Analytics'
                 ],
             ],
 

@@ -5,6 +5,8 @@ namespace App\Providers;
 
 use App\Infrastructure\Contracts\PaymentGateway;
 use App\Gateways\MidtransGateway;
+use App\Gateways\TripayGateway;
+
 use App\Models\GlintsAccount;
 use App\Models\JobstreetAccount;
 use App\Models\User;
@@ -27,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             PaymentGateway::class,
             MidtransGateway::class
+        );
+        $this->app->bind(
+            PaymentGateway::class,
+            TripayGateway::class
         );
     }
 

@@ -26,6 +26,20 @@ class MidtransGateway implements PaymentGateway
     {
         return 'midtrans';
     }
+    public function callback(array $payload): array
+    {
+        return [
+            'reference' => $payload['order_id'],
+            'amount' => (int) round($payload['gross_amount']),
+            'status' => match ($payload['transaction_status']) {
+                'settlement', 'capture' => Payment::STATUS_PAID,
+                'expire' => Payment::STATUS_EXPIRED,
+                'cancel' => Payment::STATUS_CANCELLED,
+                'deny', 'failure' => Payment::STATUS_FAILED,
+                default => Payment::STATUS_PENDING,
+            },
+        ];
+    }
 
     public function charge(Payment $payment): array
     {

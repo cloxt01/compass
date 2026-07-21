@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Adapters\GlintsAdapter;
+use App\Clients\GlintsAPI;
+use App\Clients\JobstreetAPI;
+use App\Models\User;
+use App\Services\Adapters\Provider\GlintsAdapter;
+use App\Services\Adapters\Provider\JobstreetAdapter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
-use App\Models\User;
-
-use App\Clients\JobstreetAPI;
-use App\Clients\GlintsAPI;
-use App\Services\Adapters\JobstreetAdapter;
 
 
 class ApplyController extends Controller

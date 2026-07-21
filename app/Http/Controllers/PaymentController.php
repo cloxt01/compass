@@ -5,21 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Package;
 use App\Services\Billing\BillingService;
-use App\Services\Billing\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Infrastructure\Factory\PaymentGatewayFactory;
+use App\Infrastructure\Contracts\PaymentGateway;
 
 class PaymentController extends Controller
 {
     public function __construct(
         protected BillingService $billingService,
-        protected PaymentService $paymentService
+        protected PaymentGatewayFactory $factory,
+        protected PaymentGateway $gateway
     ) {}
 
     public function webhook(Request $request)
     {
 
-        $this->paymentService->callback(
+        $this->gateway($this->factory->make('tripay'))->callback(
             $request->all()
         );
 

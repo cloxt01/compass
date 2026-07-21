@@ -3,7 +3,7 @@
 namespace App\Services\Token;
 
 use App\Clients\GlintsAPI;
-use App\Infrastructure\Contracts\PlatformToken;
+use App\Infrastructure\Contracts\Platform\PlatformToken;
 use App\Support\QueryHelper;
 use App\Support\RequestHelper;
 use Illuminate\Support\Facades\Log;

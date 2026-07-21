@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-use App\Infrastructure\Contracts\PlatformAccount;
+use App\Infrastructure\Contracts\Platform\PlatformAccount;
 use Illuminate\Database\Eloquent\Model;
 
 class JobstreetAccount extends Model implements PlatformAccount

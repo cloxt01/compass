@@ -3,8 +3,8 @@
 namespace App\Clients\Application\UseCase;
 
 use App\Events\JobStatus;
-use App\Infrastructure\Contracts\PlatformAccount;
-use App\Infrastructure\Contracts\PlatformAdapter;
+use App\Infrastructure\Contracts\Platform\PlatformAccount;
+use App\Infrastructure\Contracts\Platform\PlatformAdapter;
 use App\Support\ProviderHelper;
 use Illuminate\Support\Facades\Log;
 

@@ -3,7 +3,7 @@
 namespace App\Services\Platform\Jobstreet;
 
 use App\Clients\JobstreetAPI;
-use App\Services\Adapters\JobstreetAdapter;
+use App\Services\Adapters\Provider\JobstreetAdapter;
 use Illuminate\Support\Facades\Log;
 
 class JobstreetJob extends JobstreetAdapter

@@ -3,7 +3,7 @@
 namespace App\Services\Token;
 
 use App\Clients\api;
-use App\Infrastructure\Contracts\PlatformToken;
+use App\Infrastructure\Contracts\Platform\PlatformToken;
 use App\Support\QueryHelper;
 
 class JobstreetToken extends api implements PlatformToken

@@ -20,6 +20,7 @@ return new class extends Migration
                 ->nullOnDelete();
             $table->enum('gateway',[
                 'midtrans',
+                'tripay',
                 'xendit'
             ]);
             $table->string('gateway_transaction_id')

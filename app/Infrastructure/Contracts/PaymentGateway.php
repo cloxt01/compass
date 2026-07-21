@@ -12,5 +12,7 @@ interface PaymentGateway
 
     public function refund(Payment $payment): void;
 
+    public function callback(array $payload): array;
+
     public function verify(array $payload): bool;
 }

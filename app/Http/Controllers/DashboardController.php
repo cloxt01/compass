@@ -2,11 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Application;
-use Illuminate\Http\Request;
-use App\Services\Adapters\JobstreetAdapter;
-use App\Clients\JobstreetAPI;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

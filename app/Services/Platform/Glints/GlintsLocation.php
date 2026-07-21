@@ -3,7 +3,7 @@
 namespace App\Services\Platform\Glints;
 
 use App\Clients\GlintsAPI;
-use App\Services\Adapters\GlintsAdapter;
+use App\Services\Adapters\Provider\GlintsAdapter;
 
 class GlintsLocation extends GlintsAdapter
 {

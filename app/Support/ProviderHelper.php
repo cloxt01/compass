@@ -7,6 +7,10 @@ use function Pest\Laravel\instance;
 
 class ProviderHelper
 {
+    const ALLOWED_PROVIDERS = [
+        'glints',
+        'jobstreet'
+    ];
     public static function who($account): ?string
     {
         switch (class_basename($account)) {
@@ -17,6 +21,11 @@ class ProviderHelper
             default:
                 return null;
         }
+    }
+
+    public static function isAllowed(string $provider): bool
+    {
+        return in_array($provider, self::ALLOWED_PROVIDERS);
     }
 
 }

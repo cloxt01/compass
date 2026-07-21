@@ -2,25 +2,24 @@
 
 namespace App\Jobs;
 
+use App\Clients\Application\UseCase\ApplyUseCase;
 use App\Clients\GlintsAPI;
+use App\Clients\JobstreetAPI;
 use App\Events\JobStatus;
+use App\Exceptions\CantApply;
 use App\Models\User;
+use App\Services\Adapters\Provider\GlintsAdapter;
+use App\Services\Adapters\Provider\JobstreetAdapter;
 use App\Services\Billing\SubscriptionService;
 use App\Services\Billing\UsageService;
 use App\Support\ApplicationHelper;
 use App\Support\ProviderHelper;
-use Illuminate\Queue\SerializesModels;
-use App\Models\Subscription;
-use App\Clients\Application\UseCase\ApplyUseCase;
-use App\Exceptions\CantApply;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use App\Clients\JobstreetAPI;
-use App\Services\Adapters\GlintsAdapter;
-use App\Services\Adapters\JobstreetAdapter;
 
 class ProcessApplications implements ShouldQueue
 {
