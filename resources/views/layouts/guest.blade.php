@@ -213,8 +213,8 @@
                     <div>
                         © {{ date('Y') }} {{ config('ui.brand.name', 'Compass') }}. All rights reserved.
                     </div>
-                    <a href="https://wa.me/6285863409811" class="hover:text-[#a1a1aa] transition">
-                        • Telp: 0858-6340-9811
+                    <a href="https://wa.me/6281372935110" class="hover:text-[#a1a1aa] transition">
+                        • Telp: 0813-7293-5110
                     </a>
                 </div>
 
