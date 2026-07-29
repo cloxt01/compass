@@ -62,6 +62,7 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/traffic.log'),
             'level' => 'info',
+            'days' => env('LOG_DAILY_DAYS', 7),
         ],
 
         'single' => [
