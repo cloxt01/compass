@@ -51,9 +51,8 @@ class MidtransGateway implements PaymentGateway
 
             'transaction_details' => [
 
-                'order_id' => $payment->reference,
+                'order_id' => $invoice->invoice_number,
                 'gross_amount' => $payment->amount,
-
             ],
             'callbacks' => [
                 'finish' => route('payment.finish'),
