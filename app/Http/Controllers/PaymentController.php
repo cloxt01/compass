@@ -7,26 +7,30 @@ use App\Models\Package;
 use App\Services\Billing\BillingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Infrastructure\Factory\PaymentGatewayFactory;
+use App\Services\Billing\PaymentService;
 use App\Infrastructure\Contracts\PaymentGateway;
+
 
 class PaymentController extends Controller
 {
     public function __construct(
         protected BillingService $billingService,
-        protected PaymentGatewayFactory $factory,
-        protected PaymentGateway $gateway
-    ) {}
+        protected PaymentService $paymentService
+    ) {
+    }
 
     public function webhook(Request $request)
     {
 
-        $this->gateway($this->factory->make('tripay'))->callback(
-            $request->all()
-        );
-
+        $success = $this->paymentService->callback($request->all());
+        if ($success) {
+            Log::info('Webhook berhasil diproses.');
+            Log::info('Webhook payload: ', $request->all());
+        } else {
+            Log::warning('Webhook gagal diproses.');
+        }
         return response()->json([
-            'success' => true,
+            'success' => $success ? true : false,
         ]);
     }
     public function subscribe(
