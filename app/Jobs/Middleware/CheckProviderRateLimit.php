@@ -15,6 +15,7 @@ class CheckProvider
         $limit = $adapter->is_limit($job->job_id);
 
         if($limit){
+            JobStatus::dispatch($user->id, $job->jobData, $job->provider, 'limit_provider');
             Log::warning('User ID : ' . $user->id. ', dilewati karena limit provider tercapai.');
             return;
         }

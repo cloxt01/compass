@@ -38,7 +38,10 @@ class SearchJob implements ShouldQueue
     {
         return [
             new Middleware\CheckSubscription(),
-            new Middleware\CheckProvider()
+            new Middleware\CheckProvider(),
+
+            // With Broadcast 
+            new Middleware\CheckRateLimit()
         ];
     }
 
