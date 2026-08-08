@@ -22,7 +22,7 @@
         window.addEventListener('resize', () => sync());
     "
         class="grid grid-cols-1 gap-6 xl:grid-cols-3 items-start w-full"
-    >
+    >           
 
         {{-- COLUMN LEFT: STATS, PANEL & PROVIDER CONFIGURATION (2/3 Width) --}}
         <div x-ref="leftCol" class="xl:col-span-2 flex flex-col gap-6 w-full">

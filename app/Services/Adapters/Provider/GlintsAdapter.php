@@ -39,6 +39,10 @@ class GlintsAdapter implements PlatformAdapter {
         return PlatformFactory::job_reader(self::PROVIDER_CODE, $raw);
     }
 
+    public function isLimit(string $jobId = 'a5839963-283f-460b-8daa-cd6d7e7014c7'): bool
+    {
+        return $this->job()->is_limit($jobId);
+    }
     public function loadProfile(): array
     {
         $raw = $this->profile()->load();

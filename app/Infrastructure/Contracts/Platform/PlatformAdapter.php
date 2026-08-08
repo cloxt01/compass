@@ -8,4 +8,5 @@ interface PlatformAdapter
     public function buildPayload($data):array;
     public function canApply(array $details):array;
     public function execute(string $jobId ,array $payload, array $config = []):bool;
+    public function isLimit(string $jobId): bool;
 }

@@ -86,7 +86,7 @@ class ProcessApplications implements ShouldQueue
             'jobstreet' => new JobstreetAdapter(new JobstreetAPI($account->access_token)),
         };
 
-        $limit = $adapter->job()->is_limit($this->job_id);
+        $limit = $adapter->isLimit($this->job_id);
 
         Log::info("User ID : " . $this->user->id. ', Provider : ' . $this->provider . ', Job ID : ' . $this->job_id . ', Limit Provider : ' . ($limit ? 'Ya' : 'Tidak'));
 
