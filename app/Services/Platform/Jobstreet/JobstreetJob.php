@@ -64,6 +64,11 @@ class JobstreetJob extends JobstreetAdapter
         return $response['data']['data'];
     }
 
+    public function is_limit(string $jobId = 'a5839963-283f-460b-8daa-cd6d7e7014c7'): bool
+    {
+        return false;
+    }
+
     public function details(string $jobId): array
     {
         $details = $this->client->graphql('jobDetailsWithPersonalised', ['jobId' => $jobId])['data']['data']['jobDetails'] ?? [];

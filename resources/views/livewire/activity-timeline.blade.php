@@ -141,6 +141,8 @@ new class extends Component
                                     'applied' => 'bg-violet-400',
                                     'resume' => 'bg-yellow-400',
                                     'questionnaire' => 'bg-amber-400',
+                                    'limit_provider' => 'bg-rose-400',
+                                    'expired' => 'bg-orange-400',
                                     'linkout' => 'bg-blue-400',
                                     'error' => 'bg-rose-500',
                                     'start', 'load_job', 'load_profile', 'load_userConfig', 'inspect', 'build_payload', 'apply'
@@ -152,6 +154,8 @@ new class extends Component
                                     'success' => 'Sukses Melamar',
                                     'applied' => 'Sudah Dilamar',
                                     'questionnaire' => 'Butuh Screening',
+                                    'limit_provider' => 'Limit tercapai',
+                                    'expired' => 'Kedaluwarsa',
                                     'linkout' => 'Linkout',
                                     'start' => 'Memulai proses...',
                                     'load_job' => 'Memuat detail pekerjaan...',

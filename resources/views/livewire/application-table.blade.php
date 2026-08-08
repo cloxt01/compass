@@ -182,6 +182,7 @@ new class extends Component
                                         @case('applied') <span class="status-badge badge-applied"><i class="fas fa-history mr-1"></i>Already Applied</span> @break
                                         @case('questionnaire') <span class="status-badge badge-screening"><i class="fas fa-clipboard-list mr-1"></i>Screening</span> @break
                                         @case('linkout') <span class="status-badge badge-start"><i class="fas fa-external-link-alt mr-1"></i>Linkout</span> @break
+                                        @case('limit_provider') <span class="status-badge badge-limit"><i class="fas fa-exclamation-triangle mr-1"></i>Limit Provider</span> @break
                                         @default <span class="status-badge badge-default"><i class="fas fa-exclamation-circle mr-1"></i>Expired</span>
                                     @endswitch
                                 </div>

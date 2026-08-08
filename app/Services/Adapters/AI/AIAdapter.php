@@ -2,6 +2,7 @@
 
 namespace App\Services\Adapters\AI;
 
+use Illuminate\Support\Facades\Log;
 use App\Services\AI\AIPayloadBuilder;
 use App\Services\AI\AIPromptBuilder;
 use App\Services\AI\AIService;
@@ -20,8 +21,8 @@ class AIAdapter implements \App\Infrastructure\Contracts\AI\AIAdapter
     {
 
         $normalized = QuestionNormalizer::normalize($provider, $questionnaire);
+        Log::info("Normalized : ".json_encode($normalized));
 
-        $normalized = AIPayloadBuilder::build($normalized);
 
         $profile = json_decode('{
             "nama": "Muhammad Ferdiansyah",
@@ -34,11 +35,12 @@ class AIAdapter implements \App\Infrastructure\Contracts\AI\AIAdapter
             "bersedia_industri_banking": true
         }', true);
         $prompt = AIPromptBuilder::build($profile, $normalized);
+        Log::info("AI Prompt : ".json_encode($prompt));
         $response = $this->service->chat(
             $prompt['user'],
             $prompt['system']
-
         );
+        Log::info("AI Response : ".json_encode($response));
         return $response;
     }
 

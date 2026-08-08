@@ -24,7 +24,7 @@ class AIService
                 ]
             ])
 
-            ->withMaxTokens(2000)
+            ->withMaxTokens(4000)
             ->withPrompt($message)
             ->asText()
             ->toArray();

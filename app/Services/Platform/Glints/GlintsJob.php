@@ -51,18 +51,13 @@ class GlintsJob extends GlintsAdapter
         }
         return PlatformFactory::job_question(self::PROVIDER_CODE, $result);
     }
+    public function is_limit(string $jobId = 'a5839963-283f-460b-8daa-cd6d7e7014c7'): bool
+    {
+        $params = ['jobId' => $jobId];
+        $result = $this->client->graphql('jobHiringQuestion', $params);
+        return $result['ok'] === false && isset($result['errors'][0]['extensions']['code']) && $result['errors'][0]['extensions']['code'] === 'RATE_LIMIT_ACHIEVED';
+    }
 
-    /*
-     * Params :
-     *  --- Required ---
-     *  - Key : type (default)
-     *  ----------------
-     *  - CountryCode : string (ID)
-     *  - SearchTerm : string ('')
-     *  - includeExternalJobs : bool (false)
-     *  - page : int (1)
-     *  - pageSize : int (30)
-     */
     public function search(array $params = []): array
     {
 
@@ -123,7 +118,6 @@ class GlintsJob extends GlintsAdapter
         }
 
         $hiring_question = $this->hiring_question(['jobId' => $jobId]);
-
 
         $resp = array_merge(["details" => $details['data']['data']], ["hiring_question" => $hiring_question]);
         return $resp;

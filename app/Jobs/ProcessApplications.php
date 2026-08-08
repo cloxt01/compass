@@ -56,6 +56,7 @@ class ProcessApplications implements ShouldQueue
         return [
             new Middleware\CheckSubscription(),
             new Middleware\CheckProvider()
+            // new Middleware\CheckRateLimit()
         ];
     }
     public function handle()
@@ -85,11 +86,17 @@ class ProcessApplications implements ShouldQueue
             'jobstreet' => new JobstreetAdapter(new JobstreetAPI($account->access_token)),
         };
 
+        $is_limit = $adapter->is_limit($this->job_id);
+        if ($is_limit) {
+            Log::warning('User ID : ' . $this->user->id. ' - Provider : ' . $this->provider . ', dilewati karena limit provider tercapai.');
+            JobStatus::dispatch($this->user->id, $this->jobData, $providerName, 'limit_provider');
+            return;
+        }
 
         $is_already = ApplicationHelper::alreadyApplied($this->user->id, $this->job_id);
 
         if ($is_already) {
-            Log::info('Already applied : ', (array) json_encode($this->jobData));
+            Log::warning('User ID : ' . $this->user->id. ' - Provider : ' . $this->provider . ' - Job ID : ' . $this->job_id . ', dilewati karena sudah melamar.' . json_encode($this->jobData));
             if($is_already === 'success') {
                 JobStatus::dispatch($this->user->id, $this->jobData, $providerName, 'applied');
                 return;

@@ -139,7 +139,7 @@ class PlatformFactory
     public static function job_question(string $provider, $data): array
     {
         $result = [];
-
+        Log::info("Job Question Data : ".json_encode($data));
         $questions = match ($provider) {
             'glints' => $data['data']['getJobHiringQuestions'],
             'jobstreet' => [],
