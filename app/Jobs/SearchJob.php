@@ -83,9 +83,6 @@ class SearchJob implements ShouldQueue
                     continue;
                 }
 
-                $limit = $adapter->is_limit();
-
-
                 // Ambil daftar kata kunci
                 $keywords = $providerConfig['keyword'] ?? [];
 
