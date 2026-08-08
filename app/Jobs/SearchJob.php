@@ -41,7 +41,7 @@ class SearchJob implements ShouldQueue
             new Middleware\CheckProvider(),
 
             // With Broadcast 
-            new Middleware\CheckRateLimit()
+            // new Middleware\CheckProviderRateLimit()
         ];
     }
 
@@ -82,6 +82,9 @@ class SearchJob implements ShouldQueue
                     Log::warning("User {$user->id}: provider {$provider} belum terhubung.");
                     continue;
                 }
+
+                $limit = $adapter->is_limit();
+
 
                 // Ambil daftar kata kunci
                 $keywords = $providerConfig['keyword'] ?? [];
@@ -126,8 +129,7 @@ class SearchJob implements ShouldQueue
                         ]);
                         continue;
                     }
-
-                    $job = $adapter->job()->loadJob($job['id']);
+                    $job = $adapter->job()->loadJob($job['id'], false);
 
                     if(!$job || empty($job)) {
                         Log::warning("User {$user->id}: {$provider} job tidak memiliki detail.", [

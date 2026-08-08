@@ -34,8 +34,8 @@ class GlintsAdapter implements PlatformAdapter {
         return new GlintsJob($this->client);
     }
 
-    public function loadJob(string $jobId): array {
-        $raw = $this->job()->details($jobId);
+    public function loadJob(string $jobId, $hiring_question = true): array {
+        $raw = $this->job()->details($jobId, $hiring_question);
         return PlatformFactory::job_reader(self::PROVIDER_CODE, $raw);
     }
 

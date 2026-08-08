@@ -109,17 +109,22 @@ class GlintsJob extends GlintsAdapter
         return $response['data']['searchJobsV3']['jobsInPage'];
     }
 
-    public function details(string $jobId): array
+    public function details(string $jobId, $hiring_question = true): array
     {
+
         $details = $this->client->get('/v2/job/'. $jobId);
         if(!isset($details['data']['data'])){
             Log::info("Job Details tidak menampilkan data: ". json_encode($details));
             return [];
         }
 
-        $hiring_question = $this->hiring_question(['jobId' => $jobId]);
+        if($hiring_question){
+            $hiring_question = $this->hiring_question(['jobId' => $jobId]);
+            $resp = array_merge(["details" => $details['data']['data']], ["hiring_question" => $hiring_question]);
+        } else {
+            $resp = ["details" => $details['data']['data']];
+        }
 
-        $resp = array_merge(["details" => $details['data']['data']], ["hiring_question" => $hiring_question]);
         return $resp;
     }
     public function apply(string $jobId, array $payload, $config): bool
