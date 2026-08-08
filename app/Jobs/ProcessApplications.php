@@ -88,9 +88,11 @@ class ProcessApplications implements ShouldQueue
 
         $limit = $adapter->job()->is_limit($this->job_id);
 
+        Log::info("User ID : " . $this->user->id. ', Provider : ' . $this->provider . ', Job ID : ' . $this->job_id . ', Limit Provider : ' . ($limit ? 'Ya' : 'Tidak'));
+
         if($limit){
-            JobStatus::dispatch($user->id, $job->jobData, 'limit_provider');
-            Log::warning('User ID : ' . $user->id. ', dilewati karena limit provider tercapai.');
+            JobStatus::dispatch($this->user->id, $this->jobData, $providerName, 'limit_provider');
+            Log::warning('User ID : ' . $this->user->id. ', dilewati karena limit provider tercapai.');
             return;
         }
 
