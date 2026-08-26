@@ -1,0 +1,13 @@
+query getUserNotificationPreferenceCategories {
+  getUserNotificationPreferenceCategories {
+    id
+    name
+    userNotificationPreferences {
+      id
+      channel
+      enabled
+      __typename
+    }
+    __typename
+  }
+}

@@ -1,0 +1,38 @@
+query GetRightsToWork($languageCode: LanguageCodeIso!, $zone: Zone!, $isUnifiedSite: Boolean!) {
+  viewer {
+    _id
+    rightsToWork(
+      languageCode: $languageCode
+      zone: $zone
+      isUnifiedSite: $isUnifiedSite
+      platform: WEB
+      source: PROFILE
+    ) {
+      id
+      country {
+        countryCode
+        name
+        __typename
+      }
+      type2 {
+        id
+        formattedDescription
+        __typename
+      }
+      isDeprecated
+      verificationUrl
+      credential {
+        verification {
+          result
+          __typename
+        }
+        expiryFormatted
+        status
+        manageVerificationUrl
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}

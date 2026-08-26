@@ -1,0 +1,36 @@
+{
+  "project_name": "AI CareerMatch & Auto-Answer Screening Hub",
+  "archetype": "Swiss & High-Contrast / Precision SaaS",
+  "typography": {
+    "heading_font": "Cabinet Grotesk, Syne, sans-serif",
+    "body_font": "Plus Jakarta Sans, Inter, sans-serif",
+    "mono_font": "JetBrains Mono, monospace"
+  },
+  "colors": {
+    "primary": "#0F172A",
+    "accent": "#6366F1",
+    "success": "#10B981",
+    "warning": "#F59E0B",
+    "background": "#F8FAFC",
+    "card_bg": "#FFFFFF",
+    "border": "#E2E8F0",
+    "text_primary": "#0F172A",
+    "text_secondary": "#64748B",
+    "forbidden_colors": ["#7351B7", "#1B93A4"]
+  },
+  "visual_enhancers": {
+    "border_radius": "12px",
+    "shadow": "0 4px 20px -2px rgba(15, 23, 42, 0.08)",
+    "glassmorphism": "backdrop-blur-xl bg-white/80 border border-slate-200/80"
+  },
+  "features": [
+    "Auto AI Answer for screening questions in Indonesian via OpenRouter (default model: deepseek/deepseek-v4-flash)",
+    "Match score calculation with detailed breakdown (skills, experience, location, salary, education)",
+    "Customizable weight sliders for matching criteria",
+    "OpenRouter Model configuration & API Key settings",
+    "Interactive Screening Question answering assistant and bulk optimizer",
+    "Candidate profile & Job Description management with robust data-testid attributes"
+  ],
+  "image_urls": [],
+  "instructions_to_main_agent": "Ensure all interactive elements have data-testid. Use clean Tailwind classes and Lucide icons. Follow the exact user choices for OpenRouter deepseek/deepseek-v4-flash, Indonesian AI responses, adjustable weight sliders, and percentage match with detailed reasoning."
+}

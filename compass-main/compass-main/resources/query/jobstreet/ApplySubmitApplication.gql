@@ -1,0 +1,15 @@
+mutation ApplySubmitApplication($input: SubmitApplicationInput!, $locale: Locale) {
+  submitApplication(input: $input) {
+    ... on SubmitApplicationSuccess {
+      __typename
+    }
+    ... on SubmitApplicationFailure {
+      errors {
+        message(locale: $locale)
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
