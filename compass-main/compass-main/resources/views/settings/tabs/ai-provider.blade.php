@@ -173,9 +173,19 @@
 
             {{-- ACTIONS --}}
             <div class="p-5 flex items-center justify-between gap-3">
-                <p class="text-xs text-[#71717a]">
-                    Perubahan langsung dipakai oleh fitur Auto AI Answer &amp; Match Score.
-                </p>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        id="ai-provider-test-btn"
+                        data-testid="ai-provider-test-button"
+                        data-endpoint="{{ route('settings.ai-provider.test') }}"
+                        class="inline-flex items-center gap-2 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-200 hover:bg-emerald-500/20 transition"
+                    >
+                        <i data-lucide="plug-zap" class="w-4 h-4"></i>
+                        Test Connection
+                    </button>
+                    <span id="ai-provider-test-status" data-testid="ai-provider-test-status" class="text-xs text-[#71717a]"></span>
+                </div>
                 <button
                     type="submit"
                     data-testid="ai-provider-save-button"
@@ -210,6 +220,40 @@
             };
             range.addEventListener('input', sync);
             sync();
+        }
+
+        // ---- Test Connection ----
+        const testBtn = document.getElementById('ai-provider-test-btn');
+        const testStatus = document.getElementById('ai-provider-test-status');
+        if (testBtn && testStatus) {
+            testBtn.addEventListener('click', async function () {
+                const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                const modelValue = document.getElementById('ai-provider-model')?.value || '';
+                const apiKeyValue = document.querySelector('input[name="api_key"]')?.value || '';
+                testBtn.disabled = true;
+                testStatus.className = 'text-xs text-[#71717a]';
+                testStatus.textContent = 'Menghubungi OpenRouter...';
+                try {
+                    const resp = await fetch(testBtn.dataset.endpoint, {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrf},
+                        body: JSON.stringify({ model: modelValue, api_key: apiKeyValue })
+                    });
+                    const data = await resp.json().catch(() => ({}));
+                    if (resp.ok && data.ok) {
+                        testStatus.className = 'text-xs text-emerald-300';
+                        testStatus.textContent = `✓ ${data.message} (${data.latency_ms} ms)`;
+                    } else {
+                        testStatus.className = 'text-xs text-rose-300';
+                        testStatus.textContent = `✗ ${data.message || 'Gagal terhubung.'}`;
+                    }
+                } catch (err) {
+                    testStatus.className = 'text-xs text-rose-300';
+                    testStatus.textContent = '✗ Kesalahan jaringan: ' + err.message;
+                } finally {
+                    testBtn.disabled = false;
+                }
+            });
         }
 
         if (window.lucide && typeof window.lucide.createIcons === 'function') {

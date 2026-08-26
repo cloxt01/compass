@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AiAnswerHistory;
 use App\Services\OpenRouterService;
 use Illuminate\Http\Request;
 
@@ -91,11 +92,72 @@ class CareerMatchController extends Controller
                 $data['job_context'] ?? '',
                 $request->user()
             );
-            return response()->json(['answer' => $answer]);
+
+            $resolvedModel = $openRouter->resolveConfig($request->user())['model'] ?? null;
+            $history = AiAnswerHistory::create([
+                'user_id' => $request->user()->id,
+                'model' => $resolvedModel,
+                'question' => $data['question'],
+                'candidate_context' => $data['candidate_context'],
+                'job_context' => $data['job_context'] ?? null,
+                'answer' => $answer,
+            ]);
+
+            return response()->json([
+                'answer' => $answer,
+                'history_id' => $history->id,
+                'created_at' => $history->created_at->toIso8601String(),
+                'model' => $resolvedModel,
+            ]);
         } catch (\Throwable $exception) {
             report($exception);
             return response()->json(['message' => $exception->getMessage()], 502);
         }
+    }
+
+    public function historyIndex(Request $request)
+    {
+        $query = trim((string) $request->query('q', ''));
+        $items = AiAnswerHistory::query()
+            ->where('user_id', $request->user()->id)
+            ->when($query !== '', function ($q) use ($query) {
+                $like = '%' . $query . '%';
+                $q->where(function ($sub) use ($like) {
+                    $sub->where('question', 'like', $like)
+                        ->orWhere('answer', 'like', $like)
+                        ->orWhere('job_context', 'like', $like);
+                });
+            })
+            ->orderByDesc('created_at')
+            ->limit(50)
+            ->get(['id', 'model', 'question', 'answer', 'job_context', 'created_at']);
+
+        return response()->json([
+            'items' => $items->map(fn ($item) => [
+                'id' => $item->id,
+                'model' => $item->model,
+                'question' => $item->question,
+                'answer' => $item->answer,
+                'job_context' => $item->job_context,
+                'created_at' => $item->created_at->toIso8601String(),
+                'created_at_human' => $item->created_at->diffForHumans(),
+            ]),
+            'count' => $items->count(),
+        ]);
+    }
+
+    public function historyDestroy(Request $request, int $id)
+    {
+        $deleted = AiAnswerHistory::query()
+            ->where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->delete();
+
+        if (!$deleted) {
+            return response()->json(['message' => 'Riwayat tidak ditemukan.'], 404);
+        }
+
+        return response()->json(['success' => true]);
     }
 
     public function score(Request $request, OpenRouterService $openRouter)

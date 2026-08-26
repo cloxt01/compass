@@ -130,4 +130,62 @@ class OpenRouterService
         $content = data_get($response->json(), 'choices.0.message.content');
         return is_string($content) ? trim($content) : '';
     }
+
+    /**
+     * Ping OpenRouter with the given (or resolved) config and a minimal prompt.
+     * Returns ['ok' => bool, 'message' => string, 'latency_ms' => int, 'model' => string].
+     */
+    public function testConnection(array $overrides = [], ?User $user = null): array
+    {
+        $config = $this->resolveConfig($user);
+
+        // Allow inline overrides (e.g. values from form that user hasn't saved yet)
+        if (isset($overrides['model']) && is_string($overrides['model']) && trim($overrides['model']) !== '') {
+            $config['model'] = trim($overrides['model']);
+        }
+        if (isset($overrides['api_key']) && is_string($overrides['api_key']) && trim($overrides['api_key']) !== '') {
+            $config['api_key'] = trim($overrides['api_key']);
+        }
+
+        if (empty($config['api_key'])) {
+            return ['ok' => false, 'message' => 'API key belum diisi.', 'latency_ms' => 0, 'model' => $config['model']];
+        }
+
+        $start = microtime(true);
+        try {
+            $response = Http::withToken($config['api_key'])
+                ->acceptJson()
+                ->timeout(20)
+                ->post('https://openrouter.ai/api/v1/chat/completions', [
+                    'model' => $config['model'],
+                    'temperature' => 0,
+                    'max_tokens' => 8,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Balas hanya dengan kata "OK".'],
+                        ['role' => 'user', 'content' => 'ping'],
+                    ],
+                ]);
+        } catch (\Throwable $e) {
+            return ['ok' => false, 'message' => 'Gagal menghubungi OpenRouter: ' . $e->getMessage(), 'latency_ms' => (int) round((microtime(true) - $start) * 1000), 'model' => $config['model']];
+        }
+
+        $latency = (int) round((microtime(true) - $start) * 1000);
+
+        if ($response->failed()) {
+            $errorMsg = data_get($response->json(), 'error.message') ?: ('HTTP ' . $response->status());
+            return ['ok' => false, 'message' => $errorMsg, 'latency_ms' => $latency, 'model' => $config['model']];
+        }
+
+        $content = data_get($response->json(), 'choices.0.message.content');
+        if (!is_string($content) || trim($content) === '') {
+            return ['ok' => false, 'message' => 'Respons OpenRouter kosong / tidak valid.', 'latency_ms' => $latency, 'model' => $config['model']];
+        }
+
+        return [
+            'ok' => true,
+            'message' => 'Berhasil terhubung. Contoh respons: "' . mb_substr(trim($content), 0, 40) . '"',
+            'latency_ms' => $latency,
+            'model' => $config['model'],
+        ];
+    }
 }

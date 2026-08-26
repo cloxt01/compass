@@ -66,6 +66,21 @@ class SettingsController extends Controller
         return redirect()->route('settings', ['tab' => 'ai-provider'])
             ->with('success', 'Konfigurasi AI Provider berhasil disimpan.');
     }
+
+    public function testAiProvider(Request $request, OpenRouterService $openRouter)
+    {
+        $data = $request->validate([
+            'model' => ['nullable', 'string', 'max:200'],
+            'api_key' => ['nullable', 'string', 'max:300'],
+        ]);
+
+        $result = $openRouter->testConnection([
+            'model' => $data['model'] ?? null,
+            'api_key' => $data['api_key'] ?? null,
+        ], $request->user());
+
+        return response()->json($result, $result['ok'] ? 200 : 422);
+    }
     public function upsert_user(Request $request)
     {
         $user = auth()->user();

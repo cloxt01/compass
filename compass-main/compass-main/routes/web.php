@@ -35,10 +35,13 @@ Route::middleware(['auth','verified'])->group(function() {
     Route::post('/career-match/weights', [CareerMatchController::class, 'saveWeights'])->name('career-match.weights');
     Route::post('/career-match/answer', [CareerMatchController::class, 'answer'])->name('career-match.answer');
     Route::post('/career-match/score', [CareerMatchController::class, 'score'])->name('career-match.score');
+    Route::get('/career-match/history', [CareerMatchController::class, 'historyIndex'])->name('career-match.history');
+    Route::delete('/career-match/history/{id}', [CareerMatchController::class, 'historyDestroy'])->whereNumber('id')->name('career-match.history.destroy');
 
     Route::prefix('settings')->group(function() {
         Route::get('/', [SettingsController::class, 'settings'])->name('settings');
         Route::post('/ai-provider', [SettingsController::class, 'saveAiProvider'])->name('settings.ai-provider.save');
+        Route::post('/ai-provider/test', [SettingsController::class, 'testAiProvider'])->name('settings.ai-provider.test');
     });
     Route::prefix('products')->group(function() {
        Route::get('/compass-link', [ProductController::class, 'compass_link'])->name('products.compass-link');
