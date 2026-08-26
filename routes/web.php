@@ -10,6 +10,7 @@ use App\Http\Controllers\ApplyController;
 use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CareerMatchController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 
@@ -43,6 +44,13 @@ Route::middleware(['auth','verified'])->group(function() {
         '/dashboard',
         [DashboardController::class, 'index']
     )->name('dashboard');
+
+    Route::get('/career-match', [CareerMatchController::class, 'index'])->name('career-match');
+    Route::post('/career-match/weights', [CareerMatchController::class, 'saveWeights'])->name('career-match.weights');
+    Route::post('/career-match/answer', [CareerMatchController::class, 'answer'])->name('career-match.answer');
+    Route::post('/career-match/score', [CareerMatchController::class, 'score'])->name('career-match.score');
+    Route::get('/career-match/history', [CareerMatchController::class, 'historyIndex'])->name('career-match.history');
+    Route::delete('/career-match/history/{id}', [CareerMatchController::class, 'historyDestroy'])->whereNumber('id')->name('career-match.history.destroy');
 
     Route::middleware('subscription')->group(function () {
         Route::prefix('/apply')->group(function () {
@@ -84,6 +92,9 @@ Route::middleware(['auth','verified'])->group(function() {
             '/toggle-automation',
             [SettingsController::class, 'toggle_automation']
         )->name('settings.toggle-automation');
+
+        Route::post('/ai-provider', [SettingsController::class, 'saveAiProvider'])->name('settings.ai-provider.save');
+        Route::post('/ai-provider/test', [SettingsController::class, 'testAiProvider'])->name('settings.ai-provider.test');
     });
 
     Route::prefix('products')->group(function() {

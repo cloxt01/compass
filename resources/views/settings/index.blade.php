@@ -18,5 +18,7 @@
         @include('settings.tabs.security')
     @elseif($tab === 'apply-configuration')
         @include('settings.tabs.apply-configuration')
+    @elseif($tab === 'ai-provider')
+        @include('settings.tabs.ai-provider')
     @endif
 @endsection

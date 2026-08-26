@@ -2,6 +2,11 @@
 
 return [
 
+    'openrouter' => [
+        'key' => env('OPENROUTER_API_KEY'),
+        'model' => env('OPENROUTER_MODEL', 'deepseek/deepseek-v4-flash'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

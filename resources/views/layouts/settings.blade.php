@@ -57,6 +57,14 @@
                         <i data-lucide="monitor" class="w-4 h-4 opacity-70 {{ $currentTab === 'apply-configuration' ? 'text-[#fafafa] opacity-100' : '' }}"></i>
                         <span>Apply Configuration</span>
                     </a>
+
+                    {{-- AI Provider Tab --}}
+                    <a href="{{ route('settings', ['tab' => 'ai-provider']) }}"
+                       data-testid="settings-tab-ai-provider"
+                       class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ $currentTab === 'ai-provider' ? 'bg-[#1e1e1e] text-[#fafafa] font-medium' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
+                        <i data-lucide="sparkles" class="w-4 h-4 opacity-70 {{ $currentTab === 'ai-provider' ? 'text-[#fafafa] opacity-100' : '' }}"></i>
+                        <span>AI Provider</span>
+                    </a>
                 </nav>
 
                 <div class="pt-2 px-1">

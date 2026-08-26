@@ -36,41 +36,40 @@
 }
 ```
 
-## Implemented
-### Sesi sebelumnya
-- `OpenRouterService`, `CareerMatchController`, view `career-match.blade.php`
-- Route `/career-match`, `/career-match/weights`, `/career-match/answer`, `/career-match/score`
-- Bobot per user (skills/experience/location/salary/education) di `career_match.weights`
+## Implemented (All features)
 
-### Sesi ini (Jan 2026) — AI Provider Settings
-- **Settings → AI Provider (tab baru)** `resources/views/settings/tabs/ai-provider.blade.php`
+### CareerMatch Core
+- `OpenRouterService` — resolveConfig (user → env fallback), answerScreening, reasonMatch, testConnection
+- `CareerMatchController` — index, saveWeights, answer, score, historyIndex, historyDestroy
+- View `career-match.blade.php` — Weight sliders, score calculator, Auto AI Answer form, History panel
+- Routes: `/career-match`, `/career-match/weights`, `/career-match/answer`, `/career-match/score`, `/career-match/history`, `/career-match/history/{id}`
+
+### AI Provider Settings (Settings → AI Provider tab)
+- `resources/views/settings/tabs/ai-provider.blade.php`
   - Model slug (input + preset chips + datalist)
   - API key (masked, dukung clear key)
   - Temperature (range slider 0.0-2.0 dengan output live)
   - Max tokens (64-4096)
 - `SettingsController::saveAiProvider` — validasi & simpan ke `career_ai`
-- Route `POST /settings/ai-provider` (`settings.ai-provider.save`)
+- `SettingsController::testAiProvider` — test connection ke OpenRouter
+- Routes: `POST /settings/ai-provider`, `POST /settings/ai-provider/test`
 - Sidebar settings menambah menu "AI Provider" (icon sparkles)
-- `OpenRouterService::resolveConfig(User $user)` — user config → fallback env
-- `answerScreening` memakai model/temperature/max_tokens per user
-- `reasonMatch` — endpoint score sekarang mengembalikan reasoning AI (Bahasa Indonesia) dengan fallback deterministik
-- Link "Ubah model" di halaman CareerMatch menuju Settings
 
-### Sesi ini (Jan 2026) — Follow-ups: History, Test Connection, Weight Presets
-- **Answer History** (searchable log per user)
-  - Migration `2026_01_15_100000_create_ai_answer_histories_table.php` — `ai_answer_histories` (user_id, model, question, candidate_context, job_context, answer, timestamps)
-  - Model `App\Models\AiAnswerHistory` (belongsTo User)
-  - `CareerMatchController::answer` → menyimpan hasil ke history
-  - `CareerMatchController::historyIndex` (GET `/career-match/history?q=...`, 50 terbaru, LIKE search di question/answer/job_context)
-  - `CareerMatchController::historyDestroy` (DELETE `/career-match/history/{id}`)
-  - UI panel "Riwayat Jawaban" di `career-match.blade.php` — search debounce 250ms, salin ke clipboard, gunakan ulang (prefill form), hapus, expand-collapse (`<details>`)
-- **Test Connection Button** di halaman AI Provider
-  - `SettingsController::testAiProvider` (POST `/settings/ai-provider/test`)
-  - `OpenRouterService::testConnection(overrides, user)` — kirim ping minimal (`max_tokens=8`, "ping"→"OK"), timeout 20s
-  - Tombol "Test Connection" pada `ai-provider.blade.php` — memakai nilai model + api_key dari form (belum perlu save dulu), tampilkan latency ms dan pesan sukses/gagal
-- **Weight Presets** di halaman CareerMatch
-  - 5 preset chip: Seimbang, Tech-heavy, Location-first, Salary-first, Fresh Grad
-  - Klik chip → auto-fill slider (belum tersimpan sampai user klik "Simpan preferensi")
+### Answer History
+- Migration `2026_01_15_100000_create_ai_answer_histories_table.php`
+- Model `App\Models\AiAnswerHistory` (belongsTo User)
+- Searchable log (50 terbaru, LIKE search), salin ke clipboard, gunakan ulang, hapus
+
+### Weight Presets
+- 5 preset chip: Seimbang, Tech-heavy, Location-first, Salary-first, Fresh Grad
+- Klik chip → auto-fill slider (belum tersimpan sampai user klik "Simpan preferensi")
+
+### Test Connection Button
+- Tombol di halaman AI Provider — test pakai nilai dari form (belum perlu save dulu)
+- Tampilkan latency ms dan pesan sukses/gagal
+
+## Critical Fix (Feb 2026)
+- **File location fix**: Semua file fitur baru dipindahkan dari `/app/compass-main/compass-main/` ke root `/app/` agar ikut terpush ke GitHub. Agent sebelumnya menulis kode di folder salinan zip, bukan di root project.
 
 ## Files of Reference
 - `app/Services/OpenRouterService.php`
@@ -86,15 +85,15 @@
 
 ## Testing Notes
 - Container tidak punya PHP/Composer/Vite → verifikasi runtime dilakukan user secara lokal
-- **Wajib jalankan** `php artisan migrate` untuk membuat table `ai_answer_histories` sebelum menguji fitur history
+- **Wajib jalankan** `php artisan migrate` untuk membuat table `ai_answer_histories`
 - Endpoint yang harus dites lokal:
-  - `GET /settings?tab=ai-provider` (render tab baru)
-  - `POST /settings/ai-provider` (simpan + redirect + flash success)
-  - `POST /settings/ai-provider/test` (test connection ke OpenRouter)
-  - `POST /career-match/answer` (memakai config user, output Bahasa Indonesia, tersimpan ke history)
-  - `POST /career-match/score` (reasoning AI + fallback)
-  - `GET  /career-match/history?q=...` (list + search)
-  - `DELETE /career-match/history/{id}` (hapus riwayat)
+  - `GET /settings?tab=ai-provider`
+  - `POST /settings/ai-provider`
+  - `POST /settings/ai-provider/test`
+  - `POST /career-match/answer`
+  - `POST /career-match/score`
+  - `GET /career-match/history?q=...`
+  - `DELETE /career-match/history/{id}`
 
 ## Backlog / Next
 - P2 — Enkripsi at-rest untuk `api_key` (Laravel `encrypted` cast)
