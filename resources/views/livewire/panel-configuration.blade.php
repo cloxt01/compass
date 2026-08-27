@@ -13,6 +13,9 @@ new class extends Component
 
     public $jobstreetEnabled = false;
     public $glintsEnabled = false;
+    public $autoAnswerEnabled = false;
+    public $aiModel = null;
+    public $aiKeyReady = false;
 
     public $hasJobstreet = false;
     public $hasGlints = false;
@@ -61,7 +64,32 @@ new class extends Component
         $this->glintsEnabled =
             $config['glints']['enabled'] ?? false;
 
+        $this->autoAnswerEnabled =
+            $config['auto_answer']['enabled'] ?? false;
+
+        $careerAi = $user->apply_configuration['career_ai'] ?? [];
+        $this->aiModel = $careerAi['model'] ?? config('services.openrouter.model') ?? 'deepseek/deepseek-v4-flash';
+        $this->aiKeyReady = !empty($careerAi['api_key']) || !empty(config('services.openrouter.key'));
+
         $this->isReady = true;
+    }
+
+    public function toggleAutoAnswer($enabled)
+    {
+        $enabled = filter_var($enabled, FILTER_VALIDATE_BOOLEAN);
+
+        // Jangan izinkan aktifkan kalau API key belum di-set
+        if ($enabled && !$this->aiKeyReady) {
+            $this->dispatch('config-saved', message: 'API key OpenRouter belum diatur. Buka Settings → AI Provider.');
+            return;
+        }
+
+        $this->saveConfiguration([
+            'auto_answer' => ['enabled' => $enabled],
+        ]);
+
+        $this->autoAnswerEnabled = $enabled;
+        $this->dispatch('config-saved');
     }
 
     public function toggleProvider($provider, $enabled)
@@ -450,9 +478,12 @@ new class extends Component
                 </p>
 
 
-                <div class="flex min-h-[170px] flex-1 flex-col justify-center gap-5 rounded-xl border border-[#262626] bg-[#0a0a0a] p-4 opacity-55 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <div
+                    class="flex min-h-[170px] flex-1 flex-col justify-center gap-5 rounded-xl border border-[#262626] bg-[#0a0a0a] p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
+                    data-testid="auto-answer-panel"
+                >
 
-                    <div>
+                    <div class="flex-1">
 
                         <p class="text-sm font-medium text-[#fafafa]">
                             AI Powered Auto Answer
@@ -460,30 +491,50 @@ new class extends Component
 
                         <p class="mt-1 max-w-full text-xs leading-5 text-[#71717a] sm:max-w-md">
                             Menjawab screening question secara otomatis menggunakan AI.
+                            Lowongan dengan pertanyaan tidak akan di-block saat fitur ini aktif.
                         </p>
+
+                        <div class="mt-2 flex flex-wrap items-center gap-2">
+                            @if($aiKeyReady)
+                                <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-300">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                                    Model: {{ $aiModel }}
+                                </span>
+                            @else
+                                <a
+                                    href="{{ route('settings', ['tab' => 'ai-provider']) }}"
+                                    class="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-medium text-amber-300 hover:bg-amber-500/20"
+                                    data-testid="auto-answer-setup-link"
+                                >
+                                    API key belum diatur → Buka Settings
+                                </a>
+                            @endif
+                        </div>
 
                     </div>
 
 
                     <div class="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start">
 
-                        <label class="relative inline-flex cursor-not-allowed items-center">
+                        <label class="relative inline-flex items-center {{ $aiKeyReady ? 'cursor-pointer' : 'cursor-not-allowed opacity-60' }}">
 
                             <input
                                 type="checkbox"
-                                disabled
+                                @checked($autoAnswerEnabled)
+                                {{ !$aiKeyReady ? 'disabled' : '' }}
+                                wire:change="toggleAutoAnswer($event.target.checked)"
                                 class="peer sr-only"
+                                data-testid="auto-answer-toggle"
                             >
 
-                            <div class="h-6 w-11 rounded-full border border-[#333] bg-[#1e1e1e]"></div>
+                            <div class="h-6 w-11 rounded-full bg-[#1f1f1f] transition peer-checked:bg-blue-600 peer-disabled:bg-[#161616]"></div>
 
-                            <div class="absolute left-[4px] top-[4px] h-4 w-4 rounded-full bg-[#666]"></div>
+                            <div class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-all peer-checked:translate-x-5"></div>
 
                         </label>
 
-
-                        <span class="inline-flex items-center rounded-full border border-[#333] bg-[#161616] px-3 py-1 text-xs font-medium text-[#9ca3af]">
-                            Belum tersedia
+                        <span class="inline-flex items-center rounded-full border {{ $autoAnswerEnabled ? 'border-blue-500/30 bg-blue-500/10 text-blue-300' : 'border-[#333] bg-[#161616] text-[#9ca3af]' }} px-3 py-1 text-xs font-medium">
+                            {{ $autoAnswerEnabled ? 'Aktif' : 'Nonaktif' }}
                         </span>
 
                     </div>

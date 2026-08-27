@@ -41,6 +41,16 @@ Route::middleware(['auth','verified'])->group(function() {
     )->name('applications');
 
     Route::get(
+        '/applications/ai-answer/{id}',
+        [ApplicationController::class, 'aiAnswer']
+    )->whereNumber('id')->name('applications.ai-answer');
+
+    Route::get(
+        '/applications/{applicationId}/ai-answer',
+        [ApplicationController::class, 'aiAnswerByApplication']
+    )->whereNumber('applicationId')->name('applications.ai-answer.by-app');
+
+    Route::get(
         '/dashboard',
         [DashboardController::class, 'index']
     )->name('dashboard');

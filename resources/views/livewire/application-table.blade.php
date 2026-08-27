@@ -43,11 +43,26 @@ new class extends Component
             'questionnaire' => (clone $query)->where('status', 'questionnaire')->count(),
         ];
 
+        $paginated = $this->isReady ? $query->latest()->paginate($this->perPage) : collect();
+
+        // Peta application_id -> ai_answer_id + match_score (untuk badge/link "AI Answer")
+        $aiMap = [];
+        if ($this->isReady && $paginated->isNotEmpty()) {
+            $ids = $paginated->pluck('id')->all();
+            $aiMap = \App\Models\ApplicationAiAnswer::query()
+                ->select('id', 'application_id', 'match_score', 'status')
+                ->whereIn('application_id', $ids)
+                ->get()
+                ->keyBy('application_id')
+                ->all();
+        }
+
         return [
             // Jika belum ready (pemuatan pertama), kita kirim paginator kosong terlebih dahulu
-            'applications' => $this->isReady ? $query->latest()->paginate($this->perPage) : collect(),
+            'applications' => $paginated,
             'stats'        => $stats,
             'isPaused'     => $user->automation_paused ?? false,
+            'aiMap'        => $aiMap,
         ];
     }
 };
@@ -183,6 +198,7 @@ new class extends Component
                                         @case('questionnaire') <span class="status-badge badge-screening"><i class="fas fa-clipboard-list mr-1"></i>Screening</span> @break
                                         @case('linkout') <span class="status-badge badge-start"><i class="fas fa-external-link-alt mr-1"></i>Linkout</span> @break
                                         @case('limit_provider') <span class="status-badge badge-limit"><i class="fas fa-exclamation-triangle mr-1"></i>Limit Provider</span> @break
+                                        @case('auto_answer_failed') <span class="status-badge badge-default"><i class="fas fa-robot mr-1"></i>Auto-Answer Gagal</span> @break
                                         @default <span class="status-badge badge-default"><i class="fas fa-exclamation-circle mr-1"></i>Expired</span>
                                     @endswitch
                                 </div>
@@ -193,12 +209,25 @@ new class extends Component
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div wire:loading.delay class="mx-auto h-8 w-20 rounded-xl bg-[#222] animate-pulse"></div>
-                                <div wire:loading.remove>
+                                <div wire:loading.remove class="flex items-center justify-center gap-2">
                                     @php
                                         $targetUrl = $app->provider === 'glints'
                                             ? "https://glints.com/id/opportunities/jobs/{$app->job_id}"
                                             : "https://www.jobstreet.co.id/id/job/{$app->job_id}";
+                                        $ai = $aiMap[$app->id] ?? null;
                                     @endphp
+                                    @if($ai)
+                                        @php
+                                            $ms = (int) ($ai->match_score ?? 0);
+                                            $msClass = $ms >= 75 ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : ($ms >= 50 ? 'border-amber-500/30 bg-amber-500/10 text-amber-300' : 'border-rose-500/30 bg-rose-500/10 text-rose-300');
+                                        @endphp
+                                        <a href="{{ route('applications.ai-answer', $ai->id) }}"
+                                           class="inline-flex items-center justify-center h-8 px-3 rounded-xl border text-[11px] font-semibold {{ $msClass }} hover:brightness-110 transition"
+                                           title="Lihat jawaban AI"
+                                           data-testid="ai-answer-link-{{ $app->id }}">
+                                            <i class="fas fa-sparkles mr-1.5 text-[10px]"></i> AI {{ $ms }}%
+                                        </a>
+                                    @endif
                                     <a href="{{ $targetUrl }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center h-8 px-4 rounded-xl border border-[#262626] bg-[#0a0a0a] text-xs font-medium text-[#fafafa] hover:bg-[#161618] hover:border-[#333] transition duration-150">
                                         <i class="fas fa-external-link-alt mr-1.5 text-[10px] text-[#a1a1aa]"></i> Preview
                                     </a>
@@ -289,6 +318,18 @@ new class extends Component
                             <i class="fas fa-external-link-alt mr-2 text-[11px]"></i>
                             Preview
                         </a>
+
+                        @if(!empty($aiMap[$app->id]))
+                            @php
+                                $ai = $aiMap[$app->id];
+                                $ms = (int) ($ai->match_score ?? 0);
+                                $msClass = $ms >= 75 ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : ($ms >= 50 ? 'border-amber-500/30 bg-amber-500/10 text-amber-300' : 'border-rose-500/30 bg-rose-500/10 text-rose-300');
+                            @endphp
+                            <a href="{{ route('applications.ai-answer', $ai->id) }}"
+                               class="mt-2 flex h-10 w-full items-center justify-center rounded-xl border text-sm font-semibold {{ $msClass }}">
+                                <i class="fas fa-sparkles mr-2 text-[11px]"></i> AI Answer · {{ $ms }}%
+                            </a>
+                        @endif
 
                     </div>
 

@@ -134,13 +134,20 @@ class ProcessApplications implements ShouldQueue
 
             // Record Application
             JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $result['status']);
-            $this->user->applications()->create([
+            $application = $this->user->applications()->create([
                 'job_id' => $result['job']['job_id'] ?? $this->job_id,
                 'job_title' => $result['job']['job_title'] ?? 'Unknown',
                 'job_company' => $result['job']['job_company'] ?? 'Unknown',
                 'provider' => $result['provider'] ?? 'Unknown',
                 'status' => $result['status']
             ]);
+
+            // Link AI answer history ke application (kalau ada)
+            $aiHistoryId = $result['ai_answer']['history_id'] ?? null;
+            if ($aiHistoryId) {
+                \App\Models\ApplicationAiAnswer::where('id', $aiHistoryId)
+                    ->update(['application_id' => $application->id]);
+            }
 
             Log::info("ID Lamaran: " . $this->job_id . " Berhasil Dilamar: " . ($result['success'] ? "Ya" : "Tidak"));
         } catch (CantApply $e) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
+use App\Models\ApplicationAiAnswer;
 use Illuminate\Http\Request;
 
 class ApplicationController
@@ -37,5 +38,26 @@ class ApplicationController
         $applications->appends(['per_page' => $perPage]);
 
         return view('applications', compact('user', 'applications', 'stats', 'perPage'));
+    }
+
+    public function aiAnswer(Request $request, int $id)
+    {
+        $user = auth()->user();
+        $answer = ApplicationAiAnswer::where('user_id', $user->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return view('ai-answer-detail', compact('answer'));
+    }
+
+    public function aiAnswerByApplication(Request $request, int $applicationId)
+    {
+        $user = auth()->user();
+        $answer = ApplicationAiAnswer::where('user_id', $user->id)
+            ->where('application_id', $applicationId)
+            ->latest()
+            ->firstOrFail();
+
+        return view('ai-answer-detail', compact('answer'));
     }
 }

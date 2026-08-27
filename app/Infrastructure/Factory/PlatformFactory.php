@@ -9,6 +9,7 @@ use App\Infrastructure\Contracts\Platform\PlatformAdapter;
 use App\Models\User;
 use App\Services\Adapters\Provider\GlintsAdapter;
 use App\Services\Adapters\Provider\JobstreetAdapter;
+use App\Services\AI\AnswerTransformer;
 use App\Support\ProviderHelper;
 use App\Support\QuestionNormalizer;
 use App\Support\QuestionnaireParser;
@@ -314,10 +315,22 @@ class PlatformFactory
                 if(!$resume){
                     throw new CantApply("Tidak ada resume yang ditemukan.", 409);
                 }
+
+                $screeningAnswers = [];
+                $aiAnswer = $data['ai_answer'] ?? null;
+                if (is_array($aiAnswer)
+                    && !empty($aiAnswer['normalized'])
+                    && !empty($aiAnswer['answers'])) {
+                    $screeningAnswers = AnswerTransformer::toGlints(
+                        $aiAnswer['normalized'],
+                        $aiAnswer['answers']
+                    );
+                }
+
                 $payload = [
                     'data' => [
                         'resume' => $data['profile']['resume'],
-                        'employerScreeningQuestionAnswers' => [],
+                        'employerScreeningQuestionAnswers' => $screeningAnswers,
                         'note' => '',
                         'attachments' => []
                     ],

@@ -27,6 +27,16 @@ trait HasConfiguration
                 'location_ids' => [],
                 'location_names' => [],
             ],
+            'auto_answer' => [
+                'enabled' => false,
+                'profile' => [
+                    'ekspektasi_gaji' => null,
+                    'notice_period' => null,
+                    'bersedia_industri_banking' => null,
+                    'kewarganegaraan' => null,
+                    'sertifikasi' => [],
+                ],
+            ],
         ];
     }
 
