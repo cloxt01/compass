@@ -13,7 +13,7 @@ class SettingsController extends Controller
     {
         $tab = $request->query('tab', 'general');
 
-        $allowedTabs = ['general', 'account', 'security', 'apply-configuration', 'ai-provider'];
+        $allowedTabs = ['general', 'account', 'security', 'apply-configuration', 'ai-provider', 'ai-profile'];
         if (!in_array($tab, $allowedTabs)) {
             abort(404);
         }
@@ -80,6 +80,115 @@ class SettingsController extends Controller
         ], $request->user());
 
         return response()->json($result, $result['ok'] ? 200 : 422);
+    }
+
+    public function saveAiProfile(Request $request)
+    {
+        $data = $request->validate([
+            'nama' => ['nullable', 'string', 'max:150'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'lokasi' => ['nullable', 'string', 'max:150'],
+            'kewarganegaraan' => ['nullable', 'in:Indonesia,Lainnya'],
+            'tanggal_lahir' => ['nullable', 'date', 'before:today'],
+            'gender' => ['nullable', 'in:Laki-laki,Perempuan'],
+
+            'pendidikan' => ['nullable', 'in:SMA/SMK,Diploma,S1,S2,S3'],
+            'jurusan' => ['nullable', 'string', 'max:150'],
+            'institusi' => ['nullable', 'string', 'max:200'],
+            'tahun_lulus' => ['nullable', 'integer', 'min:1970', 'max:2035'],
+            'ipk' => ['nullable', 'numeric', 'min:0', 'max:4'],
+
+            'pengalaman_level' => ['nullable', 'in:FRESH_GRADUATE,LESS_THAN_ONE_YEAR,ONE_TO_THREE_YEARS,THREE_TO_FIVE_YEARS,FIVE_TO_TEN_YEARS,GREATER_THAN_TEN_YEARS'],
+            'pengalaman_tahun' => ['nullable', 'numeric', 'min:0', 'max:50'],
+            'posisi_terakhir' => ['nullable', 'string', 'max:150'],
+            'perusahaan_terakhir' => ['nullable', 'string', 'max:200'],
+
+            'skills' => ['nullable', 'array', 'max:50'],
+            'skills.*.name' => ['nullable', 'string', 'max:100'],
+            'skills.*.level' => ['nullable', 'in:NO_EXPERIENCE,BASIC,INTERMEDIATE,ADVANCED'],
+
+            'sertifikasi' => ['nullable', 'array', 'max:50'],
+            'sertifikasi.*.nama' => ['nullable', 'string', 'max:150'],
+            'sertifikasi.*.issuer' => ['nullable', 'string', 'max:150'],
+            'sertifikasi.*.tahun' => ['nullable', 'integer', 'min:1970', 'max:2035'],
+
+            'bahasa' => ['nullable', 'array', 'max:20'],
+            'bahasa.*.nama' => ['nullable', 'string', 'max:80'],
+            'bahasa.*.level' => ['nullable', 'in:BASIC,INTERMEDIATE,FLUENT,NATIVE'],
+
+            'gaji_terakhir' => ['nullable', 'numeric', 'min:0', 'max:9999999999'],
+            'ekspektasi_gaji' => ['nullable', 'numeric', 'min:0', 'max:9999999999'],
+            'notice_period' => ['nullable', 'in:IMMEDIATELY,TWO_WEEKS,ONE_MONTH,TWO_MONTHS'],
+
+            'bersedia_wfo' => ['nullable', 'boolean'],
+            'bersedia_wfh' => ['nullable', 'boolean'],
+            'bersedia_hybrid' => ['nullable', 'boolean'],
+            'bersedia_luar_kota' => ['nullable', 'boolean'],
+            'bersedia_industri_banking' => ['nullable', 'boolean'],
+
+            'catatan' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        // Bersihkan array dari row kosong
+        $cleanRows = function ($rows, array $requiredKeys) {
+            if (!is_array($rows)) return [];
+            $out = [];
+            foreach ($rows as $r) {
+                if (!is_array($r)) continue;
+                $filled = false;
+                foreach ($requiredKeys as $k) {
+                    if (isset($r[$k]) && trim((string) $r[$k]) !== '') { $filled = true; break; }
+                }
+                if ($filled) $out[] = $r;
+            }
+            return $out;
+        };
+
+        $profile = [
+            'nama' => $data['nama'] ?? null,
+            'phone' => $data['phone'] ?? null,
+            'lokasi' => $data['lokasi'] ?? null,
+            'kewarganegaraan' => $data['kewarganegaraan'] ?? null,
+            'tanggal_lahir' => $data['tanggal_lahir'] ?? null,
+            'gender' => $data['gender'] ?? null,
+
+            'pendidikan' => $data['pendidikan'] ?? null,
+            'jurusan' => $data['jurusan'] ?? null,
+            'institusi' => $data['institusi'] ?? null,
+            'tahun_lulus' => isset($data['tahun_lulus']) ? (int) $data['tahun_lulus'] : null,
+            'ipk' => isset($data['ipk']) ? (float) $data['ipk'] : null,
+
+            'pengalaman_level' => $data['pengalaman_level'] ?? null,
+            'pengalaman_tahun' => isset($data['pengalaman_tahun']) ? (float) $data['pengalaman_tahun'] : null,
+            'posisi_terakhir' => $data['posisi_terakhir'] ?? null,
+            'perusahaan_terakhir' => $data['perusahaan_terakhir'] ?? null,
+
+            'skills' => $cleanRows($data['skills'] ?? [], ['name']),
+            'sertifikasi' => $cleanRows($data['sertifikasi'] ?? [], ['nama']),
+            'bahasa' => $cleanRows($data['bahasa'] ?? [], ['nama']),
+
+            'gaji_terakhir' => isset($data['gaji_terakhir']) ? (int) $data['gaji_terakhir'] : null,
+            'ekspektasi_gaji' => isset($data['ekspektasi_gaji']) ? (int) $data['ekspektasi_gaji'] : null,
+            'notice_period' => $data['notice_period'] ?? null,
+
+            'bersedia_wfo' => (bool) ($data['bersedia_wfo'] ?? false),
+            'bersedia_wfh' => (bool) ($data['bersedia_wfh'] ?? false),
+            'bersedia_hybrid' => (bool) ($data['bersedia_hybrid'] ?? false),
+            'bersedia_luar_kota' => (bool) ($data['bersedia_luar_kota'] ?? false),
+            'bersedia_industri_banking' => (bool) ($data['bersedia_industri_banking'] ?? false),
+
+            'catatan' => $data['catatan'] ?? null,
+        ];
+
+        $user = $request->user();
+        $configuration = is_array($user->apply_configuration) ? $user->apply_configuration : [];
+        $autoAnswer = is_array($configuration['auto_answer'] ?? null) ? $configuration['auto_answer'] : [];
+        $autoAnswer['profile'] = $profile;
+        $configuration['auto_answer'] = $autoAnswer;
+        $user->update(['apply_configuration' => $configuration]);
+
+        return redirect()->route('settings', ['tab' => 'ai-profile'])
+            ->with('success', 'Profil kandidat berhasil disimpan.');
     }
 
     public function upsert_user(Request $request)

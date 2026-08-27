@@ -20,5 +20,7 @@
         @include('settings.tabs.apply-configuration')
     @elseif($tab === 'ai-provider')
         @include('settings.tabs.ai-provider')
+    @elseif($tab === 'ai-profile')
+        @include('settings.tabs.ai-profile')
     @endif
 @endsection

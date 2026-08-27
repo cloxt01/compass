@@ -509,6 +509,22 @@ new class extends Component
                                     API key belum diatur → Buka Settings
                                 </a>
                             @endif
+
+                            @php
+                                $userProfile = auth()->user()->apply_configuration['auto_answer']['profile'] ?? [];
+                                $completeness = is_array($userProfile) ? \App\Services\AI\ProfileBuilder::completeness($userProfile) : 0;
+                                $completenessClass = $completeness >= 70 ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                                    : ($completeness >= 40 ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
+                                    : 'border-rose-500/30 bg-rose-500/10 text-rose-300');
+                            @endphp
+                            <a
+                                href="{{ route('settings', ['tab' => 'ai-profile']) }}"
+                                class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium hover:brightness-110 transition {{ $completenessClass }}"
+                                data-testid="auto-answer-profile-link"
+                            >
+                                <i class="fas fa-user-circle text-[10px]"></i>
+                                Profil kandidat: {{ $completeness }}% lengkap
+                            </a>
                         </div>
 
                     </div>

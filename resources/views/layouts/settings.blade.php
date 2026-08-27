@@ -65,6 +65,14 @@
                         <i data-lucide="sparkles" class="w-4 h-4 opacity-70 {{ $currentTab === 'ai-provider' ? 'text-[#fafafa] opacity-100' : '' }}"></i>
                         <span>AI Provider</span>
                     </a>
+
+                    {{-- AI Profile Tab --}}
+                    <a href="{{ route('settings', ['tab' => 'ai-profile']) }}"
+                       data-testid="settings-tab-ai-profile"
+                       class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ $currentTab === 'ai-profile' ? 'bg-[#1e1e1e] text-[#fafafa] font-medium' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
+                        <i data-lucide="user-round-search" class="w-4 h-4 opacity-70 {{ $currentTab === 'ai-profile' ? 'text-[#fafafa] opacity-100' : '' }}"></i>
+                        <span>AI Profile</span>
+                    </a>
                 </nav>
 
                 <div class="pt-2 px-1">

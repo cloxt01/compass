@@ -105,6 +105,7 @@ Route::middleware(['auth','verified'])->group(function() {
 
         Route::post('/ai-provider', [SettingsController::class, 'saveAiProvider'])->name('settings.ai-provider.save');
         Route::post('/ai-provider/test', [SettingsController::class, 'testAiProvider'])->name('settings.ai-provider.test');
+        Route::post('/ai-profile', [SettingsController::class, 'saveAiProfile'])->name('settings.ai-profile.save');
     });
 
     Route::prefix('products')->group(function() {
