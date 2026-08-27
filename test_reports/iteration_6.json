@@ -1,0 +1,34 @@
+{
+  "summary": "Frontend-only regression test (Playwright, localhost:8000) of the Alpine.js fix on /settings?tab=ai-profile. The reported user bug ('gak bisa tambah skill/sertifikat/bahasa') is now FIXED. window.Alpine, window.Livewire and window.lucide are all defined on /settings, no ReferenceError 'Alpine is not defined', all 3 add buttons increment rows (0->1->2), delete (trash) removes rows, lucide trash-2 SVG icons render, full form submit returns to /settings?tab=ai-profile with flash 'Profil kandidat berhasil disimpan.', and all data (nama, 2 skills TCP/IP=BASIC + VLAN=INTERMEDIATE, 1 sertifikasi HCIA/Huawei/2024, 1 bahasa English/INTERMEDIATE) persists after reload. /apply Livewire regression OK (5 Livewire components hydrated, badge shows 'Profil kandidat: 79% lengkap'). Alpine.data('glintsSearchLocation') is confirmed registered globally on both /apply and /settings via DOM injection probe (returns keys query/results/searching/search/selectLocation). php artisan test AiProfileTest: 7/7 passed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "/apply → AI Powered Auto Answer toggle", "issue": "Toggle could NOT be exercised: input[data-testid='auto-answer-toggle'] is rendered with the `disabled` attribute because the OpenRouter/AI API key is not configured for the test user (badge shows 'API key belum diatur → Buka Settings'). This appears to be intended business logic, not a regression, but the on/off flow requested in the review is therefore UNVERIFIED. Seed an AI provider api_key for test-ai-profile@example.com if this path must be covered.", "affected_selectors": ["[data-testid='auto-answer-toggle']", "[data-testid='auto-answer-setup-link']"]}
+    ],
+    "design_issues": [
+      {"screen": "/apply → Konfigurasi Provider", "issues": ["Provider select renders with ZERO options (no connected accounts for the test user) and no placeholder/empty-state text — appears as a blank narrow dropdown next to 'Simpan Perubahan'. Add a disabled placeholder option or an empty state ('Belum ada akun provider terhubung').", "Because no provider is selected, the livewire/provider-configuration partial (which contains x-data=\"glintsSearchLocation()\") is never rendered on this page — registration was verified via injection probe instead."]},
+      {"screen": "/settings?tab=ai-profile", "issues": ["'Tanggal Lahir' uses the browser-native <input type=\"date\"> picker (mm/dd/yyyy, US format) inconsistent with the Indonesian UI copy; consider a custom/localized date component or at least lang/format hint.", "Skills/Sertifikasi/Bahasa delete buttons have no aria-label or data-testid; test had to locate them via row-scoped 'button'. Recommend data-testid='ai-profile-remove-skill' etc."]}
+    ]
+  },
+  "test_report_links": ["/app/tests/Feature/Settings/AiProfileTest.php"],
+  "action_items": [
+    "No blocking action: the original bug is fixed and all requested add/delete/save/persist flows pass.",
+    "Optional: add data-testid + aria-label to the row delete (trash) buttons for skills/sertifikasi/bahasa.",
+    "Optional: add placeholder/empty-state to the Konfigurasi Provider select on /apply.",
+    "Optional: seed an AI provider API key for the test user so the 'AI Powered Auto Answer' toggle can be regression-tested."
+  ],
+  "critical_code_review_comments": [
+    "resources/js/app.js registers Alpine.data inside the 'alpine:init' listener while @vite emits app.js as type=module (deferred) and @livewireScripts is injected at end of <body>. This currently works (verified at runtime) because Livewire fires alpine:init after module evaluation, but the ordering is fragile — safer to import Alpine data via Livewire's documented 'livewire:init'/Alpine plugin hook or move the registration into a script loaded before livewireScripts.",
+    "@livewireScripts is now loaded on EVERY page using layouts/app.blade.php, adding Livewire+Alpine payload to pages with no Livewire component. Acceptable trade-off, but consider @alpineScripts/standalone Alpine if bundle size matters.",
+    "Blade view resources/views/settings/tabs/ai-profile.blade.php contains a large inline x-data object literal (~20 lines) plus a very long form; extracting the Alpine state into resources/js/alpine/ai-profile.js would improve maintainability and testability."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (frontend-only request); AiProfileTest 7/7 passed", "frontend": "100% of testable scenarios (8/9 verified, 1 blocked by missing AI API key)"},
+  "seed_data_creation": "Saved AI profile data for existing user test-ai-profile@example.com: nama='Muhammad Ferdiansyah', ekspektasi_gaji=5000000, notice_period=IMMEDIATELY, skills=[TCP/IP:BASIC, VLAN:INTERMEDIATE], sertifikasi=[HCIA/Huawei/2024], bahasa=[English:INTERMEDIATE]",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "test-ai-profile@example.com / password123 (http://localhost:8000)",
+  "context_for_next_testing_agent": "Alpine bug is CLOSED. Verify via page.evaluate('() => !!window.Alpine') on /settings — returns true. Add/delete buttons for skill/sertifikasi/bahasa all work; rows use data-testid ai-profile-skill-row / -sertifikasi-row / -bahasa-row, delete buttons have no testid (use row-scoped 'button'). Remaining untested: /apply auto-answer toggle (disabled, needs AI API key seeded), provider-configuration glints location search UI (needs a connected provider account).",
+  "rca_of_the_issue": "Previous failure: layouts/app.blade.php lacked @livewireScripts, so on pages without a Livewire component Alpine was never injected and resources/js/app.js threw 'Alpine is not defined' when calling Alpine.data at module top level, aborting lucide icon init too. Fix (adding @livewireStyles/@livewireScripts to the layout + deferring Alpine.data registration into the alpine:init listener + exposing window.lucide) is verified working at runtime."
+}

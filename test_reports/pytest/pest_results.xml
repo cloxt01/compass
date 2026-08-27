@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/app/phpunit.xml" tests="69" assertions="227" errors="0" failures="8" skipped="0" time="5.045224">
+    <testsuite name="Unit" tests="19" assertions="77" errors="0" failures="0" skipped="0" time="1.141810">
+      <testsuite name="Tests\Unit\ExampleTest" file="tests/Unit/ExampleTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.019712">
+        <testcase name="that true is true" file="tests/Unit/ExampleTest.php::that true is true" class="Tests\Unit\ExampleTest" classname="Tests.Unit.ExampleTest" assertions="1" time="0.019712"/>
+      </testsuite>
+      <testsuite name="Tests\Unit\Services\AI\AutoAnswerRetryTest" file="Auto Answer Retry (Tests\Unit\Services\AI\AutoAnswerRetry)" tests="5" assertions="16" errors="0" failures="0" skipped="0" time="0.637459">
+        <testcase name="Retries when first attempt times out then succeeds" file="Auto Answer Retry (Tests\Unit\Services\AI\AutoAnswerRetry)::Retries when first attempt times out then succeeds" class="Tests\Unit\Services\AI\AutoAnswerRetryTest" classname="Tests.Unit.Services.AI.AutoAnswerRetryTest" assertions="5" time="0.474816">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Fails gracefully when both attempts timeout" file="Auto Answer Retry (Tests\Unit\Services\AI\AutoAnswerRetry)::Fails gracefully when both attempts timeout" class="Tests\Unit\Services\AI\AutoAnswerRetryTest" classname="Tests.Unit.Services.AI.AutoAnswerRetryTest" assertions="4" time="0.037132">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="First attempt sends reasoning disabled for speed" file="Auto Answer Retry (Tests\Unit\Services\AI\AutoAnswerRetry)::First attempt sends reasoning disabled for speed" class="Tests\Unit\Services\AI\AutoAnswerRetryTest" classname="Tests.Unit.Services.AI.AutoAnswerRetryTest" assertions="1" time="0.035111">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Retries on http 500 and second attempt uses reasoning true" file="Auto Answer Retry (Tests\Unit\Services\AI\AutoAnswerRetry)::Retries on http 500 and second attempt uses reasoning true" class="Tests\Unit\Services\AI\AutoAnswerRetryTest" classname="Tests.Unit.Services.AI.AutoAnswerRetryTest" assertions="4" time="0.042708">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Does not retry on 4xx client error" file="Auto Answer Retry (Tests\Unit\Services\AI\AutoAnswerRetry)::Does not retry on 4xx client error" class="Tests\Unit\Services\AI\AutoAnswerRetryTest" classname="Tests.Unit.Services.AI.AutoAnswerRetryTest" assertions="2" time="0.047692">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)" tests="13" assertions="60" errors="0" failures="0" skipped="0" time="0.484640">
+        <testcase name="Success path persists full history row" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Success path persists full history row" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="18" time="0.053077">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Manual profile is included in prompt sent to openrouter" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Manual profile is included in prompt sent to openrouter" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="3" time="0.042016">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="First attempt uses bumped max tokens floor" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::First attempt uses bumped max tokens floor" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="1" time="0.038172">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Second attempt uses larger max tokens and low effort reasoning" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Second attempt uses larger max tokens and low effort reasoning" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="6" time="0.039786">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Retries on 408 request timeout" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Retries on 408 request timeout" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="2" time="0.036067">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Does not retry on 422 client error" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Does not retry on 422 client error" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="2" time="0.025244">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Stops after two attempts on repeated 500" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Stops after two attempts on repeated 500" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="4" time="0.034515">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Connection exception then 500 logs failure with http error" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Connection exception then 500 logs failure with http error" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="5" time="0.039146">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Missing api key logs failure and throws without http call" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Missing api key logs failure and throws without http call" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="5" time="0.037501">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Unparseable ai content logs failure with raw response" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Unparseable ai content logs failure with raw response" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="4" time="0.036072">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Markdown fenced json is parsed successfully" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Markdown fenced json is parsed successfully" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="2" time="0.036247">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Unanswered questions lower match score and are counted" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Unanswered questions lower match score and are counted" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="4" time="0.030875">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Confidence is clamped and missing answers default to zero" file="Auto Answer Service Extended (Tests\Unit\Services\AI\AutoAnswerServiceExtended)::Confidence is clamped and missing answers default to zero" class="Tests\Unit\Services\AI\AutoAnswerServiceExtendedTest" classname="Tests.Unit.Services.AI.AutoAnswerServiceExtendedTest" assertions="4" time="0.035922">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="50" assertions="150" errors="0" failures="8" skipped="0" time="3.903413">
+      <testsuite name="Tests\Feature\Auth\AuthenticationTest" file="tests/Feature/Auth/AuthenticationTest.php" tests="4" assertions="8" errors="0" failures="0" skipped="0" time="0.480591">
+        <testcase name="login screen can be rendered" file="tests/Feature/Auth/AuthenticationTest.php::login screen can be rendered" class="Tests\Feature\Auth\AuthenticationTest" classname="Tests.Feature.Auth.AuthenticationTest" assertions="1" time="0.083222">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="users can authenticate using the login screen" file="tests/Feature/Auth/AuthenticationTest.php::users can authenticate using the login screen" class="Tests\Feature\Auth\AuthenticationTest" classname="Tests.Feature.Auth.AuthenticationTest" assertions="3" time="0.080749">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="users can not authenticate with invalid password" file="tests/Feature/Auth/AuthenticationTest.php::users can not authenticate with invalid password" class="Tests\Feature\Auth\AuthenticationTest" classname="Tests.Feature.Auth.AuthenticationTest" assertions="1" time="0.263793">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="users can logout" file="tests/Feature/Auth/AuthenticationTest.php::users can logout" class="Tests\Feature\Auth\AuthenticationTest" classname="Tests.Feature.Auth.AuthenticationTest" assertions="3" time="0.052827">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\EmailVerificationTest" file="tests/Feature/Auth/EmailVerificationTest.php" tests="3" assertions="6" errors="0" failures="0" skipped="0" time="0.172726">
+        <testcase name="email verification screen can be rendered" file="tests/Feature/Auth/EmailVerificationTest.php::email verification screen can be rendered" class="Tests\Feature\Auth\EmailVerificationTest" classname="Tests.Feature.Auth.EmailVerificationTest" assertions="1" time="0.052270">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="email can be verified" file="tests/Feature/Auth/EmailVerificationTest.php::email can be verified" class="Tests\Feature\Auth\EmailVerificationTest" classname="Tests.Feature.Auth.EmailVerificationTest" assertions="4" time="0.069303">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="email is not verified with invalid hash" file="tests/Feature/Auth/EmailVerificationTest.php::email is not verified with invalid hash" class="Tests\Feature\Auth\EmailVerificationTest" classname="Tests.Feature.Auth.EmailVerificationTest" assertions="1" time="0.051153">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\PasswordConfirmationTest" file="tests/Feature/Auth/PasswordConfirmationTest.php" tests="3" assertions="4" errors="0" failures="0" skipped="0" time="0.334407">
+        <testcase name="confirm password screen can be rendered" file="tests/Feature/Auth/PasswordConfirmationTest.php::confirm password screen can be rendered" class="Tests\Feature\Auth\PasswordConfirmationTest" classname="Tests.Feature.Auth.PasswordConfirmationTest" assertions="1" time="0.046468">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="password can be confirmed" file="tests/Feature/Auth/PasswordConfirmationTest.php::password can be confirmed" class="Tests\Feature\Auth\PasswordConfirmationTest" classname="Tests.Feature.Auth.PasswordConfirmationTest" assertions="2" time="0.041845">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="password is not confirmed with invalid password" file="tests/Feature/Auth/PasswordConfirmationTest.php::password is not confirmed with invalid password" class="Tests\Feature\Auth\PasswordConfirmationTest" classname="Tests.Feature.Auth.PasswordConfirmationTest" assertions="1" time="0.246094">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\PasswordResetTest" file="tests/Feature/Auth/PasswordResetTest.php" tests="4" assertions="4" errors="0" failures="3" skipped="0" time="0.813688">
+        <testcase name="reset password link screen can be rendered" file="tests/Feature/Auth/PasswordResetTest.php::reset password link screen can be rendered" class="Tests\Feature\Auth\PasswordResetTest" classname="Tests.Feature.Auth.PasswordResetTest" assertions="1" time="0.045269">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="reset password link can be requested" file="tests/Feature/Auth/PasswordResetTest.php::reset password link can be requested" class="Tests\Feature\Auth\PasswordResetTest" classname="Tests.Feature.Auth.PasswordResetTest" assertions="1" time="0.260861">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">reset password link can be requestedThe expected [Illuminate\Auth\Notifications\ResetPassword] notification was not sent.
+Failed asserting that false is true.
+at vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/NotificationFake.php:89
+at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+at tests/Feature/Auth/PasswordResetTest.php:20</failure>
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="reset password screen can be rendered" file="tests/Feature/Auth/PasswordResetTest.php::reset password screen can be rendered" class="Tests\Feature\Auth\PasswordResetTest" classname="Tests.Feature.Auth.PasswordResetTest" assertions="1" time="0.261528">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">reset password screen can be renderedThe expected [Illuminate\Auth\Notifications\ResetPassword] notification was not sent.
+Failed asserting that false is true.
+at vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/NotificationFake.php:89
+at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+at tests/Feature/Auth/PasswordResetTest.php:30</failure>
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="password can be reset with valid token" file="tests/Feature/Auth/PasswordResetTest.php::password can be reset with valid token" class="Tests\Feature\Auth\PasswordResetTest" classname="Tests.Feature.Auth.PasswordResetTest" assertions="1" time="0.246030">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">password can be reset with valid tokenThe expected [Illuminate\Auth\Notifications\ResetPassword] notification was not sent.
+Failed asserting that false is true.
+at vendor/laravel/framework/src/Illuminate/Support/Testing/Fakes/NotificationFake.php:89
+at vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:363
+at tests/Feature/Auth/PasswordResetTest.php:46</failure>
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\PasswordUpdateTest" file="tests/Feature/Auth/PasswordUpdateTest.php" tests="2" assertions="8" errors="0" failures="0" skipped="0" time="0.117726">
+        <testcase name="password can be updated" file="tests/Feature/Auth/PasswordUpdateTest.php::password can be updated" class="Tests\Feature\Auth\PasswordUpdateTest" classname="Tests.Feature.Auth.PasswordUpdateTest" assertions="4" time="0.072434">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="correct password must be provided to update password" file="tests/Feature/Auth/PasswordUpdateTest.php::correct password must be provided to update password" class="Tests\Feature\Auth\PasswordUpdateTest" classname="Tests.Feature.Auth.PasswordUpdateTest" assertions="4" time="0.045292">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\Auth\RegistrationTest" file="tests/Feature/Auth/RegistrationTest.php" tests="2" assertions="4" errors="0" failures="0" skipped="0" time="0.463948">
+        <testcase name="registration screen can be rendered" file="tests/Feature/Auth/RegistrationTest.php::registration screen can be rendered" class="Tests\Feature\Auth\RegistrationTest" classname="Tests.Feature.Auth.RegistrationTest" assertions="1" time="0.062078">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="new users can register" file="tests/Feature/Auth/RegistrationTest.php::new users can register" class="Tests\Feature\Auth\RegistrationTest" classname="Tests.Feature.Auth.RegistrationTest" assertions="3" time="0.401870">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\ExampleTest" file="tests/Feature/ExampleTest.php" tests="1" assertions="1" errors="0" failures="0" skipped="0" time="0.053652">
+        <testcase name="the application returns a successful response" file="tests/Feature/ExampleTest.php::the application returns a successful response" class="Tests\Feature\ExampleTest" classname="Tests.Feature.ExampleTest" assertions="1" time="0.053652">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProfileTest" file="tests/Feature/ProfileTest.php" tests="5" assertions="8" errors="0" failures="5" skipped="0" time="0.243695">
+        <testcase name="profile page is displayed" file="tests/Feature/ProfileTest.php::profile page is displayed" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="1" time="0.051295">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">profile page is displayedExpected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:174
+at vendor/laravel/framework/src/Illuminate/Testing/Concerns/AssertsStatusCodes.php:16
+at tests/Feature/ProfileTest.php:12</failure>
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="profile information can be updated" file="tests/Feature/ProfileTest.php::profile information can be updated" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="2" time="0.052269">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">profile information can be updatedExpected response status code [201, 301, 302, 303, 307, 308] but received 404.
+Failed asserting that false is true.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:199
+at tests/Feature/ProfileTest.php:27</failure>
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="email verification status is unchanged when the email address is unchanged" file="tests/Feature/ProfileTest.php::email verification status is unchanged when the email address is unchanged" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="2" time="0.044425">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">email verification status is unchanged when the email address is unchangedExpected response status code [201, 301, 302, 303, 307, 308] but received 404.
+Failed asserting that false is true.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:199
+at tests/Feature/ProfileTest.php:48</failure>
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="user can delete their account" file="tests/Feature/ProfileTest.php::user can delete their account" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="2" time="0.054313">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">user can delete their accountExpected response status code [201, 301, 302, 303, 307, 308] but received 404.
+Failed asserting that false is true.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:199
+at tests/Feature/ProfileTest.php:64</failure>
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="correct password must be provided to delete account" file="tests/Feature/ProfileTest.php::correct password must be provided to delete account" class="Tests\Feature\ProfileTest" classname="Tests.Feature.ProfileTest" assertions="1" time="0.041392">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">correct password must be provided to delete accountSession is missing expected key [errors].
+Failed asserting that false is true.
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponseAssert.php:45
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:1540
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:1617
+at vendor/laravel/framework/src/Illuminate/Testing/TestResponse.php:1711
+at tests/Feature/ProfileTest.php:81</failure>
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\Settings\AiProfileExtendedTest" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)" tests="20" assertions="74" errors="0" failures="0" skipped="0" time="0.937034">
+        <testcase name="Rejects invalid pendidikan" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Rejects invalid pendidikan" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="2" time="0.049259">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Rejects invalid skill level" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Rejects invalid skill level" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="2" time="0.051277">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Rejects invalid bahasa level and out of range numbers" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Rejects invalid bahasa level and out of range numbers" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="6" time="0.051517">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Invalid payload does not persist anything" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Invalid payload does not persist anything" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="1" time="0.049830">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Guest cannot save ai profile" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Guest cannot save ai profile" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="2" time="0.037031">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Guest cannot view ai profile tab" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Guest cannot view ai profile tab" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="2" time="0.050764">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Unknown tab returns 404" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Unknown tab returns 404" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="1" time="0.038914">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Empty sertifikasi and bahasa rows are filtered" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Empty sertifikasi and bahasa rows are filtered" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="5" time="0.046086">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Unchecked booleans are saved as false" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Unchecked booleans are saved as false" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="10" time="0.044181">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Numeric fields are cast to int and float" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Numeric fields are cast to int and float" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="6" time="0.039530">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Saving ai profile preserves other apply configuration keys" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Saving ai profile preserves other apply configuration keys" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="5" time="0.042830">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Saved profile is prefilled on the form" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Saved profile is prefilled on the form" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="5" time="0.053094">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Second save overwrites previous profile" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Second save overwrites previous profile" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="1" time="0.047851">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Profile builder falls back to platform when manual field empty" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Profile builder falls back to platform when manual field empty" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="4" time="0.055075">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Profile builder maps work preferences into readable array" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Profile builder maps work preferences into readable array" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="3" time="0.055003">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Profile builder drops blank dynamic rows" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Profile builder drops blank dynamic rows" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="3" time="0.030180">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Profile builder handles null user and jobstreet provider" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Profile builder handles null user and jobstreet provider" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="3" time="0.038911">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Profile builder tolerates non array manual profile" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Profile builder tolerates non array manual profile" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="2" time="0.040777">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Completeness is monotonic and bounded" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Completeness is monotonic and bounded" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="5" time="0.035767">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Completeness link reflects saved profile on panel configuration" file="Ai Profile Extended (Tests\Feature\Settings\AiProfileExtended)::Completeness link reflects saved profile on panel configuration" class="Tests\Feature\Settings\AiProfileExtendedTest" classname="Tests.Feature.Settings.AiProfileExtendedTest" assertions="6" time="0.079156">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\Settings\AiProfileTest" file="Ai Profile (Tests\Feature\Settings\AiProfile)" tests="6" assertions="33" errors="0" failures="0" skipped="0" time="0.285946">
+        <testcase name="Ai profile tab renders for authenticated user" file="Ai Profile (Tests\Feature\Settings\AiProfile)::Ai profile tab renders for authenticated user" class="Tests\Feature\Settings\AiProfileTest" classname="Tests.Feature.Settings.AiProfileTest" assertions="7" time="0.070373">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Saves full profile to apply configuration" file="Ai Profile (Tests\Feature\Settings\AiProfile)::Saves full profile to apply configuration" class="Tests\Feature\Settings\AiProfileTest" classname="Tests.Feature.Settings.AiProfileTest" assertions="12" time="0.038892">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Rejects invalid notice period" file="Ai Profile (Tests\Feature\Settings\AiProfile)::Rejects invalid notice period" class="Tests\Feature\Settings\AiProfileTest" classname="Tests.Feature.Settings.AiProfileTest" assertions="2" time="0.044618">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Profile builder prefers manual over platform" file="Ai Profile (Tests\Feature\Settings\AiProfile)::Profile builder prefers manual over platform" class="Tests\Feature\Settings\AiProfileTest" classname="Tests.Feature.Settings.AiProfileTest" assertions="6" time="0.051759">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Profile completeness returns score" file="Ai Profile (Tests\Feature\Settings\AiProfile)::Profile completeness returns score" class="Tests\Feature\Settings\AiProfileTest" classname="Tests.Feature.Settings.AiProfileTest" assertions="3" time="0.030988">
+          <system-out>
+</system-out>
+        </testcase>
+        <testcase name="Apply configuration settings tab shows link to ai profile" file="Ai Profile (Tests\Feature\Settings\AiProfile)::Apply configuration settings tab shows link to ai profile" class="Tests\Feature\Settings\AiProfileTest" classname="Tests.Feature.Settings.AiProfileTest" assertions="3" time="0.049317">
+          <system-out>
+</system-out>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>
