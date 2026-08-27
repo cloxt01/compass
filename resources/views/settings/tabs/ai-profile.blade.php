@@ -39,11 +39,26 @@
 @endphp
 
 <div class="space-y-6" data-testid="ai-profile-settings"
-     x-data="aiProfileForm({
-         skills: @js($skills),
-         sertifikasi: @js($sertifikasi),
-         bahasa: @js($bahasa),
-     })">
+     x-data="{
+         skills: @js($skills ?: []),
+         sertifikasi: @js($sertifikasi ?: []),
+         bahasa: @js($bahasa ?: []),
+         addSkill() {
+             this.skills.push({ name: '', level: 'INTERMEDIATE' });
+             this.$nextTick(() => { if (window.lucide) window.lucide.createIcons(); });
+         },
+         removeSkill(i) { this.skills.splice(i, 1); },
+         addSertifikasi() {
+             this.sertifikasi.push({ nama: '', issuer: '', tahun: '' });
+             this.$nextTick(() => { if (window.lucide) window.lucide.createIcons(); });
+         },
+         removeSertifikasi(i) { this.sertifikasi.splice(i, 1); },
+         addBahasa() {
+             this.bahasa.push({ nama: '', level: 'INTERMEDIATE' });
+             this.$nextTick(() => { if (window.lucide) window.lucide.createIcons(); });
+         },
+         removeBahasa(i) { this.bahasa.splice(i, 1); },
+     }">
 
     @if(session('success'))
         <div class="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300"
@@ -457,21 +472,10 @@
 
 @push('scripts')
 <script>
-    function aiProfileForm(initial) {
-        return {
-            skills: initial.skills.length ? initial.skills : [],
-            sertifikasi: initial.sertifikasi.length ? initial.sertifikasi : [],
-            bahasa: initial.bahasa.length ? initial.bahasa : [],
-            addSkill() { this.skills.push({ name: '', level: 'INTERMEDIATE' }); this.$nextTick(() => window.lucide?.createIcons()); },
-            removeSkill(i) { this.skills.splice(i, 1); },
-            addSertifikasi() { this.sertifikasi.push({ nama: '', issuer: '', tahun: '' }); this.$nextTick(() => window.lucide?.createIcons()); },
-            removeSertifikasi(i) { this.sertifikasi.splice(i, 1); },
-            addBahasa() { this.bahasa.push({ nama: '', level: 'INTERMEDIATE' }); this.$nextTick(() => window.lucide?.createIcons()); },
-            removeBahasa(i) { this.bahasa.splice(i, 1); },
-        };
-    }
     document.addEventListener('DOMContentLoaded', function () {
-        if (window.lucide?.createIcons) window.lucide.createIcons();
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons();
+        }
     });
 </script>
 @endpush

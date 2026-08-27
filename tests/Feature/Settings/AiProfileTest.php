@@ -32,6 +32,29 @@ class AiProfileTest extends TestCase
         $response->assertSee('data-testid="ai-profile-save-button"', false);
     }
 
+    public function test_alpine_x_data_uses_inline_object_not_undefined_function()
+    {
+        // Regression: Alpine tidak boleh bergantung pada function global `aiProfileForm`
+        // (yang gagal ter-register). Harus pakai inline object literal supaya "Tambah
+        // Skill/Sertifikat/Bahasa" langsung jalan.
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('settings', ['tab' => 'ai-profile']));
+        $response->assertOk();
+
+        $html = $response->getContent();
+        // Harus mengandung method addSkill/addSertifikasi/addBahasa langsung di x-data
+        $this->assertStringContainsString('addSkill()', $html);
+        $this->assertStringContainsString('addSertifikasi()', $html);
+        $this->assertStringContainsString('addBahasa()', $html);
+        // Tombol trigger harus ada
+        $this->assertStringContainsString('data-testid="ai-profile-add-skill"', $html);
+        $this->assertStringContainsString('data-testid="ai-profile-add-sertifikasi"', $html);
+        $this->assertStringContainsString('data-testid="ai-profile-add-bahasa"', $html);
+        // Tidak boleh masih pakai function wrapper name yang gagal
+        $this->assertStringNotContainsString('x-data="aiProfileForm(', $html);
+    }
+
     public function test_saves_full_profile_to_apply_configuration()
     {
         $user = User::factory()->create();

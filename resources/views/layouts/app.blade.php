@@ -16,6 +16,7 @@
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/bootstrap.js'])
+    @livewireStyles
     @stack('styles')
 </head>
 
@@ -54,6 +55,7 @@
     </div>
 </div>
 @stack('scripts')
+@livewireScripts
 
 </body>
 </html>
