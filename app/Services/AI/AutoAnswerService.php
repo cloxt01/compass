@@ -150,22 +150,23 @@ class AutoAnswerService
      *
      * @return array{0: \Illuminate\Http\Client\Response|null, 1: string|null}
      */
-    protected function callOpenRouterWithRetry(array $config, string $systemPrompt, string $userPrompt): array
-    {
+    protected function callOpenRouterWithRetry(
+        array $config,
+        string $systemPrompt,
+        string $userPrompt
+    ): array {
         $attempts = [
             [
                 'timeout' => 90,
                 'connect_timeout' => 15,
-                'reasoning' => false,      // default: matikan reasoning untuk speed
                 'max_tokens' => max(1200, (int) $config['max_tokens']),
-                'label' => 'fast-no-reasoning',
+                'label' => 'fast',
             ],
             [
-                'timeout' => 180,          // fallback: reasoning boleh nyala tapi timeout lebih besar
+                'timeout' => 180,
                 'connect_timeout' => 15,
-                'reasoning' => true,
                 'max_tokens' => max(1500, (int) $config['max_tokens']),
-                'label' => 'retry-with-reasoning',
+                'label' => 'retry',
             ],
         ];
 
@@ -178,51 +179,74 @@ class AutoAnswerService
                 'max_tokens' => $opt['max_tokens'],
                 'response_format' => ['type' => 'json_object'],
                 'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $userPrompt],
+                    [
+                        'role' => 'system',
+                        'content' => $systemPrompt,
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => $userPrompt,
+                    ],
                 ],
             ];
 
-            // Kontrol reasoning: OpenRouter mendukung baik top-level maupun provider-specific
-            if (!$opt['reasoning']) {
-                $payload['reasoning'] = ['enabled' => false];
-                $payload['provider'] = ['reasoning' => ['enabled' => false]];
-            } else {
-                $payload['reasoning'] = ['enabled' => true, 'effort' => 'low'];
-            }
-
             $attemptStart = microtime(true);
+
             try {
                 $response = Http::withToken($config['api_key'])
                     ->acceptJson()
                     ->connectTimeout($opt['connect_timeout'])
                     ->timeout($opt['timeout'])
-                    ->post('https://openrouter.ai/api/v1/chat/completions', $payload);
+                    ->post(
+                        'https://openrouter.ai/api/v1/chat/completions',
+                        $payload
+                    );
 
-                $ms = (int) round((microtime(true) - $attemptStart) * 1000);
-                Log::info("AutoAnswer OpenRouter [{$opt['label']}] status={$response->status()} in {$ms}ms model={$config['model']}");
+                $ms = (int) round(
+                    (microtime(true) - $attemptStart) * 1000
+                );
 
-                // Retry hanya untuk 5xx atau 408; 4xx lain langsung return supaya user tahu problem-nya
+                Log::info(
+                    "AutoAnswer OpenRouter [{$opt['label']}] " .
+                    "status={$response->status()} in {$ms}ms " .
+                    "model={$config['model']}"
+                );
+
+                // Retry hanya untuk 5xx atau 408
                 if ($response->serverError() || $response->status() === 408) {
                     $lastError = 'HTTP ' . $response->status() . ' dari OpenRouter';
-                    if ($i < count($attempts) - 1) continue;
+
+                    if ($i < count($attempts) - 1) {
+                        continue;
+                    }
                 }
+
                 return [$response, null];
+
             } catch (\Illuminate\Http\Client\ConnectionException $e) {
                 $lastError = 'Gagal menghubungi OpenRouter: ' . $e->getMessage();
-                Log::warning("AutoAnswer OpenRouter [{$opt['label']}] ConnectionException: {$e->getMessage()}");
-                // Try next attempt
+
+                Log::warning(
+                    "AutoAnswer OpenRouter [{$opt['label']}] " .
+                    "ConnectionException: {$e->getMessage()}"
+                );
+
                 continue;
+
             } catch (\Throwable $e) {
                 $lastError = 'Gagal menghubungi OpenRouter: ' . $e->getMessage();
-                Log::error("AutoAnswer OpenRouter [{$opt['label']}] Throwable: {$e->getMessage()}");
+
+                Log::error(
+                    "AutoAnswer OpenRouter [{$opt['label']}] " .
+                    "Throwable: {$e->getMessage()}"
+                );
+
                 continue;
             }
         }
 
         return [null, $lastError];
     }
-
     protected function buildSystemPrompt(): string
     {
         return <<<PROMPT
