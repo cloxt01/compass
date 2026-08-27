@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('job_title');
             $table->string('job_company');
             $table->enum('provider', ['glints', 'jobstreet']);
-            $table->enum('status', ['success', 'applied', 'linkout', 'questionnaire', 'expired']); // Tanggal lamaran
+            $table->enum('status', ['success', 'applied', 'linkout', 'questionnaire', 'expired', 'auto_answer_failed']); 
             $table->timestamps();
         });
     }
