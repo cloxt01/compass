@@ -104,8 +104,8 @@ class ProcessApplications implements ShouldQueue
                 JobStatus::dispatch($this->user->id, $this->jobData, $providerName, 'applied');
                 return;
             }
-            JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $is_already);
-            return;
+            // JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $is_already);
+            // return;
         }
 
         // 4. GUNAKAN $jobData DI SINI
