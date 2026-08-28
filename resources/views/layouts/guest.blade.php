@@ -123,13 +123,11 @@
 
 
     @stack('styles')
-
 </head>
 
 
 
 <body class="@hasSection('body-class')@yield('body-class')@else bg-[#0a0a0a] text-[#fafafa] antialiased min-h-screen flex flex-col relative overflow-hidden @endif">
-
 
 
 {{-- Background --}}
@@ -256,13 +254,7 @@
     });
 
 </script>
-
-
-
 @stack('scripts')
-
-
-
 </body>
 
 </html>

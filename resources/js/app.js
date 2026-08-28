@@ -1,5 +1,6 @@
 import './bootstrap'
 import './sidebar'
+import intersect from '@alpinejs/intersect' // 1. Import plugin
 
 import { createIcons, icons } from 'lucide'
 
@@ -14,6 +15,7 @@ import glintsSearchLocation from './alpine/glints-search-location.js'
 
 document.addEventListener('alpine:init', () => {
     if (window.Alpine) {
+        window.Alpine.plugin(intersect) // 2. Register plugin di sini
         window.Alpine.data('glintsSearchLocation', glintsSearchLocation)
     }
 })
