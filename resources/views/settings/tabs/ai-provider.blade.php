@@ -155,14 +155,14 @@
                     <div class="md:w-1/3">
                         <h3 class="text-sm font-semibold text-[#fafafa]">Max Tokens</h3>
                         <p class="text-xs text-[#71717a] mt-1">
-                            Batas panjang jawaban yang di-generate. Rentang 64 – 4096.
+                            Batas panjang jawaban yang di-generate. Rentang 64 – 8192.
                         </p>
                     </div>
                     <div class="md:flex-1">
                         <input
                             type="number"
                             name="max_tokens"
-                            min="64" max="4096" step="16"
+                            min="64" max="8192" step="16"
                             value="{{ old('max_tokens', $currentMaxTokens) }}"
                             data-testid="ai-provider-max-tokens-input"
                             class="w-40 rounded-md border border-[#333] bg-[#111] px-3 py-2 text-sm text-[#fafafa] focus:outline-none focus:border-indigo-400"
