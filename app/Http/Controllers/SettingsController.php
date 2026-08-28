@@ -27,7 +27,7 @@ class SettingsController extends Controller
             'model' => ['nullable', 'string', 'max:200'],
             'api_key' => ['nullable', 'string', 'max:300'],
             'temperature' => ['nullable', 'numeric', 'min:0', 'max:2'],
-            'max_tokens' => ['nullable', 'integer', 'min:64', 'max:4096'],
+            'max_tokens' => ['nullable', 'integer', 'min:64', 'max:8192'],
             'clear_api_key' => ['nullable', 'boolean'],
         ]);
 
