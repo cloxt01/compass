@@ -292,6 +292,7 @@ new class extends Component
                                     @case('success') <span class="status-badge badge-success"><i class="fas fa-check-circle mr-1"></i>Success</span> @break
                                     @case('applied') <span class="status-badge badge-applied"><i class="fas fa-history mr-1"></i>Already Applied</span> @break
                                     @case('questionnaire') <span class="status-badge badge-screening"><i class="fas fa-clipboard-list mr-1"></i>Screening</span> @break
+                                    @case('auto_answer_failed') <span class="status-badge badge-auto-answer-failed"><i class="fas fa-robot mr-1"></i>Auto Answer Failed</span> @break
                                     @case('linkout') <span class="status-badge badge-start"><i class="fas fa-external-link-alt mr-1"></i>Linkout</span> @break
                                     @default <span class="status-badge badge-default"><i class="fas fa-exclamation-circle mr-1"></i>Expired</span>
                                 @endswitch
