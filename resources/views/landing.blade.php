@@ -211,14 +211,14 @@
                 
                 <div class="space-y-3 text-sm leading-relaxed text-[#a1a1aa] flex-1">
                     <h3 class="text-base sm:text-lg font-semibold text-white tracking-wide">
-                        Realita singkat soal Compass.
+                        Penting
                     </h3>
                     <p class="text-sm sm:text-base">
-                        Ngetok pintu perusahaan satu per satu memang makan waktu. Compass hadir buat <span class="text-amber-300 font-medium">buka pintunya sebanyak mungkin</span> lewat otomatisasi lamaran, biar peluang kamu dipanggil interview makin besar.
+                        Cari kerja sebagai fresh-grad itu tidaklah mudah, apalagi hidup di indonesia yang tiap lowongan bisa di lamar oleh ratursan atau bahkan ribuan pelamar. Salah satu hal yang paling realistis ialah memperbanyak jumlah lamaran guna memperbesar peluangnya oleh karena itu Compass hadir untuk membantu kamu dalam mengirim lamaran kerja secara otomatis.
                     </p>
                     <div class="pt-3 border-t border-white/5 text-xs text-[#88888e] flex items-center gap-2">
                         <i data-lucide="shield-alert" class="h-4 w-4 text-amber-400/80 flex-shrink-0"></i>
-                        <span><strong>Catatan:</strong> Compass bantu di urusan pengiriman form. Kunci diterima kerja tetap di CV, portofolio, dan persiapan interview kamu.</span>
+                        <span><strong>Catatan:</strong> Compass tidak menjamin kamu diterima kerja, karena kunci diterima kerja tetap di CV, portofolio, dan persiapan interview kamu..</span>
                     </div>
                 </div>
             </div>
