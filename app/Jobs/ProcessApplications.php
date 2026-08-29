@@ -100,10 +100,22 @@ class ProcessApplications implements ShouldQueue
 
         if ($is_already) {
             Log::warning('User ID : ' . $this->user->id. ' - Provider : ' . $this->provider . ' - Job ID : ' . $this->job_id . ', dilewati karena sudah melamar.' . json_encode($this->jobData));
-            if($is_already === 'success') {
-                JobStatus::dispatch($this->user->id, $this->jobData, $providerName, 'applied');
-                return;
+            
+            switch ($is_already) {
+                case 'applied':
+                case 'success':
+                    JobStatus::dispatch($this->user->id, $this->jobData, $providerName, 'applied');
+                    return;
+                case 'expired':
+                    JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $is_already);
+                    return;
+                default:
+                    break;
             }
+            // if(in_array($is_already, ['applied', 'success'])) {
+            //     JobStatus::dispatch($this->user->id, $this->jobData, $providerName, 'applied');
+            //     return;
+            // } 
             // JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $is_already);
             // return;
         }
@@ -134,8 +146,9 @@ class ProcessApplications implements ShouldQueue
 
             // Record Application
             JobStatus::dispatch($this->user->id, $this->jobData, $providerName, $result['status']);
-            $application = $this->user->applications()->create([
-                'job_id' => $result['job']['job_id'] ?? $this->job_id,
+            $application = $this->user->applications()->updateOrCreate([
+                'job_id' => $result['job']['job_id'] ?? $this->job_id
+            ], [
                 'job_title' => $result['job']['job_title'] ?? 'Unknown',
                 'job_company' => $result['job']['job_company'] ?? 'Unknown',
                 'provider' => $result['provider'] ?? 'Unknown',
