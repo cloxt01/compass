@@ -225,6 +225,59 @@
         </div>
     </section>
 
+    {{-- Social Proof: Real Notifications --}}
+    <section class="mx-auto mt-32 max-w-4xl px-6">
+        <div class="mb-10 text-center">
+            <span class="inline-flex rounded-full border border-green-500/20 bg-green-500/10 px-4 py-1 text-xs font-medium text-green-400">
+                Bukti Nyata
+            </span>
+            <h2 class="mx-auto mt-4 max-w-xl text-3xl font-bold leading-tight text-white sm:text-4xl">
+                Ini balasan asli HRD yang masuk ke user Compass.
+            </h2>
+            <p class="mx-auto mt-3 max-w-md text-sm text-[#a1a1aa]">
+                Bukan mockup — ini rangkaian chat WhatsApp dan email konfirmasi interview yang datang sendiri.
+            </p>
+        </div>
+
+        <div class="grid gap-6 sm:grid-cols-2">
+            <div
+                x-data="{ visible: false }"
+                x-intersect.once="visible = true"
+                x-show="visible"
+                x-transition:enter="transition ease-out duration-700"
+                x-transition:enter-start="opacity-0 translate-y-6"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                class="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-2 shadow-2xl shadow-black/40"
+            >
+                <img
+                    src="{{ asset('images/proof-whatsapp.png') }}"
+                    alt="Bukti balasan HRD di WhatsApp setelah Compass auto-apply"
+                    class="w-full rounded-xl"
+                    loading="lazy"
+                >
+                <p class="mt-2 pb-1 text-center text-xs text-[#a1a1aa]">Balasan HRD via WhatsApp</p>
+            </div>
+
+            <div
+                x-data="{ visible: false }"
+                x-intersect.once="visible = true"
+                x-show="visible"
+                x-transition:enter="transition ease-out duration-700 delay-150"
+                x-transition:enter-start="opacity-0 translate-y-6"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                class="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-2 shadow-2xl shadow-black/40"
+            >
+                <img
+                    src="{{ asset('images/proof-email.png') }}"
+                    alt="Bukti undangan interview via email setelah Compass auto-apply"
+                    class="w-full rounded-xl"
+                    loading="lazy"
+                >
+                <p class="mt-2 pb-1 text-center text-xs text-[#a1a1aa]">Undangan interview via Email</p>
+            </div>
+        </div>
+    </section>
+    
     {{-- FAQ Section --}}
     <section class="mx-auto mt-32 max-w-3xl px-6">
         <div class="mb-12 text-center">
