@@ -48,7 +48,10 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-
+    <link
+        href="https://unpkg.com/aos@2.3.4/dist/aos.css"
+        rel="stylesheet"
+    />
 
     <style>
 
@@ -240,21 +243,27 @@
 </div>
 
 
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 
 <script>
-
     document.addEventListener('DOMContentLoaded', () => {
-
         if (window.lucide) {
 
             lucide.createIcons();
 
         }
-
+        AOS.init({
+            duration: 700,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 80,
+            delay: 0,
+        });
     });
-
 </script>
+
 @stack('scripts')
+
 </body>
 
 </html>

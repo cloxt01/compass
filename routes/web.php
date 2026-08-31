@@ -98,6 +98,11 @@ Route::middleware(['auth','verified'])->group(function() {
             [SettingsController::class, 'upsert_user']
         )->name('settings.profile.update');
 
+        Route::delete(
+            '/profile',
+            [SettingsController::class, 'destroy_user']
+        )->name('settings.profile.destroy');
+
         Route::post(
             '/toggle-automation',
             [SettingsController::class, 'toggle_automation']

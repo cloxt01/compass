@@ -42,7 +42,9 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $user = \App\Models\User::where('email', $this->email)->first();
+
+        if (! $user || ! \Hash::check($this->password, $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -51,7 +53,26 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        /*
+        * Jika user menggunakan 2FA, jangan login penuh.
+        * Simpan ID user untuk diproses oleh Fortify TwoFactor challenge.
+        */
+        if ($user->two_factor_secret) {
+            session([
+                'login.id' => $user->getAuthIdentifier(),
+                'login.remember' => $this->boolean('remember'),
+            ]);
+
+            return;
+        }
+
+        /*
+        * User tanpa 2FA langsung login.
+        */
+        Auth::login($user, $this->boolean('remember'));
     }
+
 
     /**
      * Ensure the login request is not rate limited.

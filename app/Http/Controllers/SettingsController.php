@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\OpenRouterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class SettingsController extends Controller
@@ -12,13 +13,14 @@ class SettingsController extends Controller
     public function settings(Request $request)
     {
         $tab = $request->query('tab', 'general');
+        $user = Auth()->user(); 
 
-        $allowedTabs = ['general', 'account', 'security', 'apply-configuration', 'ai-provider', 'ai-profile'];
+        $allowedTabs = ['general', 'security', 'apply-configuration', 'ai-provider', 'ai-profile', 'profile'];
         if (!in_array($tab, $allowedTabs)) {
             abort(404);
         }
 
-        return view('settings.index', compact('tab'));
+        return view('settings.index', compact('tab', 'user'));
     }
 
     public function saveAiProvider(Request $request)
@@ -191,6 +193,29 @@ class SettingsController extends Controller
             ->with('success', 'Profil kandidat berhasil disimpan.');
     }
 
+    public function destroy_user(Request $request)
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required'],
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->password, $user->password)) {
+            return back()->withErrors([
+                'password' => 'Password yang Anda masukkan salah.',
+            ], 'userDeletion');
+        }
+
+        Auth::logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
+    }
     public function upsert_user(Request $request)
     {
         $user = auth()->user();

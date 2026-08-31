@@ -37,11 +37,11 @@
                         <span>General</span>
                     </a>
 
-                    {{-- Account Tab --}}
-                    <a href="{{ route('settings', ['tab' => 'account']) }}"
-                       class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ $currentTab === 'account' ? 'bg-[#1e1e1e] text-[#fafafa] font-medium' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
-                        <i data-lucide="user-cog" class="w-4 h-4 opacity-70 {{ $currentTab === 'account' ? 'text-[#fafafa] opacity-100' : '' }}"></i>
-                        <span>Account</span>
+                    {{-- Profile Tab --}}
+                    <a href="{{ route('settings', ['tab' => 'profile']) }}"
+                       class="flex items-center gap-3 rounded-md px-3 py-2 transition-colors duration-200 {{ $currentTab === 'profile' ? 'bg-[#1e1e1e] text-[#fafafa] font-medium' : 'text-[#a1a1aa] hover:bg-[#1e1e1e] hover:text-[#fafafa]' }}">
+                        <i data-lucide="user" class="w-4 h-4 opacity-70 {{ $currentTab === 'profile' ? 'text-[#fafafa] opacity-100' : '' }}"></i>
+                        <span>Profile</span>
                     </a>
 
                     {{-- Keamanan Tab --}}

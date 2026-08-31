@@ -9,6 +9,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -25,20 +27,37 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        if(!in_array(config('app.env'), ['local', 'testing'])) {
+        if (!in_array(config('app.env'), ['local', 'testing'])) {
             $verified = CloudflareTurnstile::verify($request);
-            if(!$verified){
+
+            if (!$verified) {
                 return back()->withErrors([
                     'captcha' => 'Verifikasi keamanan gagal'
                 ])->onlyInput('email');
             }
         }
+
         $request->authenticate();
 
+        /*
+        * User memiliki 2FA.
+        * Jangan regenerate session atau redirect ke dashboard.
+        * Arahkan ke Fortify Two-Factor Challenge.
+        */
+        if ($request->session()->has('login.id')) {
+            return redirect()->route('two-factor.login');
+        }
+
+        /*
+        * User tidak menggunakan 2FA.
+        */
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(
+            route('dashboard', absolute: false)
+        );
     }
+
 
     /**
      * Destroy an authenticated session.

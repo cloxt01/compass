@@ -1,21 +1,27 @@
 import './bootstrap'
 import './sidebar'
-import intersect from '@alpinejs/intersect' // 1. Import plugin
+
+import Alpine from 'alpinejs'
+import intersect from '@alpinejs/intersect'
 
 import { createIcons, icons } from 'lucide'
 
-// Expose lucide globally so dynamic components (Alpine x-for etc) can re-render icons
-window.lucide = { createIcons: (opts = {}) => createIcons({ icons, ...opts }), icons }
+// Alpine
+window.Alpine = Alpine
+Alpine.plugin(intersect)
 
-createIcons({ icons })
-
-// Alpine components: register on `alpine:init` — Livewire injects & starts Alpine.
-// This ensures registration happens BEFORE Alpine.start() parses the DOM.
+// Alpine components
 import glintsSearchLocation from './alpine/glints-search-location.js'
 
-document.addEventListener('alpine:init', () => {
-    if (window.Alpine) {
-        window.Alpine.plugin(intersect) // 2. Register plugin di sini
-        window.Alpine.data('glintsSearchLocation', glintsSearchLocation)
-    }
-})
+Alpine.data('glintsSearchLocation', glintsSearchLocation)
+
+// Start Alpine
+Alpine.start()
+
+// Lucide
+window.lucide = {
+    createIcons: (opts = {}) => createIcons({ icons, ...opts }),
+    icons
+}
+
+createIcons({ icons })
