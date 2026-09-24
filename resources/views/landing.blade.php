@@ -4,7 +4,7 @@
 
 @section('body-class', 'w-full min-w-0 bg-[#0a0a0a] text-[#fafafa] antialiased min-h-screen flex flex-col relative overflow-x-hidden')
 
-@section('main-class', 'flex flex-1 flex-col justify-center')
+@section('main-class', 'flex flex-1 flex-col justify-center overflow-x-hidden')
 
 @section('background') <div class="absolute inset-0 overflow-hidden"> <div class="absolute inset-0 bg-gradient-to-b from-[#111827] via-[#0a0a0a] to-[#0a0a0a]"></div>
 
