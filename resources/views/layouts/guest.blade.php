@@ -139,7 +139,7 @@
 
 
 
-<div class="relative z-10 flex min-h-screen flex-col">
+<div class="relative z-10 flex min-h-screen w-full min-w-0 flex-col">
 
 
 
@@ -195,7 +195,7 @@
 
     {{-- Content --}}
 
-    <main class="@hasSection('main-class')@yield('main-class')@else flex-1 @endif">
+    <main class="w-full min-w-0 @hasSection('main-class')@yield('main-class')@else flex-1 @endif">
 
         @yield('content')
 

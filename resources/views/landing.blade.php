@@ -2,7 +2,7 @@
 
 @section('title', 'Compass — Auto Apply Kerja Buat Freshgrad')
 
-@section('body-class', 'bg-[#0a0a0a] text-[#fafafa] antialiased min-h-screen flex flex-col relative overflow-x-hidden')
+@section('body-class', 'w-full min-w-0 bg-[#0a0a0a] text-[#fafafa] antialiased min-h-screen flex flex-col relative overflow-x-hidden')
 
 @section('main-class', 'flex flex-1 flex-col justify-center')
 
